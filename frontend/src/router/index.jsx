@@ -2,22 +2,35 @@ import {
     createBrowserRouter
 } from 'react-router-dom';
 
+// layouts 
+import AuthLayout from '../layouts/AuthLayout';
+import UserLayout from '../layouts/UserLayout';
+import CompanyLayout from '../layouts/CompanyLayout';
+import AdminLayout from '../layouts/AdminLayout';
+
+// pages
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
-import UserLayout from '../layouts/UserLayout';
-import AuthLayout from '../layouts/AuthLayout';
 
+// links 
+export const LOGIN_LINK = '/login';
+export const REGISTER_LINK = '/register';
+export const USER_HOME_LINK = '/user/home';
+export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
+export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
+
+// router 
 export const router = createBrowserRouter([
     {
         element: <AuthLayout />,
         children: [
             {
-                path: '/login',
+                path: LOGIN_LINK,
                 element: <Login />
             },
             {
-                path: '/register',
+                path: REGISTER_LINK,
                 element: <Register />
             },
         ]
@@ -26,8 +39,26 @@ export const router = createBrowserRouter([
         element: <UserLayout />,
         children: [
             {
-                path: '/',
-                element: <h1>home</h1>
+                path: USER_HOME_LINK,
+                element: <h1>user home</h1>
+            }
+        ]
+    },
+    {
+        element: <CompanyLayout />,
+        children: [
+            {
+                path: COMPANY_DASHBOARD_LINK,
+                element: <h1>dashboard</h1>
+            }
+        ]
+    },
+    {
+        element: <AdminLayout />,
+        children: [
+            {
+                path: ADMIN_DASHBOARD_LINK,
+                element: <h1>hi admin</h1>
             }
         ]
     },

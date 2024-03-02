@@ -1,6 +1,10 @@
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { axiosClient } from '../../api/axios';
+import { useNavigate } from 'react-router-dom';
+import { USER_HOME_LINK } from '../../router';
+import { toast } from 'sonner'
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -8,11 +12,23 @@ const schema = yup.object().shape({
 });
 
 function Login() {
+    const navigate = useNavigate()
     const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(schema) });
-    const { errors, isSubmitting, isValid } = formState;
+    const { errors, isSubmitting } = formState;
 
-    function submit(data) {
-        console.log(data)
+    const submit = (data) => {
+        axiosClient.post('/login', data)
+            .then(() => {
+                // set user
+                // set token
+                navigate(USER_HOME_LINK)
+            })
+            .catch(({ response }) => {
+                toast.error(response.data.message);
+            })
+            .finally(() => {
+
+            });
     }
 
     return (
