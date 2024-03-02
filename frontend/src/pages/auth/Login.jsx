@@ -5,6 +5,8 @@ import { axiosClient } from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { USER_HOME_LINK } from '../../router';
 import { toast } from 'sonner'
+import { useContext } from 'react';
+import { authContext } from '../../contexts/AuthWrapper';
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -12,15 +14,18 @@ const schema = yup.object().shape({
 });
 
 function Login() {
+    const userContext = useContext(authContext);
+
     const navigate = useNavigate()
+
     const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(schema) });
     const { errors, isSubmitting } = formState;
 
     const submit = (data) => {
         axiosClient.post('/login', data)
-            .then(() => {
-                // set user
-                // set token
+            .then((response) => {
+                userContext.setUser(response.data.user)
+                localStorage.setItem('token', response.data.token)
                 navigate(USER_HOME_LINK)
             })
             .catch(({ response }) => {
