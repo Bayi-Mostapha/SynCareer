@@ -7,6 +7,8 @@ import { USER_HOME_LINK } from '../../router';
 import { toast } from 'sonner'
 import { useContext } from 'react';
 import { authContext } from '../../contexts/AuthWrapper';
+import InputGroup from '../../components/general/InputGroup';
+import PrimaryBtn from '../../components/general/PrimaryBtn';
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -39,24 +41,17 @@ function Login() {
 
     return (
         <>
-            {
-                userContext.isFetchingUser ?
-                    <p>loading...</p>
-                    :
-                    <form onSubmit={handleSubmit(submit)}>
-                        <div>
-                            <input type="text" placeholder="email" {...register('email')} />
-                            <p className='text-red-500'>{errors.email && errors.email.message}</p>
-                        </div>
-                        <div>
-                            <input type="password" placeholder="password" {...register('password')} />
-                            <p className='text-red-500'>{errors.password && errors.password.message}</p>
-                        </div>
-                        <button disabled={isSubmitting} className='px-3 py-1 bg-blue-600 text-white font-bold capitalize rounded' type="submit">
-                            login
-                        </button>
-                    </form>
-            }
+            <div className="w-full flex justify-center items-center">
+                <form className='w-96 flex flex-col gap-2' onSubmit={handleSubmit(submit)}>
+                    <InputGroup label='Email' name='email' type='text' placeholder='' register={register} />
+                    <p className='text-red-500'>{errors.email && errors.email.message}</p>
+
+                    <InputGroup label='Password' name='password' type='password' placeholder='' register={register} />
+                    <p className='text-red-500'>{errors.password && errors.password.message}</p>
+
+                    <PrimaryBtn className='mx-auto' type="submit" body="Login" disabled={isSubmitting} />
+                </form>
+            </div>
         </>
     );
 }
