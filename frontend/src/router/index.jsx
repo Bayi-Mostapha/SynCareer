@@ -13,6 +13,10 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
 
+// protectors 
+import UserRoute from './protectors/UserRoute';
+import GuestRoute from './protectors/GuestRoute';
+
 // links 
 export const LOGIN_LINK = '/login';
 export const REGISTER_LINK = '/register';
@@ -23,7 +27,7 @@ export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 // router 
 export const router = createBrowserRouter([
     {
-        element: <AuthLayout />,
+        element: <GuestRoute><AuthLayout /></GuestRoute>,
         children: [
             {
                 path: LOGIN_LINK,
@@ -36,7 +40,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <UserLayout />,
+        element: <UserRoute><UserLayout /></UserRoute>,
         children: [
             {
                 path: USER_HOME_LINK,

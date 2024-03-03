@@ -25,6 +25,7 @@ function Login() {
         axiosClient.post('/login', data)
             .then((response) => {
                 userContext.setUser(response.data.user)
+                userContext.setIsLoggedIn(true)
                 localStorage.setItem('token', response.data.token)
                 navigate(USER_HOME_LINK)
             })

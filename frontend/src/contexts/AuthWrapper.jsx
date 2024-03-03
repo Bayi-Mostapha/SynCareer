@@ -25,7 +25,7 @@ export function AuthWrapper({ children }) {
             setIsLoggedIn(false)
             setUser({})
             localStorage.removeItem('token')
-            console.log(err);
+            console.log("AuthWrapper: ", err);
         });
     }
 
