@@ -39,19 +39,24 @@ function Login() {
 
     return (
         <>
-            <form onSubmit={handleSubmit(submit)}>
-                <div>
-                    <input type="text" placeholder="email" {...register('email')} />
-                    <p className='text-red-500'>{errors.email && errors.email.message}</p>
-                </div>
-                <div>
-                    <input type="password" placeholder="password" {...register('password')} />
-                    <p className='text-red-500'>{errors.password && errors.password.message}</p>
-                </div>
-                <button disabled={isSubmitting} className='px-3 py-1 bg-blue-600 text-white font-bold capitalize rounded' type="submit">
-                    login
-                </button>
-            </form>
+            {
+                userContext.isFetchingUser ?
+                    <p>loading...</p>
+                    :
+                    <form onSubmit={handleSubmit(submit)}>
+                        <div>
+                            <input type="text" placeholder="email" {...register('email')} />
+                            <p className='text-red-500'>{errors.email && errors.email.message}</p>
+                        </div>
+                        <div>
+                            <input type="password" placeholder="password" {...register('password')} />
+                            <p className='text-red-500'>{errors.password && errors.password.message}</p>
+                        </div>
+                        <button disabled={isSubmitting} className='px-3 py-1 bg-blue-600 text-white font-bold capitalize rounded' type="submit">
+                            login
+                        </button>
+                    </form>
+            }
         </>
     );
 }

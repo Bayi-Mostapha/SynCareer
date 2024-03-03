@@ -2,6 +2,8 @@ import { createContext, useEffect, useState } from "react";
 import { axiosClient } from "../api/axios";
 
 export const authContext = createContext({
+    isFetchingUser: false,
+    setIsFetchingUser: () => { },
     user: {},
     setUser: () => { },
     logout: () => { },
@@ -10,6 +12,7 @@ export const authContext = createContext({
 })
 
 export function AuthWrapper({ children }) {
+    const [isFetchingUser, setIsFetchingUser] = useState(false)
     const [user, setUser] = useState({})
     const [isLoggedIn, setIsLoggedIn] = useState(false)
 
@@ -18,6 +21,7 @@ export function AuthWrapper({ children }) {
     }, [])
 
     const getUser = async () => {
+        setIsFetchingUser(true)
         await axiosClient.get('/user').then(userResponse => {
             setIsLoggedIn(true)
             setUser(userResponse.data)
@@ -26,6 +30,8 @@ export function AuthWrapper({ children }) {
             setUser({})
             localStorage.removeItem('token')
             console.log("AuthWrapper: ", err);
+        }).finally(() => {
+            setIsFetchingUser(false)
         });
     }
 
@@ -38,7 +44,7 @@ export function AuthWrapper({ children }) {
 
     return <>
         <authContext.Provider value={{
-            user, setUser, logout, isLoggedIn, setIsLoggedIn
+            isFetchingUser, setIsFetchingUser, user, setUser, logout, isLoggedIn, setIsLoggedIn
         }}>
             {children}
         </authContext.Provider>
