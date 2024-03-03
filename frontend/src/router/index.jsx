@@ -10,8 +10,7 @@ import AdminLayout from '../layouts/AdminLayout';
 
 // pages
 import Login from '../pages/auth/Login';
-import UserRegister from '../pages/auth/UserRegister';
-import CompanyRegister from '../pages/auth/CompanyRegister';
+import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
 
 // protectors 
@@ -22,8 +21,7 @@ import AdminRoute from './protectors/AdminRoute';
 
 // links 
 export const LOGIN_LINK = '/login';
-export const USER_REGISTER_LINK = '/user/register';
-export const COMPANY_REGISTER_LINK = '/company/register';
+export const REGISTER_LINK = '/register';
 export const USER_HOME_LINK = '/user/home';
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
@@ -38,11 +36,8 @@ export const router = createBrowserRouter([
                 element: <Login />
             },
             {
-                path: USER_REGISTER_LINK,
-                element: <UserRegister />
-            },{
-                path: COMPANY_REGISTER_LINK,
-                element: <CompanyRegister />
+                path: REGISTER_LINK,
+                element: <Register />
             },
         ]
     },
