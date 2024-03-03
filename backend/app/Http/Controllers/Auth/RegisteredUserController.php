@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -18,13 +19,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
+        $type = $request->validate([
+            'type' => 'required|string|in:user,company' 
+        ])['type'];
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:' . ($type === 'user' ? 'users' : 'companies'),
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
+        $model = $type === 'user' ? User::class : Company::class;
+        $user = $model::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
@@ -32,6 +38,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return response()->json(['message' => 'acount created successfully']);
+        return response()->json(['message' => 'Account created successfully']);
     }
 }

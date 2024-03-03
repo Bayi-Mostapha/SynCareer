@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { authContext } from "../../contexts/AuthWrapper";
 import { useNavigate } from "react-router-dom";
 
-import { LOGIN_LINK } from "..";
+import { LOGIN_LINK} from "..";
 import { goHome } from './goHome'
 
 export default function AdminRoute({ children }) {
