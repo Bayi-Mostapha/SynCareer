@@ -14,8 +14,10 @@ import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
 
 // protectors 
-import UserRoute from './protectors/UserRoute';
 import GuestRoute from './protectors/GuestRoute';
+import UserRoute from './protectors/UserRoute';
+import CompanyRoute from './protectors/CompanyRoute';
+import AdminRoute from './protectors/AdminRoute';
 
 // links 
 export const LOGIN_LINK = '/login';
@@ -49,7 +51,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <CompanyLayout />,
+        element: <CompanyRoute><CompanyLayout /></CompanyRoute>,
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
@@ -58,7 +60,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AdminLayout />,
+        element: <AdminRoute><AdminLayout /></AdminRoute>,
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,

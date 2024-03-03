@@ -37,9 +37,9 @@ export function AuthWrapper({ children }) {
 
     const logout = async () => {
         await axiosClient.post('/logout');
-        localStorage.removeItem('token')
-        setIsLoggedIn(false)
-        setUser({})
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setUser({});
     }
 
     return <>

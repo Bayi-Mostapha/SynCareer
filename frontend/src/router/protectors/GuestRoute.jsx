@@ -1,16 +1,32 @@
 import { useContext, useEffect } from "react";
 import { authContext } from "../../contexts/AuthWrapper";
 import { useNavigate } from "react-router-dom";
-import { USER_HOME_LINK } from "..";
+import { ADMIN_DASHBOARD_LINK, COMPANY_DASHBOARD_LINK, LOGIN_LINK, USER_HOME_LINK } from "..";
 
 export default function GuestRoute({ children }) {
-    const { isLoggedIn } = useContext(authContext);
+    const { isLoggedIn, user, logout } = useContext(authContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (isLoggedIn) {
-            //switch on user role
-            navigate(USER_HOME_LINK);
+            // switch (user.type) {
+            //     case 'user':
+            //         navigate(USER_HOME_LINK);
+            //         break;
+            //     case 'company':
+            //         navigate(COMPANY_DASHBOARD_LINK);
+            //         break;
+            //     case 'admin':
+            //         navigate(ADMIN_DASHBOARD_LINK);
+            //         break;
+            //     case 'super-admin':
+            //         navigate(ADMIN_DASHBOARD_LINK);
+            //         break;
+            //     default:
+            //         logout()
+            //         navigate(LOGIN_LINK);
+            //         break;
+            // }
         }
     }, [isLoggedIn, navigate]);
 
