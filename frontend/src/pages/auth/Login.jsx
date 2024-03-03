@@ -24,7 +24,7 @@ function Login() {
     const submit = (data) => {
         axiosClient.post('/login', data)
             .then((response) => {
-                userContext.setUser(response.data.user)
+                userContext.setUser({ ...response.data.user, type: response.data.type });
                 userContext.setIsLoggedIn(true)
                 localStorage.setItem('token', response.data.token)
                 navigate(USER_HOME_LINK)

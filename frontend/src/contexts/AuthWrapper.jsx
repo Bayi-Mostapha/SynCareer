@@ -20,16 +20,17 @@ export function AuthWrapper({ children }) {
         getUser()
     }, [])
 
-    const getUser = async () => {
+    const getUser = () => {
         setIsFetchingUser(true)
-        await axiosClient.get('/user').then(userResponse => {
+        axiosClient.get('/user').then(userResponse => {
             setIsLoggedIn(true)
-            setUser(userResponse.data)
+            const newUser = { ...userResponse.data.user, type: userResponse.data.type };
+            setUser(newUser);
         }).catch(err => {
             setIsLoggedIn(false)
             setUser({})
             localStorage.removeItem('token')
-            console.log("AuthWrapper: ", err);
+            console.error("AuthWrapper: ", err);
         }).finally(() => {
             setIsFetchingUser(false)
         });

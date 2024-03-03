@@ -26,7 +26,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.store');
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
+Route::group(['middleware' => 'auth:sanctum'], function () { //,admin,company
     Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
@@ -39,6 +39,21 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         ->name('logout');
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        $user = $request->user();
+
+        if ($user->tokenCan('user')) {
+            $type = 'user';
+        } elseif ($user->tokenCan('company')) {
+            $type = 'company';
+        } elseif ($user->tokenCan('admin')) {
+            $type = 'admin';
+        } else {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return response()->json([
+            'user' => $user,
+            'type' => $type,
+        ]);
     });
 });
