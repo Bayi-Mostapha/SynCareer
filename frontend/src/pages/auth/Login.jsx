@@ -8,7 +8,9 @@ import { toast } from 'sonner'
 import { useContext } from 'react';
 import { authContext } from '../../contexts/AuthWrapper';
 import InputGroup from '../../components/general/InputGroup';
-import PrimaryBtn from '../../components/general/PrimaryBtn';
+import { Button } from '@/components/ui/button';
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -43,13 +45,15 @@ function Login() {
         <>
             <div className="w-full flex justify-center items-center">
                 <form className='w-96 flex flex-col gap-2' onSubmit={handleSubmit(submit)}>
-                    <InputGroup label='Email' name='email' type='text' placeholder='' register={register} />
+                    <Label htmlFor='email'>Your email address: </Label>
+                    <Input id='email' type='text' name='email' register={register} />
                     <p className='text-red-500'>{errors.email && errors.email.message}</p>
 
-                    <InputGroup label='Password' name='password' type='password' placeholder='' register={register} />
+                    <Label htmlFor='password'>Your password: </Label>
+                    <Input id='password' type='password' name='password' register={register} />
                     <p className='text-red-500'>{errors.password && errors.password.message}</p>
 
-                    <PrimaryBtn className='mx-auto' type="submit" body="Login" disabled={isSubmitting} />
+                    <Button disabled={isSubmitting} variant='default' className='w-fit mx-auto' type="submit">Login</Button>
                 </form>
             </div>
         </>
