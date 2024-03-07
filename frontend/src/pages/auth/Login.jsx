@@ -7,7 +7,6 @@ import { USER_HOME_LINK } from '../../router';
 import { toast } from 'sonner'
 import { useContext } from 'react';
 import { authContext } from '../../contexts/AuthWrapper';
-import InputGroup from '../../components/general/InputGroup';
 import { Button } from '@/components/ui/button';
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"

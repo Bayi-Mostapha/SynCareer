@@ -18,8 +18,10 @@
     --primary: 219 100% 47%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 96.1%;
+    --secondary: 	198 100% 87%;
     --secondary-foreground: 0 0% 9%;
+
+    --secondary2: 	222 83% 98%;
 
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
@@ -76,5 +78,9 @@
 
   body {
     @apply bg-bbackground text-foreground;
+  }
+
+  .side-nav .active{
+    @apply bg-secondary2 text-primary;
   }
 }
