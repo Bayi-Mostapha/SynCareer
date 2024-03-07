@@ -32,14 +32,16 @@ function TopNav() {
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        if (window.innerWidth > 768) {
+        const breakpoint = 1024
+
+        if (window.innerWidth > breakpoint) {
             setOpen(false);
         } else {
             setOpen(true);
         }
 
         const handleResize = () => {
-            if (window.innerWidth > 768) {
+            if (window.innerWidth > breakpoint) {
                 setOpen(false);
             } else {
                 setOpen(true);
@@ -53,9 +55,9 @@ function TopNav() {
         };
     }, [])
     return (
-        <nav className="w-full px-6 py-3 md:py-0 flex items-center  bg-background">
+        <nav className="fixed top-0 left-0 right-0 px-6 py-3 lg:py-0 flex items-center  bg-background">
             <h1 className="py-2 text-xl text-primary font-semibold">SynCareer</h1>
-            <ul className="pt-3 ml-20 hidden md:flex gap-5">
+            <ul className="pt-3 ml-20 hidden lg:flex gap-4">
                 <li>
                     <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
                         Home
@@ -79,7 +81,7 @@ function TopNav() {
             </ul>
 
             <DropdownMenu>
-                <DropdownMenuTrigger className='ml-auto hidden md:block'>
+                <DropdownMenuTrigger className='ml-auto hidden lg:block'>
                     <div className="py-4 flex gap-3">
                         <Avatar>
                             <AvatarImage src="https://github.com/shadcn.png" />
@@ -93,7 +95,7 @@ function TopNav() {
                         </div>
                     </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=' hidden md:block'>
+                <DropdownMenuContent className=' hidden lg:block'>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
@@ -106,7 +108,7 @@ function TopNav() {
             </DropdownMenu>
 
             <Sheet>
-                <SheetTrigger className="ml-auto md:hidden">
+                <SheetTrigger className="ml-auto lg:hidden">
                     <IoIosMenu className="text-2xl" />
                 </SheetTrigger>
                 {
@@ -130,7 +132,7 @@ function TopNav() {
 
                             <Separator />
 
-                            <DropdownMenuContent className="md:hidden block">
+                            <DropdownMenuContent className="lg:hidden block">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
