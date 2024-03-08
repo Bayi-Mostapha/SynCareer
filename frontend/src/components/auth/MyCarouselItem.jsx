@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/carousel"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-function MyCarouselItem({key, text, image, name, position, nStarts }) {
+function MyCarouselItem({ text, image, name, position, nStarts }) {
     return (
-        <CarouselItem key={key}>
+        <CarouselItem>
             <div className="p-5 bg-[#004CDF] text-background rounded-xl">
                 <p className="text-xs mb-3">{text}</p>
                 <div className="flex items-center gap-2">

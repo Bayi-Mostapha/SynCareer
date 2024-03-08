@@ -21,6 +21,10 @@ export function AuthWrapper({ children }) {
     }, [])
 
     const getUser = () => {
+        if (localStorage.getItem('token') == null) {
+            return;
+        }
+
         setIsFetchingUser(true)
         axiosClient.get('/user').then(userResponse => {
             setIsLoggedIn(true)
@@ -30,7 +34,7 @@ export function AuthWrapper({ children }) {
             setIsLoggedIn(false)
             setUser({})
             localStorage.removeItem('token')
-            console.error("AuthWrapper: ", err);
+            console.error("error from AuthWrapper: ", err);
         }).finally(() => {
             setIsFetchingUser(false)
         });

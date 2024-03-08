@@ -35,7 +35,7 @@ function MyCarousel({ testimonials }) {
             >
                 <CarouselContent>
                     {testimonials.map((item, index) => (
-                        <MyCarouselItem key={index} {...item} />
+                        <MyCarouselItem {...item} />
                     ))}
                 </CarouselContent>
             </Carousel>
