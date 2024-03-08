@@ -53,7 +53,7 @@ function Side() {
                                 </Avatar>
                                 <div>
                                     <p>Mostapha</p>
-                                    <p className="text-xs text-[#DAEAFF]">senior full stack engineer</p>
+                                    <p className="text-xs text-[#DAEAFF] uppercase">full stack engineer</p>
                                 </div>
                                 <div className="flex gap-1 text-xs text-[#E8FF1D]">
                                     <FaStar />

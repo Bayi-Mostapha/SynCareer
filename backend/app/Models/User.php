@@ -3,10 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Report;
+use App\Models\JobOffer;
+use App\Models\UserEducation;
+use App\Models\UserExperience;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -18,9 +22,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'birthday',
         'email',
         'password',
+        'picture',
+        'bio',
     ];
 
     /**
@@ -42,4 +51,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function experiences()
+    {
+        return $this->hasMany(UserExperience::class);
+    }
+
+    public function educations()
+    {
+        return $this->hasMany(UserEducation::class);
+    }
+
+    public function savedOffers()
+    {
+        return $this->belongsToMany(JobOffer::class, 'user_saved_offers', 'user_id', 'offer_id')
+            ->withTimestamps();
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }
