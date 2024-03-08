@@ -4,9 +4,10 @@ docs :)
 ### CRUD using eloquent relashionships
 
 - **how to insert a new candidate for a job offer:**
+
 `$jobOffer->candidats()->attach($user, ['matching_percentage' => $x]);`
 
-==user== and ==jobOffer== are eloquent models, so get your user using a user_id `User::find($user_id)` or the current user `$user = $request->user();`, and your jobOffer using an offer_id `JobOffer::find($offer_id)`, leave x as a 0 for now
+$user and $jobOffer are eloquent models, so get your user using a user_id `User::find($user_id)` or the current user `$user = $request->user();`, and your jobOffer using an offer_id `JobOffer::find($offer_id)`, leave x as a 0 for now
 
 - **how to remove an apply**
 `$jobOffer->candidats()->detach($user);`
