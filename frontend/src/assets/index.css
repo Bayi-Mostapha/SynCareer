@@ -79,7 +79,7 @@
   }
 
   body {
-    @apply bg-bbackground text-foreground;
+    @apply bg-background text-foreground;
   }
 
   .side-nav .active {
