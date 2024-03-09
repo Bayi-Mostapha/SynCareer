@@ -31,7 +31,7 @@ class RegisteredUserController extends Controller
                 'last_name' => 'required|string|max:255',
                 'job_title' => 'nullable|string|max:255',
                 'email' => 'required|email|unique:users',
-                'password' => 'required|string|min:8|confirmed',
+                'password' => 'required|string|min:8',
             ]);
 
             $user = User::create([
@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
                 'last_name' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:companies',
-                'password' => 'required|string|min:8|confirmed',
+                'password' => 'required|string|min:8',
                 'country' => 'required|string|max:255',
                 'city' => 'nullable|string|max:255',
                 'industry' => 'nullable|string|max:255',

@@ -35,13 +35,13 @@ function MyCarousel({ testimonials }) {
             >
                 <CarouselContent>
                     {testimonials.map((item, index) => (
-                        <MyCarouselItem {...item} />
+                        <MyCarouselItem key={index} {...item} />
                     ))}
                 </CarouselContent>
             </Carousel>
             <div className="py-3 flex items-center justify-center gap-1">
                 {[...Array(testimonials.length)].map((_, index) => (
-                    <div className={`h-1.5 w-1.5 rounded-full ${current === index ? 'bg-background' : 'bg-primary border border-background'}`}></div>
+                    <div key={index} className={`h-1.5 w-1.5 rounded-full ${current === index ? 'bg-background' : 'bg-primary border border-background'}`}></div>
                 ))}
             </div>
         </>
