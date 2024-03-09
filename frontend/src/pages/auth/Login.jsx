@@ -52,63 +52,61 @@ function Login() {
     }
 
     return (
-        <div className="w-full flex justify-center items-center">
-            <div className="w-fit h-fit">
-                <h2 className='text-center text-2xl font-semibold'>Welcome back</h2>
-                <p className='text-center mb-8 text-sm text-gray-700'>Enter your account details below</p>
-                <Form {...form}>
-                    <form className='w-96 flex flex-col gap-2' onSubmit={handleSubmit(submit)}>
-                        <FormField
-                            control={control}
-                            name="email"
-                            render={({ field }) => {
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input type='text' placeholder='Example@gmail.com' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )
-                            }}
-                        />
-                        <FormField
-                            control={control}
-                            name="password"
-                            render={({ field }) => {
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <PasswordInput className="pr-10" placeholder="Your password" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )
-                            }}
-                        />
+        <div className="w-full flex flex-col justify-center items-center">
+            <h2 className='text-center text-2xl font-semibold'>Welcome back</h2>
+            <p className='text-center mb-8 text-sm text-gray-700'>Enter your account details below</p>
+            <Form {...form}>
+                <form className='w-full sm:w-96 px-10 sm:p-0 flex flex-col gap-2' onSubmit={handleSubmit(submit)}>
+                    <FormField
+                        control={control}
+                        name="email"
+                        render={({ field }) => {
+                            return (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input type='text' placeholder='Example@gmail.com' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )
+                        }}
+                    />
+                    <FormField
+                        control={control}
+                        name="password"
+                        render={({ field }) => {
+                            return (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <PasswordInput className="pr-10" placeholder="Your password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )
+                        }}
+                    />
 
-                        <div className="flex justify-between items-center">
-                            <div className='flex items-center gap-2'>
-                                <Checkbox id="remember" />
-                                <Label htmlFor="remember">
-                                    Remember me
-                                </Label>
-                            </div>
-                            <Link to='' className='text-primary text-sm font-medium'>Forgot passsword</Link>
+                    <div className="mt-1 flex flex-col min-[375px]:flex-row justify-between items-start min-[375px]:items-center gap-1">
+                        <div className='flex items-center gap-2'>
+                            <Checkbox id="remember" />
+                            <Label htmlFor="remember">
+                                Remember me
+                            </Label>
                         </div>
+                        <Link to='' className='text-primary text-sm font-medium'>Forgot passsword?</Link>
+                    </div>
 
-                        <Button disabled={isSubmitting || !isValid} variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>
-                            Login
-                            <FaArrowRight />
-                        </Button>
-                    </form>
-                </Form>
-                <div className='mt-8 flex justify-center items-center gap-2'>
-                    <p className='text-center text-gray-700'>Don't have an account?</p>
-                    <Link to={REGISTER_LINK} className='text-primary font-medium'>Register</Link>
-                </div>
+                    <Button disabled={isSubmitting || !isValid} variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>
+                        Login
+                        <FaArrowRight />
+                    </Button>
+                </form>
+            </Form>
+            <div className='mt-8 flex justify-center items-center gap-2'>
+                <p className='text-center text-gray-700'>Don't have an account?</p>
+                <Link to={REGISTER_LINK} className='text-primary font-medium'>Register</Link>
             </div>
         </div>
     );

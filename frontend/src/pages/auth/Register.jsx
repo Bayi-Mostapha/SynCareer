@@ -27,18 +27,21 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { industries } from '@/api/industries';
 import PasswordInput from '@/components/general/password-input';
+import Stepper from '@/components/auth/Stepper';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const schema = yup.object().shape({
     // section 1
-    type: yup.string().required(),
+    type: yup.string().required().oneOf(['user', 'company']),
 
     // section 2
-    first_name: yup.string().required(),
-    last_name: yup.string().required(),
+    first_name: yup.string().required("First name is required"),
+    last_name: yup.string().required("Last name is required"),
     email: yup.string().email().required(),
     password: yup.string().min(8).required(),
 
     // section 3
+    terms: yup.boolean().oneOf([true], 'You must accept the terms and conditions').required('Terms and conditions are required'),
     // user 
     job_title: yup.string(),
     // company 
@@ -80,10 +83,11 @@ function Register() {
             country: '',
             city: '',
 
+            terms: false,
         },
     });
-    const { register, control, setError, handleSubmit, formState, trigger, watch } = form;
-    const { errors } = formState;
+    const { register, control, handleSubmit, formState, trigger, watch } = form;
+    const { errors, isValid, isSubmitting } = formState;
     const formData = watch();
 
     useEffect(() => {
@@ -94,29 +98,17 @@ function Register() {
         }
     }, [formStep, formData.type])
 
-    const submit = (formData) => {
-        axiosClient.post('/register', formData)
-            .then(({ data }) => {
-                toast.success(data.message)
-                navigate(LOGIN_LINK)
-            })
-            .catch(({ response }) => {
-                const responseErrors = response.data.errors;
-                Object.keys(responseErrors).forEach(key => {
-                    setError(key, { message: responseErrors[key].join(' ') });
-                    if (key === 'type') {
-                        setFormStep(0);
-                    } else if (key === 'first_name' || key === 'last_name' || key === 'email' || key === 'password') {
-                        setFormStep(1);
-                    } else {
-                        setFormStep(2);
-                    }
-                });
-            })
-            .finally(() => {
+    const submit = async (formData) => {
+        try {
+            const { data } = await axiosClient.post('/register', formData);
+            toast.success(data.message);
+            navigate(LOGIN_LINK);
+        } catch (error) {
+            toast.error(error.response.data.message);
+            setFormStep(0);
+        }
+    };
 
-            });
-    }
 
     const getSectionValidity = (step) => {
         switch (step) {
@@ -131,8 +123,7 @@ function Register() {
         }
     };
 
-    const goToNext = (e) => {
-        e.preventDefault();
+    const goToNext = () => {
         if (getSectionValidity(formStep)) {
             setFormStep(prev => {
                 if (prev > 2)
@@ -142,8 +133,7 @@ function Register() {
         }
     };
 
-    const goToPrev = (e) => {
-        e.preventDefault();
+    const goToPrev = () => {
         setFormStep((prev) => {
             if (prev <= 0) return prev;
             return prev - 1;
@@ -163,23 +153,24 @@ function Register() {
         <div className="w-full h-screen flex justify-center items-center">
             <Form {...form}>
                 <form className='px-8 sm:p-0 flex flex-col justify-around w-full sm:w-[450px] h-full'>
+                    <Stepper formStep={formStep} />
                     {formStep === 0 && (
                         <section>
                             <h2 className='mb-3 font-semibold text-2xl'>Let's get started</h2>
                             <p className='mb-14 text-gray-500 text-sm'>Have an account? <Link to={LOGIN_LINK} className='text-primary'>Login</Link></p>
 
-                            <div className="flex gap-3">
-                                <div className={`flex-1 py-10 px-6 border rounded-lg ${watch('type') === 'user' ? 'bg-[#F4F7FE] border-primary' : 'bg-white border-gray-400'}`}>
+                            <div className="flex flex-col min-[450px]:flex-row gap-3">
+                                <div className={`flex-1 py-5 sm:py-10 sm:px-6 px-3 border rounded-lg ${watch('type') === 'user' ? 'bg-[#F4F7FE] border-primary' : 'bg-white border-gray-400'}`}>
                                     <input id="user" type="radio" {...register('type')} value="user" />
-                                    <label htmlFor="user" className={`text-sm ${watch('type') === 'user' ? 'text-primary' : 'text-black'}`}> I’m a candidate,<br /> looking for work</label>
+                                    <label htmlFor="user" className={`text-sm ${watch('type') === 'user' ? 'text-primary' : 'text-black'}`}> I’m a candidate, looking for work</label>
                                 </div>
 
-                                <div className={`flex-1 py-10 px-6 border rounded-lg ${watch('type') === 'company' ? 'bg-[#F4F7FE] border-primary' : 'bg-white border-gray-400'}`}>
+                                <div className={`flex-1 py-5 sm:py-10 sm:px-6 px-3 border rounded-lg ${watch('type') === 'company' ? 'bg-[#F4F7FE] border-primary' : 'bg-white border-gray-400'}`}>
                                     <input id="company" type="radio" {...register('type')} value="company" />
-                                    <label htmlFor="company" className={`text-sm ${watch('type') === 'company' ? 'text-primary' : 'text-black'}`}> I’m a recruiter,<br /> hiring for a position</label>
+                                    <label htmlFor="company" className={`text-sm ${watch('type') === 'company' ? 'text-primary' : 'text-black'}`}> I’m a recruiter, hiring for a position</label>
                                 </div>
                             </div>
-                            <p className="mt-1 text-red-500 text-sm">{errors.type && errors.type.message}</p>
+                            <p className="mt-1 text-destructive text-sm">{errors.type && errors.type.message}</p>
                         </section>
                     )
                     }
@@ -187,13 +178,13 @@ function Register() {
                     {
                         formStep === 1 && (
                             <section>
-                                <div className="flex gap-2">
+                                <div className="w-full flex flex-col min-[500px]:flex-row gap-2">
                                     <FormField
                                         control={control}
                                         name="first_name"
                                         render={({ field }) => {
                                             return (
-                                                <FormItem>
+                                                <FormItem className="block w-full">
                                                     <FormLabel>First name</FormLabel>
                                                     <FormControl>
                                                         <Input type='text' {...field} />
@@ -208,7 +199,7 @@ function Register() {
                                         name="last_name"
                                         render={({ field }) => {
                                             return (
-                                                <FormItem>
+                                                <FormItem className="block w-full">
                                                     <FormLabel>Last name</FormLabel>
                                                     <FormControl>
                                                         <Input type='text' {...field} />
@@ -234,6 +225,7 @@ function Register() {
                                         )
                                     }}
                                 />
+
                                 <FormField
                                     control={control}
                                     name="password"
@@ -255,163 +247,184 @@ function Register() {
 
                     {
                         formStep === 2 &&
-                        (
-                            formData.type === 'user' ?
-                                <section>
-                                    <FormField
-                                        control={control}
-                                        name="job_title"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Job title</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                </section>
-                                :
-                                <section>
-                                    <FormField
-                                        control={control}
-                                        name="name"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Company name</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-
-                                    <FormField
-                                        control={control}
-                                        name="size"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Company size</FormLabel>
-                                                    <Select onValueChange={field.onChange}>
+                        <section>
+                            {
+                                formData.type === 'user' ?
+                                    <>
+                                        <FormField
+                                            control={control}
+                                            name="job_title"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>Job title</FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger className="p-5">
-                                                                <SelectValue placeholder="select a size" />
-                                                            </SelectTrigger>
-
+                                                            <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="1-9">1 to 9 employees</SelectItem>
-                                                            <SelectItem value="10-49">10 to 49 employees</SelectItem>
-                                                            <SelectItem value="50-249">50 to 249 employees</SelectItem>
-                                                            <SelectItem value="250+">More than 250 employees</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-
-                                    <FormField
-                                        control={control}
-                                        name="industry"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Industry</FormLabel>
-                                                    <Select onValueChange={field.onChange}>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    </>
+                                    :
+                                    <>
+                                        <FormField
+                                            control={control}
+                                            name="name"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>Company name</FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger className="p-5">
-                                                                <SelectValue placeholder="select an industry" />
-                                                            </SelectTrigger>
-
+                                                            <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <SelectContent className="h-52">
-                                                            {industries.map(industry => {
-                                                                return <SelectItem key={industry} value={industry}>{industry}</SelectItem>
-                                                            })}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
 
-                                    <FormField
-                                        control={control}
-                                        name="country"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Country</FormLabel>
-                                                    <Select onValueChange={field.onChange}>
+                                        <FormField
+                                            control={control}
+                                            name="size"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>Company size</FormLabel>
+                                                        <Select onValueChange={field.onChange}>
+                                                            <FormControl>
+                                                                <SelectTrigger className="p-5">
+                                                                    <SelectValue placeholder="select a size" />
+                                                                </SelectTrigger>
+
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="1-9">1 to 9 employees</SelectItem>
+                                                                <SelectItem value="10-49">10 to 49 employees</SelectItem>
+                                                                <SelectItem value="50-249">50 to 249 employees</SelectItem>
+                                                                <SelectItem value="250+">More than 250 employees</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="industry"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>Industry</FormLabel>
+                                                        <Select onValueChange={field.onChange}>
+                                                            <FormControl>
+                                                                <SelectTrigger className="p-5">
+                                                                    <SelectValue placeholder="select an industry" />
+                                                                </SelectTrigger>
+
+                                                            </FormControl>
+                                                            <SelectContent className="h-52">
+                                                                {industries.map(industry => {
+                                                                    return <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                                                                })}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="country"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>Country</FormLabel>
+                                                        <Select onValueChange={field.onChange}>
+                                                            <FormControl>
+                                                                <SelectTrigger className="p-5">
+                                                                    <SelectValue placeholder="select a country" />
+                                                                </SelectTrigger>
+
+                                                            </FormControl>
+                                                            <SelectContent className="h-52">
+                                                                {countries.map(country => {
+                                                                    return <SelectItem key={country.Iso3} value={country.Iso3}>{country.name}</SelectItem>
+                                                                })}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+
+                                        <FormField
+                                            control={control}
+                                            name="city"
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>City</FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger className="p-5">
-                                                                <SelectValue placeholder="select a country" />
-                                                            </SelectTrigger>
-
+                                                            <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <SelectContent className="h-52">
-                                                            {countries.map(country => {
-                                                                return <SelectItem key={country.Iso3} value={country.Iso3}>{country.name}</SelectItem>
-                                                            })}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-
-                                    <FormField
-                                        control={control}
-                                        name="city"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>City</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                </section>
-                        )
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    </>
+                            }
+                            <FormField
+                                control={form.control}
+                                name="terms"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <div className="mt-4 flex items-center gap-2">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <FormLabel className="text-sm text-gray-500">
+                                                I agree with SynCareer’s User Agreement and Privacy Policy.
+                                            </FormLabel>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </section>
                     }
 
                     {/* buttons  */}
-
                     <div className="flex gap-4">
 
                         {
                             formStep > 0 && (
-                                <Button type="button" variant="ghost" onClick={goToPrev}>Back</Button>
+                                <Button className="p-5" type="button" variant="ghost" onClick={goToPrev}>Back</Button>
                             )
                         }
                         {
                             formStep === 0 && (
-                                <Button className="w-full" type="button" variant="default" disabled={!getSectionValidity(formStep)} onClick={goToNext}>Get started <FaArrowRight className='ml-2' /></Button>
+                                <Button className="py-5 w-full font-normal uppercase" type="button" variant="default" disabled={!getSectionValidity(formStep)} onClick={goToNext}>Get started <FaArrowRight className='ml-2' /></Button>
                             )
                         }
                         {
                             formStep === 1 && (
-                                <Button type="button" variant="default" disabled={!getSectionValidity(formStep)} onClick={goToNext}>Next Step</Button>
+                                <Button className="p-5" type="button" variant="default" disabled={!getSectionValidity(formStep)} onClick={goToNext}>Next Step</Button>
                             )
                         }
                         {
                             formStep === 2 && (
-                                <Button type="submit" variant="default" disabled={!getSectionValidity(formStep)} onClick={handleSubmit(submit)}>Create Account</Button>
+                                <Button className="p-5" type="submit" variant="default" disabled={!isValid || isSubmitting} onClick={handleSubmit(submit)}>Create Account</Button>
                             )
                         }
                     </div>
