@@ -29,7 +29,8 @@ function Login() {
 
     const navigate = useNavigate()
 
-    const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(schema) });
+    const form = useForm({ resolver: yupResolver(schema) });
+    const { register, handleSubmit, formState } = form;
     const { errors, isSubmitting } = formState;
 
     const submit = (data) => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 // api 
 import { axiosClient } from '../../api/axios';
 // form 
-import { useForm } from 'react-hook-form';
+import { useForm, useController } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 // routing 
@@ -50,7 +50,6 @@ const schema = yup.object().shape({
         return this.parent.type === 'company' ? (value !== '') : true;
     }),
     city: yup.string(),
-
 });
 
 function Register() {
@@ -59,7 +58,7 @@ function Register() {
     const [formStep, setFormStep] = useState(0);
     const [countries, setCountries] = useState([]);
 
-    const { register, setError, handleSubmit, formState, trigger, watch } = useForm({
+    const { register, control, setError, handleSubmit, formState, trigger, watch } = useForm({
         mode: 'all',
         resolver: yupResolver(schema),
         defaultValues: {
@@ -85,6 +84,12 @@ function Register() {
     });
     const { errors } = formState;
     const formData = watch();
+
+    const { field } = useController({ name: 'country', control })
+
+    function handleSelectChange(option) {
+        field.onChange(option)
+    }
 
     useEffect(() => {
         trigger();
@@ -154,11 +159,8 @@ function Register() {
         try {
             const response = await axios.get("https://restcountries.com/v3.1/all");
             setCountries(response.data.sort((a, b) => {
-                const aName = a.name.common;
-                const bName = b.name.common;
-                return (aName < bName) ? -1 : (aName > bName) ? 1 : 0;
+                return a.name.common.localeCompare(b.name.common);
             }));
-            console.log(countries)
         } catch (error) {
             console.error(error);
         }
@@ -239,24 +241,23 @@ function Register() {
                                     <p className="text-red-500">{errors.industry && errors.industry.message}</p>
                                 </div>
 
+                                {JSON.stringify(watch('country'))}
                                 <div>
                                     {/* <select {...register('country')}>
                                         {countries.map((country, index) => (
                                             <option key={index} value={country.cioc}>{country.name.common}</option>
                                         ))}
                                     </select> */}
-                                    {/* <Select register={register} name="country">
+                                    <Select value={field.value} onValueChange={handleSelectChange}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="select a country" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectGroup>
-                                                {countries.map((country, index) => {
-                                                    <SelectItem key={index} value={country.cioc}>{country.name.common}</SelectItem>
-                                                })}
-                                            </SelectGroup>
+                                            {countries.map((country, index) => {
+                                                return <SelectItem key={index} value={country.name.common}>{country.name.common}</SelectItem>
+                                            })}
                                         </SelectContent>
-                                    </Select> */}
+                                    </Select>
 
                                     <p className="text-red-500">{errors.country && errors.country.message}</p>
                                 </div>
