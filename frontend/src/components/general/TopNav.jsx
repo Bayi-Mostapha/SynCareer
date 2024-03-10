@@ -30,7 +30,7 @@ function TopNav() {
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div className="hidden sm:flex flex-col items-start">
-                            {userContext.user.name}
+                            {userContext.user.first_name}
                             <span className="text-gray-500 text-sm">
                                 {userContext.user.email}
                             </span>
@@ -41,7 +41,7 @@ function TopNav() {
                     <DropdownMenuLabel>
                         <h2 className="hidden sm:block">My account</h2>
                         <div className="sm:hidden flex flex-col items-start">
-                            {userContext.user.name}
+                            {userContext.user.first_name}
                             <span className="font-light text-gray-400 text-xs">
                                 {userContext.user.email}
                             </span>

@@ -20,10 +20,15 @@ import CompanyRoute from './protectors/CompanyRoute';
 import AdminRoute from './protectors/AdminRoute';
 
 // links 
+// auth 
 export const LOGIN_LINK = '/login';
 export const REGISTER_LINK = '/register';
+// user 
 export const USER_HOME_LINK = '/user/home';
+export const USER_RESUMES_LINK = '/user/resumes';
+// company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
+// dashboard 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
 // router 
@@ -47,7 +52,11 @@ export const router = createBrowserRouter([
             {
                 path: USER_HOME_LINK,
                 element: <h1>user home</h1>
-            }
+            },
+            {
+                path: USER_RESUMES_LINK,
+                element: <h1>hi from user resumes</h1>
+            },
         ]
     },
     {
@@ -56,7 +65,7 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_DASHBOARD_LINK,
                 element: <h1>dashboard</h1>
-            }
+            },
         ]
     },
     {
@@ -65,7 +74,7 @@ export const router = createBrowserRouter([
             {
                 path: ADMIN_DASHBOARD_LINK,
                 element: <h1>hi admin</h1>
-            }
+            },
         ]
     },
     {

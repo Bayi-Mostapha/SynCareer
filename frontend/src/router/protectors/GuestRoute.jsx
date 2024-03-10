@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { goHome } from './goHome'
 
 export default function GuestRoute({ children }) {
-    const { isLoggedIn, user } = useContext(authContext);
+    const { isLoggedIn, user, currLocation } = useContext(authContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (isLoggedIn) {
-            goHome(user.type, navigate);
+            goHome(user.type, navigate, currLocation);
         }
-    }, [isLoggedIn, user, navigate]);
+    }, [isLoggedIn]);
 
     return isLoggedIn ? null : children;
 }

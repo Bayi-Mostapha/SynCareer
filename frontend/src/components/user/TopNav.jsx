@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { IoIosLogOut, IoIosMenu } from "react-icons/io";
 import { NavLink } from "react-router-dom";
-import { USER_HOME_LINK } from "@/router";
+import { USER_HOME_LINK, USER_RESUMES_LINK } from "@/router";
 
 import {
     DropdownMenu,
@@ -74,7 +74,7 @@ function TopNav() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="ttt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
                         Resume Library
                     </NavLink>
                 </li>
@@ -88,7 +88,7 @@ function TopNav() {
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col items-start">
-                            {userContext.user.name}
+                            {userContext.user.first_name}
                             <span className="text-gray-500 text-sm">
                                 {userContext.user.email}
                             </span>
@@ -122,7 +122,7 @@ function TopNav() {
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col items-start">
-                                        {userContext.user.name}
+                                        {userContext.user.first_name}
                                         <span className="text-gray-500 text-sm">
                                             {userContext.user.email}
                                         </span>

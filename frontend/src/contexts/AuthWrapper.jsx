@@ -2,6 +2,8 @@ import { createContext, useEffect, useState } from "react";
 import { axiosClient } from "../api/axios";
 
 export const authContext = createContext({
+    currLocation: '',
+    setCurrLocation: () => { },
     isFetchingUser: false,
     setIsFetchingUser: () => { },
     user: {},
@@ -12,44 +14,53 @@ export const authContext = createContext({
 })
 
 export function AuthWrapper({ children }) {
+    const [currLocation, setCurrLocation] = useState('')
     const [isFetchingUser, setIsFetchingUser] = useState(false)
     const [user, setUser] = useState({})
     const [isLoggedIn, setIsLoggedIn] = useState(false)
 
     useEffect(() => {
-        getUser()
-    }, [])
+        if (!isLoggedIn && localStorage.getItem('token') != null)
+            getUser()
+    }, [isLoggedIn]);
 
-    const getUser = () => {
-        if (localStorage.getItem('token') == null) {
-            return;
-        }
-
-        setIsFetchingUser(true)
-        axiosClient.get('/user').then(userResponse => {
-            setIsLoggedIn(true)
+    const getUser = async () => {
+        setIsFetchingUser(true);
+        try {
+            const userResponse = await axiosClient.get('/user');
+            setIsLoggedIn(true);
             const newUser = { ...userResponse.data.user, type: userResponse.data.type };
             setUser(newUser);
-        }).catch(err => {
-            setIsLoggedIn(false)
-            setUser({})
-            localStorage.removeItem('token')
+        } catch (err) {
+            setIsLoggedIn(false);
+            setUser({});
+            localStorage.removeItem('token');
             console.error("error from AuthWrapper: ", err);
-        }).finally(() => {
-            setIsFetchingUser(false)
-        });
-    }
+        } finally {
+            setIsFetchingUser(false);
+        }
+    };
+
 
     const logout = async () => {
-        await axiosClient.post('/logout');
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        setUser({});
-    }
+        try {
+            await axiosClient.post('/logout');
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            setUser({});
+        } catch (err) {
+            console.error("error logging out: ", err);
+        }
+    };
+
 
     return <>
         <authContext.Provider value={{
-            isFetchingUser, setIsFetchingUser, user, setUser, logout, isLoggedIn, setIsLoggedIn
+            currLocation, setCurrLocation,
+            isFetchingUser, setIsFetchingUser,
+            user, setUser,
+            logout,
+            isLoggedIn, setIsLoggedIn
         }}>
             {children}
         </authContext.Provider>

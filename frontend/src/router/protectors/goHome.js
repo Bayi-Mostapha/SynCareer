@@ -1,15 +1,20 @@
-import { ADMIN_DASHBOARD_LINK, COMPANY_DASHBOARD_LINK, LOGIN_LINK, USER_HOME_LINK } from "..";
+import {
+    LOGIN_LINK,
+    USER_HOME_LINK,
+    COMPANY_DASHBOARD_LINK,
+    ADMIN_DASHBOARD_LINK,
+} from "..";
 
-export const goHome = (type, navigate) => {
+export const goHome = (type, navigate, path = '') => {
     switch (type) {
         case 'user':
-            navigate(USER_HOME_LINK);
+            path !== '' ? navigate(path) : navigate(USER_HOME_LINK);
             break;
         case 'company':
-            navigate(COMPANY_DASHBOARD_LINK);
+            path !== '' ? navigate(path) : navigate(COMPANY_DASHBOARD_LINK);
             break;
         case 'admin':
-            navigate(ADMIN_DASHBOARD_LINK);
+            path !== '' ? navigate(path) : navigate(ADMIN_DASHBOARD_LINK);
             break;
         // case 'super-admin':
         //     navigate(ADMIN_DASHBOARD_LINK);

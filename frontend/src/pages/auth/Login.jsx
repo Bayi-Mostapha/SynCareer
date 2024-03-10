@@ -35,21 +35,17 @@ function Login() {
     const { formState, handleSubmit, control } = form;
     const { isSubmitting, isValid } = formState;
 
-    const submit = (data) => {
-        axiosClient.post('/login', data)
-            .then((response) => {
-                userContext.setUser({ ...response.data.user, type: response.data.type });
-                userContext.setIsLoggedIn(true)
-                localStorage.setItem('token', response.data.token)
-                navigate(USER_HOME_LINK)
-            })
-            .catch(({ response }) => {
-                toast.error(response.data.message);
-            })
-            .finally(() => {
-
-            });
-    }
+    const submit = async (data) => {
+        try {
+            const response = await axiosClient.post('/login', data);
+            userContext.setUser({ ...response.data.user, type: response.data.type });
+            userContext.setIsLoggedIn(true);
+            localStorage.setItem('token', response.data.token);
+            navigate(USER_HOME_LINK);
+        } catch (error) {
+            toast.error(error.response.data.message);
+        }
+    };
 
     return (
         <div className="w-full flex flex-col justify-center items-center">
