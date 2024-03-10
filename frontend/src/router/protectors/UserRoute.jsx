@@ -6,10 +6,19 @@ import { LOGIN_LINK } from "..";
 import { goHome } from './goHome'
 
 export default function UserRoute({ children }) {
-    const { isLoggedIn, user, setCurrLocation } = useContext(authContext);
-    const navigate = useNavigate();
+    const {
+        getUser,
+        user,
+        isLoggedIn,
+        setCurrLocation,
+    } = useContext(authContext);
     const location = useLocation();
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        if (!isLoggedIn && localStorage.getItem('token') != null)
+            getUser()
+    }, []);
     useEffect(() => {
         if (!isLoggedIn) {
             setCurrLocation(location.pathname)

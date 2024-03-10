@@ -10,7 +10,8 @@ export const authContext = createContext({
     setUser: () => { },
     logout: () => { },
     isLoggedIn: false,
-    setIsLoggedIn: () => { }
+    setIsLoggedIn: () => { },
+    getUser: () => { },
 })
 
 export function AuthWrapper({ children }) {
@@ -18,11 +19,6 @@ export function AuthWrapper({ children }) {
     const [isFetchingUser, setIsFetchingUser] = useState(false)
     const [user, setUser] = useState({})
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-    useEffect(() => {
-        if (!isLoggedIn && localStorage.getItem('token') != null)
-            getUser()
-    }, [isLoggedIn]);
 
     const getUser = async () => {
         setIsFetchingUser(true);
@@ -60,7 +56,8 @@ export function AuthWrapper({ children }) {
             isFetchingUser, setIsFetchingUser,
             user, setUser,
             logout,
-            isLoggedIn, setIsLoggedIn
+            isLoggedIn, setIsLoggedIn,
+            getUser,
         }}>
             {children}
         </authContext.Provider>
