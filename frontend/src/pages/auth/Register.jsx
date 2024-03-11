@@ -87,7 +87,7 @@ function Register() {
         },
     });
     const { register, control, handleSubmit, formState, trigger, watch } = form;
-    const { errors, isValid, isSubmitting } = formState;
+    const { touchedFields, errors, isValid, isSubmitting } = formState;
     const formData = watch();
 
     useEffect(() => {
@@ -96,7 +96,7 @@ function Register() {
         if (formData.type === 'company' && formStep === 2 && countries.length === 0) {
             fetchCountries();
         }
-    }, [formStep, formData.type])
+    }, [formStep])
 
     const submit = async (formData) => {
         try {
@@ -104,7 +104,14 @@ function Register() {
             toast.success(data.message);
             navigate(LOGIN_LINK);
         } catch (error) {
-            toast.error(error.response.data.message);
+            const errorMessages = Object.entries(error.response.data.errors).flatMap(([field, messages]) =>
+                messages.map((message) =>
+                    <li key={message}>
+                        <span className='font-semibold'>{field}:</span> {message}
+                    </li>
+                )
+            );
+            toast.error(<ul>{errorMessages}</ul>);
             setFormStep(0);
         }
     };
@@ -184,12 +191,12 @@ function Register() {
                                         name="first_name"
                                         render={({ field }) => {
                                             return (
-                                                <FormItem className="block w-full">
+                                                <FormItem>
                                                     <FormLabel>First name</FormLabel>
                                                     <FormControl>
                                                         <Input type='text' {...field} />
                                                     </FormControl>
-                                                    <FormMessage />
+                                                    {touchedFields.first_name && <FormMessage />}
                                                 </FormItem>
                                             )
                                         }}
@@ -204,7 +211,7 @@ function Register() {
                                                     <FormControl>
                                                         <Input type='text' {...field} />
                                                     </FormControl>
-                                                    <FormMessage />
+                                                    {touchedFields.last_name && <FormMessage />}
                                                 </FormItem>
                                             )
                                         }}
@@ -220,7 +227,7 @@ function Register() {
                                                 <FormControl>
                                                     <Input type='text' {...field} />
                                                 </FormControl>
-                                                <FormMessage />
+                                                {touchedFields.email && <FormMessage />}
                                             </FormItem>
                                         )
                                     }}
@@ -236,7 +243,7 @@ function Register() {
                                                 <FormControl>
                                                     <PasswordInput className="pr-10" {...field} />
                                                 </FormControl>
-                                                <FormMessage />
+                                                {touchedFields.password && <FormMessage />}
                                             </FormItem>
                                         )
                                     }}
@@ -261,7 +268,7 @@ function Register() {
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <FormMessage />
+                                                        {touchedFields.job_title && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}
@@ -279,7 +286,7 @@ function Register() {
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <FormMessage />
+                                                        {touchedFields.name && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}
@@ -306,7 +313,7 @@ function Register() {
                                                                 <SelectItem value="250+">More than 250 employees</SelectItem>
                                                             </SelectContent>
                                                         </Select>
-                                                        <FormMessage />
+                                                        {touchedFields.size && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}
@@ -332,7 +339,7 @@ function Register() {
                                                                 })}
                                                             </SelectContent>
                                                         </Select>
-                                                        <FormMessage />
+                                                        {touchedFields.industry && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}
@@ -358,7 +365,7 @@ function Register() {
                                                                 })}
                                                             </SelectContent>
                                                         </Select>
-                                                        <FormMessage />
+                                                        {touchedFields.country && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}
@@ -374,7 +381,7 @@ function Register() {
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
-                                                        <FormMessage />
+                                                        {touchedFields.city && <FormMessage />}
                                                     </FormItem>
                                                 )
                                             }}

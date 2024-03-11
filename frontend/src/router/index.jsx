@@ -12,13 +12,13 @@ import AdminLayout from '../layouts/AdminLayout';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
+import Template from '@/pages/user/resume-builder';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import UserRoute from './protectors/UserRoute';
 import CompanyRoute from './protectors/CompanyRoute';
 import AdminRoute from './protectors/AdminRoute';
-import Template from '@/pages/user/test';
 
 // links 
 // auth 
