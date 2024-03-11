@@ -18,6 +18,7 @@ import GuestRoute from './protectors/GuestRoute';
 import UserRoute from './protectors/UserRoute';
 import CompanyRoute from './protectors/CompanyRoute';
 import AdminRoute from './protectors/AdminRoute';
+import Template from '@/pages/user/test';
 
 // links 
 // auth 
@@ -55,7 +56,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: USER_RESUMES_LINK,
-                element: <h1>hi from user resumes</h1>
+                element: <Template />
             },
         ]
     },

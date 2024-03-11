@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Report;
+use App\Models\Resume;
 use App\Models\JobOffer;
 use App\Models\UserEducation;
 use App\Models\UserExperience;
@@ -72,5 +73,10 @@ class User extends Authenticatable
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function resumes()
+    {
+        return $this->hasMany(Resume::class);
     }
 }
