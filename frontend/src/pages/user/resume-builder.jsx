@@ -1,14 +1,39 @@
 import { useRef, useState } from "react";
-
 // shadcn 
 import { Button } from "@/components/ui/button";
 import { axiosClient } from "@/api/axios";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogDescription,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+// sonner 
 import { toast } from "sonner";
-
+// icons 
+import { FaRegTrashCan } from "react-icons/fa6";
+import { TbPencil, TbPencilOff } from "react-icons/tb";
+import { FaPlus } from "react-icons/fa";
 
 const Template = () => {
     const resumeRef = useRef();
 
+    const [isEdit, setIsEdit] = useState(false);
+
+    const toggleEditable = () => {
+        setIsEdit(!isEdit);
+    };
+
+
+    const [titles, setTitles] = useState({
+        summary: "Summay",
+        experience: "Experience",
+        skills: "Skills",
+        education: "Education",
+    });
     const [formData, setFormData] = useState({
         fullname: "Your Name",
         jobPosition: "Your Job Title",
@@ -18,7 +43,6 @@ const Template = () => {
         website: "www.yourwebsite.com",
         address: "your address",
     });
-
     const [experiences, setExperiences] = useState([
         {
             year: "Enter time and end time",
@@ -27,18 +51,16 @@ const Template = () => {
             description: "desc"
         }
     ]);
-
     const [skills, setSkills] = useState([
         {
             title: "skill",
         }
     ]);
-
     const [education, setEducation] = useState([
         {
-            year: "Graduation year",
-            major: "ENTER YOUR MAJOR",
             university: "Name of your university/school",
+            major: "Your major",
+            year: "Graduation year",
         },
     ]);
 
@@ -51,26 +73,23 @@ const Template = () => {
         // Update the state with the modified array
         setExperiences(updatedExperiences);
     };
-
     const removeExperience = (index) => {
-        // Create a copy of the workExperiences array and remove the experience at the given index
-        const updatedExperiences = [...experiences];
-        updatedExperiences.splice(index, 1);
-        // Update the state with the modified array
-        setExperiences(updatedExperiences);
+        setExperiences(prev => {
+            const updatedExp = [...prev];
+            updatedExp.splice(index, 1);
+            return updatedExp;
+        });
     };
-
     const addExperience = () => {
         // Create a copy of the workExperiences array and add a new experience
         const updatedExperiences = [
             ...experiences,
             {
-                year: "2012 - 2014",
+                year: "Enter time and end time",
                 title: "Job Position Here",
                 companyAndLocation: "Company Name / Location here",
-                description:
-                    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis voluptatibus minima tenetur nostrum quo aliquam dolorum incidunt.",
-            },
+                description: "desc"
+            }
         ];
         // Update the state with the modified array
         setExperiences(updatedExperiences);
@@ -82,19 +101,19 @@ const Template = () => {
         updatedSkills[index][name] = value;
         setSkills(updatedSkills);
     };
-
     const removeSkill = (index) => {
-        const updatedSkills = [...skills];
-        updatedSkills.splice(index, 1);
-        setSkills(updatedSkills);
+        setSkills(prev => {
+            const updatedSkills = [...prev];
+            updatedSkills.splice(index, 1);
+            return updatedSkills;
+        });
     };
-
     const addSkill = () => {
         const updatedSkills = [
             ...skills,
             {
-                title: "skill1",
-            },
+                title: "skill",
+            }
         ];
         setSkills(updatedSkills);
     };
@@ -105,19 +124,20 @@ const Template = () => {
         updatedEdu[index][name] = value;
         setEducation(updatedEdu);
     };
-
     const removeEducation = (index) => {
-        const updatedEdu = [...education];
-        updatedEdu.splice(index, 1);
-        setEducation(updatedEdu);
+        setEducation(prev => {
+            const updatedEdu = [...prev];
+            updatedEdu.splice(index, 1);
+            return updatedEdu;
+        });
     };
-
     const addEducation = () => {
         const updatedEdu = [
             ...education,
             {
+                university: "Name of your university/school",
                 major: "ENTER YOUR MAJOR",
-                university: "Name of your university / college 2005-2009",
+                year: "Graduation year",
             },
         ];
         setEducation(updatedEdu);
@@ -130,12 +150,15 @@ const Template = () => {
             [name]: value,
         }));
     };
+    const handleTitleChange = (e) => {
+        const { name, value } = e.target;
+        setTitles((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
-    function textAreaAdjustHeight(e) {
-        e.target.style.height = "1px";
-        e.target.style.height = (e.target.scrollHeight) + "px";
-    }
-
+    //backend request
     const generatePdf = async () => {
         const htmlContent = resumeRef.current.innerHTML;
 
@@ -174,76 +197,320 @@ const Template = () => {
 
     const styles = {
         display: 'block',
+        color: 'black',
+        fontFamily: 'sans-serif',
         backgroundColor: 'transparent',
         outline: 'none',
         border: 'none',
-        resize: 'none',
+        width: '100%'
+    };
+
+    const titleStyles = {
+        display: 'block',
+        color: 'black',
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        fontFamily: 'sans-serif',
+        backgroundColor: 'transparent',
+        outline: 'none',
+        border: 'none',
         width: '100%'
     };
 
     return (
         <>
-            <Button
-                variant="default"
-                onClick={generatePdf}
-            >
-                Save and Download
-            </Button>
-            {/* the resume  */}
-            <div ref={resumeRef} className="h-fit w-full">
+            <div className="flex justify-between items-center">
+                <h2 className="text-gray-700">
+                    {isEdit ? "editing mode" : "viewing mode"}
+                </h2>
+                <Button variant="ghost" className="p-0" onClick={toggleEditable}>
+                    {!isEdit ? <TbPencil className="text-xl" /> : <TbPencilOff className="text-xl" />}
+                </Button>
+            </div>
+            {/* resume container  */}
+            <div ref={resumeRef} className="mx-auto h-fit w-[793px]">
+                {/* the resume  */}
                 <div className="p-8 w-full h-fit bg-white">
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.fullname}
+                        value={formData.fullname}
                         name="fullname"
                         onChange={handleChange}
                         style={styles}
                     />
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.jobPosition}
+                        value={formData.jobPosition}
                         name="jobPosition"
                         onChange={handleChange}
                         style={styles}
                     />
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.address}
+                        value={formData.address}
                         name="address"
                         onChange={handleChange}
                         style={styles}
                     />
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.email}
+                        value={formData.email}
                         name="email"
                         onChange={handleChange}
                         style={styles}
                     />
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.phoneNumber}
+                        value={formData.phoneNumber}
+                        name="phoneNumber"
+                        onChange={handleChange}
+                        style={styles}
+                    />
+                    <input
+                        readOnly={!isEdit}
+                        type="text"
+                        value={formData.website}
                         name="website"
                         onChange={handleChange}
                         style={styles}
                     />
                     <input
+                        readOnly={!isEdit}
                         type="text"
-                        defaultValue={formData.website}
-                        name="website"
-                        onChange={handleChange}
-                        style={styles}
+                        value={titles.summary}
+                        name="summary"
+                        onChange={handleTitleChange}
+                        style={titleStyles}
                     />
-                    <textarea
-                        defaultValue={formData.personalSummary}
-                        name="personalSummary"
-                        onChange={handleChange}
-                        onKeyDownCapture={textAreaAdjustHeight}
-                        rows="2"
-                        style={styles}
-                    />
+                    {
+                        isEdit ?
+                            <Dialog>
+                                <DialogTrigger className="w-full text-left">{formData.personalSummary}</DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>{titles.summary}</DialogTitle>
+                                        <DialogDescription>You can close this pop up after you are done!</DialogDescription>
+                                        <Textarea
+                                            value={formData.personalSummary}
+                                            name="personalSummary"
+                                            onChange={handleChange}
+                                        />
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                            :
+                            <div>
+                                {formData.personalSummary}
+                            </div>
+                    }
+
+                    {/* education section */}
+                    <div>
+                        {(education && education.length) > 0 ? (
+                            <>
+                                {/* title  */}
+                                <input
+                                    readOnly={!isEdit}
+                                    type="text"
+                                    value={titles.education}
+                                    name="education"
+                                    onChange={handleTitleChange}
+                                    style={titleStyles}
+                                />
+                                {education.map((edu, i) => (
+                                    <div key={i} className='relative'>
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={edu.university}
+                                            name="university"
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                            style={styles}
+                                        />
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={edu.major}
+                                            name="major"
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                            style={styles}
+                                        />
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={edu.year}
+                                            name="year"
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                            style={styles}
+                                        />
+                                        {
+                                            isEdit && <Button
+                                                variant="ghost"
+                                                className="py-1 px-2 absolute top-0 right-0 text-lg text-destructive hover:opacity-85 hover:text-destructive transition-all"
+                                                onClick={() => removeEducation(i)}
+                                            >
+                                                <FaRegTrashCan />
+                                            </Button>
+                                        }
+                                    </div>
+                                ))}
+                            </>
+                        ) : null}
+                    </div>
+                    {isEdit &&
+                        <div
+                            onClick={addEducation}
+                            className="my-2 p-2 font-bold cursor-pointer w-full flex items-center justify-center gap-1 text-primary bg-[#DCE6F6] hover:opacity-80 rounded-md transition-all"
+                        >
+                            <FaPlus /> Add Education
+                        </div>
+                    }
+
+                    {/* experience section */}
+                    <div>
+                        {(experiences && experiences.length) > 0 ? (
+                            <>
+                                {/* title  */}
+                                <input
+                                    readOnly={!isEdit}
+                                    type="text"
+                                    value={titles.experience}
+                                    name="experience"
+                                    onChange={handleTitleChange}
+                                    style={titleStyles}
+                                />
+                                {experiences.map((exp, i) => (
+                                    <div key={i} className='relative'>
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={exp.companyAndLocation}
+                                            name="companyAndLocation"
+                                            onChange={(e) => handleExpChange(i, e)}
+                                            style={styles}
+                                        />
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={exp.title}
+                                            name="title"
+                                            onChange={(e) => handleExpChange(i, e)}
+                                            style={styles}
+                                        />
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={exp.year}
+                                            name="year"
+                                            onChange={(e) => handleExpChange(i, e)}
+                                            style={styles}
+                                        />
+                                        {
+                                            isEdit ?
+                                                <Dialog>
+                                                    <DialogTrigger className="w-full text-left">{exp.description}</DialogTrigger>
+                                                    <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle>Experience description</DialogTitle>
+                                                            <DialogDescription>You can close this pop up after you are done!</DialogDescription>
+                                                            <Textarea
+                                                                value={exp.description}
+                                                                name="description"
+                                                                onChange={(e) => handleExpChange(i, e)}
+                                                            />
+                                                        </DialogHeader>
+                                                    </DialogContent>
+                                                </Dialog>
+                                                :
+                                                <div>
+                                                    {exp.description}
+                                                </div>
+                                        }
+                                        {
+                                            isEdit && <Button
+                                                variant="ghost"
+                                                className="py-1 px-2 absolute top-0 right-0 text-lg text-destructive hover:opacity-85 hover:text-destructive transition-all"
+                                                onClick={() => removeExperience(i)}
+                                            >
+                                                <FaRegTrashCan />
+                                            </Button>
+                                        }
+                                    </div>
+                                ))}
+                            </>
+                        ) : null}
+                    </div>
+                    {isEdit &&
+                        <div
+                            onClick={addExperience}
+                            className="my-2 p-2 font-bold cursor-pointer w-full flex items-center justify-center gap-1 text-primary bg-[#DCE6F6] hover:opacity-80 rounded-md transition-all"
+                        >
+                            <FaPlus /> Add Experience
+                        </div>
+                    }
+
+                    {/* skills section */}
+                    <div>
+                        {(skills && skills.length) > 0 ? (
+                            <>
+                                {/* title  */}
+                                <input
+                                    readOnly={!isEdit}
+                                    type="text"
+                                    value={titles.skills}
+                                    name="skills"
+                                    onChange={handleTitleChange}
+                                    style={titleStyles}
+                                />
+                                {skills.map((skill, i) => (
+                                    <div key={i} className='relative'>
+                                        <input
+                                            readOnly={!isEdit}
+                                            type="text"
+                                            value={skill.title}
+                                            name="title"
+                                            onChange={(e) => handleSkillsChange(i, e)}
+                                            style={styles}
+                                        />
+                                        {
+                                            isEdit && <Button
+                                                variant="ghost"
+                                                className="py-1 px-2 absolute top-0 right-0 text-lg text-destructive hover:opacity-85 hover:text-destructive transition-all"
+                                                onClick={() => removeSkill(i)}
+                                            >
+                                                <FaRegTrashCan />
+                                            </Button>
+                                        }
+                                    </div>
+                                ))}
+                            </>
+                        ) : null}
+                    </div>
+                    {isEdit &&
+                        <div
+                            onClick={addSkill}
+                            className="my-2 p-2 font-bold cursor-pointer w-full flex items-center justify-center gap-1 text-primary bg-[#DCE6F6] hover:opacity-80 rounded-md transition-all"
+                        >
+                            <FaPlus /> Add Skill
+                        </div>
+                    }
                 </div>
-            </div>
+            </div >
+            {/* end of resume */}
+
+            <Button
+                disabled={isEdit}
+                variant="default"
+                className="my-3 block ml-auto"
+                onClick={generatePdf}
+            >
+                Save and download
+            </Button>
         </>
     );
 };
