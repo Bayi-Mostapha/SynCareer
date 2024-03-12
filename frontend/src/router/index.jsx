@@ -16,9 +16,7 @@ import Template from '@/pages/user/resume-builder';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
-import UserRoute from './protectors/UserRoute';
-import CompanyRoute from './protectors/CompanyRoute';
-import AdminRoute from './protectors/AdminRoute';
+import AuthRoute from './protectors/AuthRoute';
 
 // links 
 // auth 
@@ -48,7 +46,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <UserRoute><UserLayout /></UserRoute>,
+        element: <AuthRoute type="user"><UserLayout /></AuthRoute>,
         children: [
             {
                 path: USER_HOME_LINK,
@@ -61,7 +59,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <CompanyRoute><CompanyLayout /></CompanyRoute>,
+        element: <AuthRoute type="company"><CompanyLayout /></AuthRoute>,
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
@@ -70,7 +68,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AdminRoute><AdminLayout /></AdminRoute>,
+        element: <AuthRoute type="admin"><AdminLayout /></AuthRoute>,
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,
