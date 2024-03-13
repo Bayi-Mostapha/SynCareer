@@ -55,7 +55,7 @@ function TopNav() {
         };
     }, [])
     return (
-        <nav className="fixed top-0 left-0 right-0 px-6 py-3 lg:py-0 flex items-center  bg-background">
+        <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 lg:py-0 flex items-center bg-background">
             <h1 className="py-2 text-xl text-primary font-semibold">SynCareer</h1>
             <ul className="pt-3 ml-20 hidden lg:flex gap-4">
                 <li>

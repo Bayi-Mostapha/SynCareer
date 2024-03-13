@@ -10,7 +10,11 @@ class Resume extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'resume_path'];
+    protected $fillable = [
+        'user_id', 
+        'resume_name',
+        'image_name',
+    ];
 
     public function user()
     {

@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { TbPencil, TbPencilOff } from "react-icons/tb";
 import { FaPlus } from "react-icons/fa";
+// html to pdf 
+import { toJpeg } from 'html-to-image';
 
 const Template = () => {
     const resumeRef = useRef();
@@ -160,13 +162,15 @@ const Template = () => {
 
     //backend request
     const generatePdf = async () => {
+        const formData = new FormData();
         const htmlContent = resumeRef.current.innerHTML;
-
         try {
-            // saving to database 
-            const saveResponse = await axiosClient.post('/store-resume', {
-                html_content: htmlContent,
-            });
+            const dataUrl = await toJpeg(resumeRef.current, { width: 793 });
+            const blobData = dataURItoBlob(dataUrl);
+            formData.append('image', blobData, 'my-image-name.jpeg');
+            formData.append('html_content', htmlContent);
+
+            const saveResponse = await axiosClient.post('/store-resume', formData);
             toast.success(saveResponse.data.message)
             const fileName = saveResponse.data.fileName
 
@@ -177,16 +181,15 @@ const Template = () => {
                     'Content-Type': 'application/pdf',
                 },
             });
+
             const blob = new Blob([downloadResponse.data], { type: 'application/pdf' });
             const url = window.URL.createObjectURL(blob);
 
             const a = document.createElement('a');
             a.href = url;
             a.download = 'syncareer-resume.pdf';
-            document.body.appendChild(a);
             a.click();
             URL.revokeObjectURL(url);
-            document.body.removeChild(a);
         } catch (error) {
             if (error.code === 'ERR_BAD_REQUEST') {
                 toast.error('Forbidden!!')
@@ -216,6 +219,17 @@ const Template = () => {
         border: 'none',
         width: '100%'
     };
+
+    function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    }
 
     return (
         <>

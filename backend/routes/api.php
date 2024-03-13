@@ -11,7 +11,6 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
@@ -63,26 +62,29 @@ Route::group(['middleware' => 'auth:sanctum'], function () { //,admin,company
     Route::post('/store-resume', function (Request $request) {
         $validatedData = $request->validate([
             'html_content' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         $dompdf = new Dompdf();
         $dompdf->loadHtml($validatedData['html_content']);
         $dompdf->render();
         $pdfContent = $dompdf->output();
-
-        // storing in storage 
-        $fileName = uniqid() . '.pdf';
+        $fileName = 'resume_' . uniqid() . '.pdf';
         $filePath = 'resumes/' . $fileName;
         Storage::put($filePath, $pdfContent);
 
-        // storing in db 
+        $image = $request->file('image');
+        $imageName = 'image_' . uniqid() . '.' . $image->getClientOriginalExtension();
+        $image->storeAs('resume-images', $imageName);
+
         Resume::create([
             'user_id' => $request->user()->id,
-            'resume_path' => $fileName
+            'resume_name' => $fileName,
+            'image_name' => $imageName,
         ]);
 
         return response()->json([
-            'message' => 'resume saved successfully',
+            'message' => 'Resume saved successfully',
             'fileName' => $fileName
         ]);
     });
@@ -90,7 +92,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () { //,admin,company
     Route::get('/download-resume/{filename}', function (Request $request, $filename) {
         $user = $request->user();
         $resume = Resume::where('user_id', $user->id)
-            ->where('resume_path', $filename)
+            ->where('resume_name', $filename)
             ->first();
         if (!$resume) {
             abort(404);
@@ -103,8 +105,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () { //,admin,company
         return response()->download($filePath, $filename);
     });
 
-
-    //getting a ressource (image..)
+    //getting a private ressource (image, resume)
     // Route::get('/storage/{folder}/{file}', function ($folder, $file) {
     //     $path = storage_path("app/{$folder}/{$file}");
     //     if (!file_exists($path)) {

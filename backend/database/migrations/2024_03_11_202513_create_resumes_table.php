@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('resumes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('resume_path');
+            $table->string('resume_name');
+            $table->string('image_name');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
