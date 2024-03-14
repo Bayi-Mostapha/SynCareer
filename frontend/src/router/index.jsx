@@ -12,7 +12,10 @@ import AdminLayout from '../layouts/AdminLayout';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
-import Template from '@/pages/user/resume-builder';
+import ResumeContainer from '@/pages/user/resume-container';
+import Resumes from '@/pages/user/resume/resume-library';
+import ResumeEditor from '@/pages/user/resume/resume-editor';
+import ResumeCreator from '@/pages/user/resume/resume-builder';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -54,7 +57,21 @@ export const router = createBrowserRouter([
             },
             {
                 path: USER_RESUMES_LINK,
-                element: <Template />
+                element: <ResumeContainer />,
+                children: [
+                    {
+                        path: '',
+                        element: <Resumes />
+                    },
+                    {
+                        path: 'create',
+                        element: <ResumeCreator />
+                    },
+                    {
+                        path: ':id',
+                        element: <ResumeEditor />
+                    }
+                ]
             },
         ]
     },

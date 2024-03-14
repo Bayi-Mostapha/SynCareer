@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 // shadcn 
 import { Button } from "@/components/ui/button";
@@ -20,9 +21,10 @@ import { FaPlus } from "react-icons/fa";
 // html to pdf 
 import { toJpeg } from 'html-to-image';
 
-const Template = () => {
+const ResumeCreator = () => {
+    const [isSaving, setIsSaving] = useState(false);
     const resumeRef = useRef();
-
+    const navigate = useNavigate();
     const [isEdit, setIsEdit] = useState(false);
 
     const toggleEditable = () => {
@@ -164,12 +166,12 @@ const Template = () => {
     const generatePdf = async () => {
         const formData = new FormData();
         const htmlContent = resumeRef.current.innerHTML;
+        setIsSaving(true)
         try {
-            const dataUrl = await toJpeg(resumeRef.current, { width: 793 });
+            const dataUrl = await toJpeg(resumeRef.current);
             const blobData = dataURItoBlob(dataUrl);
-            formData.append('image', blobData, 'my-image-name.jpeg');
+            formData.append('image', blobData, 'resume-image.jpeg');
             formData.append('html_content', htmlContent);
-
             const saveResponse = await axiosClient.post('/store-resume', formData);
             toast.success(saveResponse.data.message)
             const fileName = saveResponse.data.fileName
@@ -190,11 +192,15 @@ const Template = () => {
             a.download = 'syncareer-resume.pdf';
             a.click();
             URL.revokeObjectURL(url);
+
+            navigate('../');
         } catch (error) {
             if (error.code === 'ERR_BAD_REQUEST') {
                 toast.error('Forbidden!!')
             }
             console.error('Error generating PDF:', error);
+        } finally {
+            setIsSaving(false)
         }
     };
 
@@ -518,7 +524,7 @@ const Template = () => {
             {/* end of resume */}
 
             <Button
-                disabled={isEdit}
+                disabled={isEdit || isSaving}
                 variant="default"
                 className="my-3 block ml-auto"
                 onClick={generatePdf}
@@ -529,4 +535,4 @@ const Template = () => {
     );
 };
 
-export default Template;
+export default ResumeCreator;
