@@ -117,7 +117,7 @@ function Resumes() {
                                 Create new <FaPlus />
                             </Link>
                         </Button>
-                        <div className="my-5 grid grid-cols-4 gap-3">
+                        <div className="my-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                             {displayResumes()}
                         </div >
                     </>

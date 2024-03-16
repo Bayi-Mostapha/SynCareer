@@ -14,7 +14,6 @@ import Register from '../pages/auth/Register';
 import NotFound from '../pages/NotFound';
 import ResumeContainer from '@/pages/user/resume-container';
 import Resumes from '@/pages/user/resume/resume-library';
-import ResumeEditor from '@/pages/user/resume/resume-editor';
 import ResumeCreator from '@/pages/user/resume/resume-builder';
 
 // protectors 
@@ -66,10 +65,6 @@ export const router = createBrowserRouter([
                     {
                         path: 'create',
                         element: <ResumeCreator />
-                    },
-                    {
-                        path: ':id',
-                        element: <ResumeEditor />
                     }
                 ]
             },

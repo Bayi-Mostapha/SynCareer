@@ -1,6 +1,6 @@
 // icons 
 import { FaRegTrashCan, FaPlus } from "react-icons/fa6";
-import { TbPencil, TbCalendarTime } from "react-icons/tb";
+import { TbCalendarTime } from "react-icons/tb";
 import { MdOutlineFileDownload } from "react-icons/md";
 // shadcn 
 import { Button } from "@/components/ui/button";
@@ -36,12 +36,6 @@ function ResumeCard({ resume, onDelete, onDownload }) {
             <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold">#{resume.id}</p>
                 <div className="flex items-center gap-1">
-                    {/* <Link
-                                to={`${resume.id}`}
-                                className="p-0 text-xl bg-transparent text-primary hover:bg-transparent hover:opacity-80 hover:text-primary active:opacity-70 transition-all"
-                            >
-                                <TbPencil />
-                            </Link> */}
                     <Dialog>
                         <DialogTrigger>
                             <FaRegTrashCan className="text-destructive hover:opacity-80 active:opacity-70" />
@@ -65,13 +59,15 @@ function ResumeCard({ resume, onDelete, onDownload }) {
                     </Dialog>
                 </div>
             </div>
-            <p className="my-1 text-xs text-gray-500 flex items-center gap-1"><TbCalendarTime className="text-sm" /> {date} {time}</p>
-            <img className="border border-1 bg-gray-400" src={`http://localhost:8000/api/storage/resume-images/${resume.image_name}`} alt={resume.id} />
+            <p className="text-xs text-gray-500 flex items-center gap-1"><TbCalendarTime className="text-sm" /> {date} {time}</p>
+            <div className="mt-3 h-40 overflow-auto">
+                <img className="border border-1 bg-gray-400" src={`http://localhost:8000/api/storage/resume-images/${resume.image_name}`} alt={resume.id} />
+            </div>
             <Button
                 disabled={resume.isDeleting || resume.isDownloading}
                 onClick={() => { onDownload(resume.resume_name, resume.id) }}
                 variant="default"
-                className="mt-2 w-full flex items-center gap-1"
+                className="mt-4 w-full flex items-center gap-1"
             >
                 <MdOutlineFileDownload className="text-xl" /> Download
             </Button>

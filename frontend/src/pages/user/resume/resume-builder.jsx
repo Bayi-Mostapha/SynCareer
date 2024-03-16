@@ -198,7 +198,7 @@ const ResumeCreator = () => {
             }
             return (
                 <Reorder.Item
-                    className="relative"
+                    className="relative bg-white"
                     style={{ padding: '0' }}
                     key={item}
                     value={item}
@@ -206,7 +206,7 @@ const ResumeCreator = () => {
                     dragControls={controls}
                 >
                     {component}
-                    {isEdit && <div className="p-2 bg-background absolute top-0 right-[-75px] rounded-md shadow-sm cursor-grab hover:opacity-90 active:opacity-80 active:cursor-grabbing">
+                    {isEdit && <div className="p-2 bg-background absolute top-0 left-[-55px] rounded-md shadow-sm cursor-grab hover:opacity-90 active:opacity-80 active:cursor-grabbing">
                         <LuChevronsUpDown />
                     </div>}
                 </Reorder.Item>
@@ -228,8 +228,8 @@ const ResumeCreator = () => {
                 <DnDFile {...dropZone} />
             }
             <h2 className="mt-8 text-lg font-bold">Your resume:</h2>
-            <div ref={resumeRef} className="mx-auto h-fit w-full flex items-center justify-center overflow-auto">
-                <div className="w-[793px] p-5" ref={imageResumeRef} style={{ backgroundColor: 'white' }}>
+            <div ref={resumeRef} className="w-full overflow-auto pl-12 lg:flex items-center justify-center">
+                <div className="w-[793px] min-w-[793px] p-5" ref={imageResumeRef} style={{ backgroundColor: 'white' }}>
                     <ResumeHeader styles={styles} formData={formData} handleChange={handleChange} titleStyles={titleStyles} isEdit={isEdit} avatarUrl={avatarUrl} setAvatarUrl={setAvatarUrl} />
                     <ResumeSummary styles={styles} formData={formData} handleChange={handleChange} handleTitleChange={handleTitleChange} titles={titles} titleStyles={titleStyles} isEdit={isEdit} />
                     <Reorder.Group values={order} onReorder={setOrder} style={{ listStyleType: 'none', padding: '0' }}>
