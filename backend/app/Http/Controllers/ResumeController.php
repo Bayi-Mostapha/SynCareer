@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Dompdf\Dompdf;
 use App\Models\Resume;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,13 +24,19 @@ class ResumeController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($validatedData['html_content']);
-        $dompdf->render();
-        $pdfContent = $dompdf->output();
-        $fileName = 'resume_' . uniqid() . '.pdf';
-        $filePath = 'resumes/' . $fileName;
-        Storage::put($filePath, $pdfContent);
+        try {
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($validatedData['html_content']);
+            $dompdf->setPaper('A4');
+            $dompdf->set_option('defaultFont', 'sans-serif');
+            $dompdf->render();
+            $pdfContent = $dompdf->output();
+            $fileName = 'resume_' . uniqid() . '.pdf';
+            $filePath = 'resumes/' . $fileName;
+            Storage::put($filePath, $pdfContent);
+        } catch (\Exception $e) {
+            Log::error('An error occurred in dompdf: ' . $e->getMessage());
+        }
 
         $image = $request->file('image');
         $imageName = 'image_' . uniqid() . '.' . $image->getClientOriginalExtension();

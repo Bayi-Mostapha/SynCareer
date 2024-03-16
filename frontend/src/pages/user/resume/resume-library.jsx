@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 // sonner 
 import { toast } from "sonner";
-import ResumeCard from "../../../components/user/resume-card";
-import ResumesSkeleton from "@/components/user/resumes-skeleton";
+// componentes
+import ResumeCard from "../../../components/user/resume/resume-card";
+import ResumesSkeleton from "@/components/user/resume/resumes-skeleton";
 
 function Resumes() {
     const [isFetching, setIsFetching] = useState(false);
