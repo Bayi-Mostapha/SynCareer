@@ -27,7 +27,7 @@ function Side() {
     ];
 
     return (
-        <div className="px-10 pt-12 hidden lg:flex flex-col w-2/5 h-full bg-primary">
+        <div className="px-10 pt-12 hidden lg:flex flex-col w-2/5 h-screen bg-primary">
             <h1 className="font-medium text-white text-xl">SynCareer</h1>
             <div className="flex-1 my-16">
                 <h2 className="mb-8 font-medium text-white text-4xl leading-normal">Start your journey with us</h2>

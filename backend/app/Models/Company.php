@@ -55,6 +55,6 @@ class Company extends Authenticatable
     ];
 
     public function jobOffers(){
-        $this->hasMany(JobOffer::class);
+        return $this->hasMany(JobOffer::class);
     }
 }

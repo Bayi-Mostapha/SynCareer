@@ -26,7 +26,7 @@ function MyCarousel({ testimonials }) {
     return (
         <>
             <Carousel
-                className="w-full max-w-xs hover:cursor-grab active:cursor-grabbing"
+                className="mx-auto w-full max-w-xs hover:cursor-grab active:cursor-grabbing"
                 setApi={setApi}
                 opts={{
                     align: "start",

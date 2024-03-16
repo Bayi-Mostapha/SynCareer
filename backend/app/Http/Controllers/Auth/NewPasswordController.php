@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\ValidationException;
 
 class NewPasswordController extends Controller
@@ -21,33 +23,35 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'min:8'],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        if ($status != Password::PASSWORD_RESET) {
+        $user = User::where('email', $validatedData['email'])->first();
+        if (!$user) {
             throw ValidationException::withMessages([
-                'email' => [__($status)],
+                'email' => ['User not found.'],
             ]);
         }
 
-        return response()->json(['status' => __($status)]);
+        $tokenExists = DB::table('password_reset_tokens')
+            ->where('email', $validatedData['email'])
+            ->where('token', $validatedData['token'])
+            ->exists();
+        if (!$tokenExists) {
+            return response()->json(['message' => 'Invalid code'], 400);
+        }
+
+        $user->password = Hash::make($validatedData['password']);
+        $user->remember_token = Str::random(60);
+        $user->save();
+
+        // event(new PasswordReset($user));
+
+        DB::table('password_reset_tokens')->where('email', $validatedData['email'])->delete();
+
+        return response()->json(['message' => 'Password reset successfully.']);
     }
 }
