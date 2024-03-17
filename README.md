@@ -1,6 +1,6 @@
 # Syncareer
 docs :)
-
+## Backend
 ### CRUD using eloquent relashionships
 
 - **how to insert a new candidate for a job offer:**
@@ -35,3 +35,10 @@ $user and $jobOffer are eloquent models, so get your user using a user_id `User:
 - reports has a model
 - user experience has a model
 - user education has a model
+
+## Frontend
+to work with a tabel fist import DataTable, provide it with columns data and seach column
+`<DataTable columns={columns} data={data} searchColumn={"email"} />`
+- columns are defined for each table, check components/company/job-offers-table to know how to make one, you can add "sorting by" column and action like i did
+- data is fetched from server, make sure that data structure is like columns
+- seachColumn is the column used for seach

@@ -1,83 +1,185 @@
-import { Button } from "@/components/ui/button"
 import { axiosClient } from '../../api/axios';
+// form 
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+// sonner 
 import { toast } from 'sonner'
+// shadcn 
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+// table 
+import DataTable from "@/components/general/data-table";
+import { columns } from '@/components/company/job-offers-table/columns';
 
-  
-    const schema = yup.object().shape({
-   
+const schema = yup.object().shape({
     job_title: yup.string().required(),
     location: yup.string().required(),
     workplace_type: yup.string().required(),
     workhours_type: yup.string().required(),
-    exp_years: yup.number().required().integer(),  
+    exp_years: yup.number().required().integer(),
     role_desc: yup.string().required(),
 });
 
 function JobOffer() {
-    const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: yupResolver(schema)
+    const form = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            email: '',
+            password: '',
+        }
     });
+    const { formState, handleSubmit, control } = form;
+    const { isSubmitting, isValid } = formState;
 
     const onSubmit = async (data) => {
         try {
-            // Make API call to post job offer data
             const response = await axiosClient.post('/joboffers', data);
-
-            // Handle successful response
             console.log(response.data);
             toast.success('Job offer posted successfully!');
         } catch (error) {
-            // Handle error
             console.error('Error posting job offer:', error);
             toast.error('Failed to post job offer. Please try again later.');
         }
     };
 
-    return (  
+    const data = [
+        {
+            id: "728ed52f",
+            amount: 100,
+            status: "pending",
+            email: "m@example.com",
+        },
+        {
+            id: "52wed8s9",
+            amount: 45,
+            status: "done",
+            email: "a@example.com",
+        },
+    ]
+
+    return (
         <>
-            <Dialog>
-                <DialogTrigger>
-                    <Button className="" variant="default">Post Job</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Post a Job Offer</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <input type="text" {...register("job_title")} placeholder="Job Title" />
-                        {errors.job_title && <p>{errors.job_title.message}</p>}
-
-                        <input type="text" {...register("location")} placeholder="Location" />
-                        {errors.location && <p>{errors.location.message}</p>}
-
-                        <input type="text" {...register("workplace_type")} placeholder="Workplace Type" />
-                        {errors.workplace_type && <p>{errors.workplace_type.message}</p>}
-
-                        <input type="text" {...register("workhours_type")} placeholder="Workhours Type" />
-                        {errors.workhours_type && <p>{errors.workhours_type.message}</p>}
-
-                        <input type="number" {...register("exp_years")} placeholder="Years of Experience" />
-                        {errors.exp_years && <p>{errors.exp_years.message}</p>}
-
-                        <textarea {...register("role_desc")} placeholder="Role Description" />
-                        {errors.role_desc && <p>{errors.role_desc.message}</p>}
-
-                        <Button type="submit">Submit</Button>
-                    </form>
-                </DialogContent>
-            </Dialog>
+            <div className="flex justify-end">
+                <Dialog>
+                    <DialogTrigger>
+                        <Button variant="default">Post Job</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Post a Job Offer</DialogTitle>
+                        </DialogHeader>
+                        <Form {...form}>
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <ScrollArea className="h-[400px] p-5">
+                                    <FormField
+                                        control={control}
+                                        name="job_title"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Job title</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='text' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="location"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Location</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='text' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="workplace_type"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Workplace type</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='text' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="workhours_type"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Workhours type</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='text' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="exp_years"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Experience years</FormLabel>
+                                                    <FormControl>
+                                                        <Input type='text' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="role_desc"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Role description</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                </ScrollArea>
+                                <Button disabled={isSubmitting} type="submit">Submit</Button>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <DataTable columns={columns} data={data} searchColumn={"email"} />
         </>
     );
 }

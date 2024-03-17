@@ -24,34 +24,36 @@ class JobOfferController extends Controller
         $user = $request->user();
         if (!$user->tokenCan('company')) {
             return response()->json(['message' => 'Unauthorized'], 401);
-        } else {
-
-            // Validate the incoming request data
-            $validatedData = $request->validate([
-                'job_title' => 'required|string',
-                'location' => 'required|string',
-                'workplace_type' => 'required|string',
-                'workhours_type' => 'required|string',
-                'exp_years' => 'required|integer',
-                'role_desc' => 'required|string',
-            ]);
-            // Assign company_id to the authenticated user's ID
-            $validatedData['company_id'] = $user->id;
-            // Create a new job offer instance
-            $jobOffer = JobOffer::create($validatedData);
-
-            // Return a response indicating success
-            return response()->json(['message' => 'Job offer created successfully', 'jobOffer' => $jobOffer], 201);
         }
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'job_title' => 'required|string',
+            'location' => 'required|string',
+            'workplace_type' => 'required|string',
+            'workhours_type' => 'required|string',
+            'exp_years' => 'required|integer',
+            'role_desc' => 'required|string',
+        ]);
+        // Assign company_id to the authenticated user's ID
+        $validatedData['company_id'] = $user->id;
+        // Create a new job offer instance
+        $jobOffer = JobOffer::create($validatedData);
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Job offer created successfully', 'jobOffer' => $jobOffer], 201);
     }
 
-    public function show(Request $request, JobOffer $jobOffer)
+    public function show(JobOffer $jobOffer)
     {
         return response()->json($jobOffer);
     }
 
     public function update(Request $request, JobOffer $jobOffer)
     {
+        $user = $request->user();
+        if (!$user->tokenCan('company')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
         $this->authorize('update', $jobOffer);
         // Validate the incoming request data
         $validatedData = $request->validate([
@@ -72,8 +74,12 @@ class JobOfferController extends Controller
 
 
 
-    public function destroy(JobOffer $jobOffer)
+    public function destroy(Request $request, JobOffer $jobOffer)
     {
+        $user = $request->user();
+        if (!$user->tokenCan('company')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
         $this->authorize('delete', $jobOffer);
         $jobOffer->delete();
         return response()->json(['message' => 'Job offer deleted successfully']);

@@ -11,26 +11,12 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 class JobOfferPolicy
 {
-
-
-    /**
-     * Determine whether the user can create models.
-     */
-    // public function create(Company $user): bool
-    // {
-    //     //
-    // }
-
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Company $user, JobOffer $jobOffer): bool
+    public function update(Company $company, JobOffer $jobOffer): bool
     {
-        if (!$user->tokenCan('company')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $jobOffer->company_id === $jobOffer->user_id;
+        return $company->id === $jobOffer->company_id;
     }
 
     /**
@@ -38,10 +24,6 @@ class JobOfferPolicy
      */
     public function delete(Company $company, JobOffer $jobOffer)
     {
-        if (!$company->tokenCan('company')) {
-            throw new AuthorizationException('Unauthorized', 401);
-        }
-
         return $company->id === $jobOffer->company_id;
     }
 
@@ -50,7 +32,6 @@ class JobOfferPolicy
      */
     public function restore(Company $user, JobOffer $jobOffer): bool
     {
-        //
         return false;
     }
 
@@ -59,7 +40,6 @@ class JobOfferPolicy
      */
     public function forceDelete(Company $user, JobOffer $jobOffer): bool
     {
-        //
         return false;
     }
 }
