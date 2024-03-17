@@ -117,7 +117,7 @@ const ResumeCreator = () => {
             const blobData = dataURItoBlob(dataUrl);
             formData.append('image', blobData, 'resume-image.jpeg');
             formData.append('html_content', htmlContent);
-            const saveResponse = await axiosClient.post('/store-resume', formData);
+            const saveResponse = await axiosClient.post('/resumes', formData);
             toast.success(saveResponse.data.message)
             const fileName = saveResponse.data.fileName
 

@@ -40,11 +40,7 @@ function Resumes() {
                 return resume;
             }));
 
-            const downloadResponse = await axiosClient.delete(`/delete-resume`, {
-                data: {
-                    id: id,
-                }
-            });
+            const downloadResponse = await axiosClient.delete(`/resumes/${id}`);
             setResumes(prev => prev.filter((resume) => resume.id != id))
             toast.success(downloadResponse.data.message)
         } catch (error) {

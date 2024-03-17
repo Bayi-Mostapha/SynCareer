@@ -60,9 +60,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::get('/resumes', [ResumeController::class, 'index']);
-    Route::post('/store-resume', [ResumeController::class, 'store']);
+    Route::post('/resumes', [ResumeController::class, 'store']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
-    Route::delete('/delete-resume', [ResumeController::class, 'deleteResume']);
+    Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
 });
 //getting a private ressource (image, resume)

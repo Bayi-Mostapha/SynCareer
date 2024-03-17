@@ -21,6 +21,7 @@ import ResumeCreator from '@/pages/user/resume/resume-builder';
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
+import CompanyDashboard from '@/pages/company/company-dashboard';
 
 // links 
 // auth 
@@ -88,7 +89,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
-                element: <h1>dashboard</h1>
+                element: <CompanyDashboard />
             },
         ]
     },

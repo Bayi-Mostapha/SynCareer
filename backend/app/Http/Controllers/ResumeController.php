@@ -19,6 +19,11 @@ class ResumeController extends Controller
 
     function store(Request $request)
     {
+        $user = $request->user();
+        if (!$user->tokenCan('user')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
         $validatedData = $request->validate([
             'html_content' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif',
@@ -71,12 +76,14 @@ class ResumeController extends Controller
         return response()->download($filePath, $filename);
     }
 
-    function deleteResume(Request $request)
+    function deleteResume(Request $request, Resume $resume)
     {
-        $validatedData = $request->validate([
-            'id' => 'required',
-        ]);
-        $resume = Resume::findOrFail($validatedData['id']);
+        $user = $request->user();
+        if (!$user->tokenCan('user')) {
+            return response()->json(["message" => 'This action is forbidden'], 403);
+        }
+        $this->authorize('delete', $resume);
+
         Storage::delete(['resume-images/' . $resume->image_name, 'resumes/' . $resume->resume_name]);
         $resume->delete();
         return response()->json(["message" => 'resume deleted successfully']);
