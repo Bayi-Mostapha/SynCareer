@@ -40,13 +40,13 @@ export function SidebarItem({ icon, text, location, alert }) {
         <NavLink
             to={location}
             className={`
-        relative flex items-center py-2 px-3 my-1
+        relative flex items-center ${expanded ? 'justify-start' : 'justify-center'} p-3 my-3
         font-medium rounded-md cursor-pointer
         transition-colors group hover:bg-secondary text-gray-600`}
         >
             {icon}
             <span
-                className={`overflow-hidden transition-all ${expanded ? "ml-3" : "w-0"}`}
+                className={`overflow-hidden transition-all ${expanded ? "ml-3" : "hidden"}`}
             >
                 {text}
             </span>
@@ -61,9 +61,9 @@ export function SidebarItem({ icon, text, location, alert }) {
             {!expanded && (
                 <div
                     className={`
-          absolute left-full rounded-md px-2 py-1 ml-6
+          whitespace-nowrap absolute left-full rounded-md px-2 py-1 ml-6
           bg-secondary text-primary text-sm
-          invisible opacity-20 -translate-x-3 transition-all
+          invisible opacity-20 translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
                 >
                     {text}
