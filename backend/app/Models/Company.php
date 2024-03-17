@@ -54,7 +54,8 @@ class Company extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function jobOffers(){
-        $this->hasMany(JobOffer::class);
+    public function jobOffers()
+    {
+        return $this->hasMany(JobOffer::class);
     }
 }
