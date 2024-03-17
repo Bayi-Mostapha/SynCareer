@@ -2,13 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\ResumeController;
 
 // GUEST
 Route::post('/register', [RegisteredUserController::class, 'store'])
@@ -64,8 +65,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
+    // joboffers
+    Route::get('/joboffers', [JobOfferController::class, 'index']);
+    Route::post('/joboffers', [JobOfferController::class, 'store']);
+    Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
+    Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
+    Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
 });
-//getting a private ressource (image, resume)
+
+//getting a private resource (image, resume)
 Route::get('/storage/{folder}/{file}', function ($folder, $file) {
     $path = storage_path("app/$folder/$file");
     if (!file_exists($path)) {

@@ -17,6 +17,7 @@ import NotFound from '../pages/NotFound';
 import ResumeContainer from '@/pages/user/resume-container';
 import Resumes from '@/pages/user/resume/resume-library';
 import ResumeCreator from '@/pages/user/resume/resume-builder';
+import JobOffer from '@/pages/company/JobOffer';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -37,6 +38,9 @@ export const USER_RESUMES_LINK = '/user/resumes';
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 // dashboard 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
+
+export const JOBOFFER_LINK = '/company/joboffer';
+
 
 // router 
 export const router = createBrowserRouter([
@@ -90,6 +94,11 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_DASHBOARD_LINK,
                 element: <CompanyDashboard />
+            },
+
+            {
+                path: JOBOFFER_LINK,
+                element: <JobOffer/>
             },
         ]
     },
