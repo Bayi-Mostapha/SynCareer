@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 // routing
 import { Link, useNavigate } from 'react-router-dom';
-import { REGISTER_LINK, USER_HOME_LINK } from '../../router';
+import { FORGOT_PASSWORD_LINK, REGISTER_LINK, USER_HOME_LINK } from '../../router';
 
 // icons 
 import { FaArrowRight } from "react-icons/fa";
@@ -31,7 +31,13 @@ function Login() {
 
     const navigate = useNavigate()
 
-    const form = useForm({ resolver: yupResolver(schema) });
+    const form = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            email: '',
+            password: '',
+        }
+    });
     const { formState, handleSubmit, control } = form;
     const { isSubmitting, isValid } = formState;
 
@@ -91,7 +97,7 @@ function Login() {
                                 Remember me
                             </Label>
                         </div>
-                        <Link to='' className='text-primary text-sm font-medium'>Forgot passsword?</Link>
+                        <Link to={FORGOT_PASSWORD_LINK} className='text-primary text-sm font-medium'>Forgot passsword?</Link>
                     </div>
 
                     <Button disabled={isSubmitting || !isValid} variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use App\Mail\PasswordMail;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -17,23 +21,40 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated_data = $request->validate([
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        if ($status != Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+        $user = User::where('email', $validated_data['email'])->first();
+        if (!$user) {
+            return response()->json(['message' => 'email does not exist'], 404);
         }
 
-        return response()->json(['status' => __($status)]);
+        $token = random_int(100000, 999999);
+
+        try {
+            DB::table('password_reset_tokens')->insert([
+                'email' => $validated_data['email'],
+                'token' => $token,
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Code already sent, check your email'], 400);
+        }
+
+        Mail::to($validated_data['email'])->send(new PasswordMail($token));
+        return response()->json(['message' => 'check your email']);
+
+        // $status = Password::sendResetLink(
+        //     $request->only('email')
+        // );
+
+        // if ($status != Password::RESET_LINK_SENT) {
+        //     throw ValidationException::withMessages([
+        //         'email' => [__($status)],
+        //     ]);
+        // }
+
+        // return response()->json(['status' => __($status)]);
     }
 }

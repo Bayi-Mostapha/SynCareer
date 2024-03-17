@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\JobOffer;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -54,6 +53,11 @@ class Company extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Define a relationship with JobOffer model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function jobOffers()
     {
         return $this->hasMany(JobOffer::class);

@@ -71,10 +71,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
     Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
     Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
-    // Route::resource('/joboffers', JobOfferController::class);
 });
 
-//getting a private ressource (image, resume)
+//getting a private resource (image, resume)
 Route::get('/storage/{folder}/{file}', function ($folder, $file) {
     $path = storage_path("app/$folder/$file");
     if (!file_exists($path)) {

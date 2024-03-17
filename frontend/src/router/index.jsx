@@ -11,6 +11,8 @@ import AdminLayout from '../layouts/AdminLayout';
 // pages
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
+import ForgotPassword from '@/pages/auth/forgot-password';
+import ResetPassword from '@/pages/auth/reset-password';
 import NotFound from '../pages/NotFound';
 import ResumeContainer from '@/pages/user/resume-container';
 import Resumes from '@/pages/user/resume/resume-library';
@@ -25,6 +27,9 @@ import AuthRoute from './protectors/AuthRoute';
 // auth 
 export const LOGIN_LINK = '/login';
 export const REGISTER_LINK = '/register';
+export const FORGOT_PASSWORD_LINK = '/forgot-password';
+export const RESET_PASSWORD_BASE_LINK = '/reset-password';
+export const RESET_PASSWORD_LINK = '/reset-password/:email';
 // user 
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
@@ -48,6 +53,14 @@ export const router = createBrowserRouter([
             {
                 path: REGISTER_LINK,
                 element: <Register />
+            },
+            {
+                path: FORGOT_PASSWORD_LINK,
+                element: <ForgotPassword />
+            },
+            {
+                path: RESET_PASSWORD_LINK,
+                element: <ResetPassword />
             },
         ]
     },
