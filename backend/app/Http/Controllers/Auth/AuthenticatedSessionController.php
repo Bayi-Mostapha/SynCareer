@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
             return response()->json(['message' => 'Your email address is not verified.'], 409);
         }
 
-        $user->tokens->delete();
+        $user->tokens()->delete();
         $token = $user->createToken('api-token', [$authenticatedGuard])->plainTextToken;
 
         return response()->json([

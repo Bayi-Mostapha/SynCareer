@@ -11,7 +11,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
-Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
