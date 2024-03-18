@@ -7,18 +7,36 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
 // icons 
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 
 export const columns = [
     {
-        accessorKey: "id",
-        header: "Id",
+        accessorKey: "matching",
+        header: "",
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("matching"));
+            const formatted = new Intl.NumberFormat("en-US", {
+                style: "percent",
+                minimumFractionDigits: 2,
+            }).format(amount);
+
+            return <>{formatted}</>
+        },
     },
     {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "first_name",
+        header: "First name",
+    },
+    {
+        accessorKey: "last_name",
+        header: "Last name",
+    },
+    {
+        accessorKey: "job_title",
+        header: "Job title",
     },
     {
         accessorKey: "email",
@@ -33,10 +51,6 @@ export const columns = [
                 </Button>
             )
         },
-    },
-    {
-        accessorKey: "amount",
-        header: "Amount",
     },
     {
         id: "actions",

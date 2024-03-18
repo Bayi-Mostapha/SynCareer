@@ -6,6 +6,7 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -66,6 +67,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
     Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
     Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
+
+    //cadidats
+    Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
 
     //getting a private resource (image, resume)
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {

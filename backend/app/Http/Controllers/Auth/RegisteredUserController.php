@@ -32,6 +32,7 @@ class RegisteredUserController extends Controller
                 'job_title' => 'nullable|string|max:255',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|string|min:8',
+                'terms' => 'required|accepted'
             ]);
 
             $user = User::create([
@@ -52,6 +53,7 @@ class RegisteredUserController extends Controller
                 'city' => 'nullable|string|max:255',
                 'industry' => 'nullable|string|max:255',
                 'size' => 'nullable|string|max:255',
+                'terms' => 'required|accepted'
             ]);
             $user = Company::create([
                 'first_name' => $validatedData['first_name'],
