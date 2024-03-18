@@ -38,10 +38,10 @@ export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
+export const JOBOFFER_LINK_BASE = '/company/joboffer';
 // dashboard 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
-export const JOBOFFER_LINK = '/company/joboffer';
 
 
 // router 
@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
             },
 
             {
-                path: JOBOFFER_LINK,
+                path: JOBOFFER_LINK_BASE,
                 children: [
                     {
                         path: '',

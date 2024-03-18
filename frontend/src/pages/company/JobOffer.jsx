@@ -55,7 +55,7 @@ function JobOffer() {
 
     const data = [
         {
-            id: "728ed52f",
+            id: "4",
             amount: 100,
             status: "pending",
             email: "m@example.com",

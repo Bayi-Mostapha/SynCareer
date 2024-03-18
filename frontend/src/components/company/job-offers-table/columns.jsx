@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+// shadcn 
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -7,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { JOBOFFER_LINK_BASE } from "@/router";
 // icons 
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
@@ -53,14 +56,14 @@ export const columns = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>
+                            <Link to={`${JOBOFFER_LINK_BASE}/${jobOffer.id}` }>view candidats</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => navigator.clipboard.writeText(jobOffer.id)}
                         >
                             Delete
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            Update
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
