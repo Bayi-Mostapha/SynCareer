@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Validation\ValidationException;
 
 class PasswordResetLinkController extends Controller
@@ -28,6 +29,10 @@ class PasswordResetLinkController extends Controller
         $user = User::where('email', $validated_data['email'])->first();
         if (!$user) {
             return response()->json(['message' => 'email does not exist'], 404);
+        }
+
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Your email address is not verified.'], 409);
         }
 
         $token = random_int(100000, 999999);

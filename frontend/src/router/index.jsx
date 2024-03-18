@@ -23,6 +23,7 @@ import JobOffer from '@/pages/company/JobOffer';
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
+import VerifyEmail from '@/pages/auth/verify-email';
 
 // links 
 // auth 
@@ -98,7 +99,7 @@ export const router = createBrowserRouter([
 
             {
                 path: JOBOFFER_LINK,
-                element: <JobOffer/>
+                element: <JobOffer />
             },
         ]
     },
@@ -110,6 +111,10 @@ export const router = createBrowserRouter([
                 element: <h1>hi admin</h1>
             },
         ]
+    },
+    {
+        path: '/verify-email/:url',
+        element: <VerifyEmail />
     },
     {
         path: '*',

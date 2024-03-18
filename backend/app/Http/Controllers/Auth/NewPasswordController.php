@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Validation\ValidationException;
 
 class NewPasswordController extends Controller
@@ -35,6 +33,11 @@ class NewPasswordController extends Controller
                 'email' => ['User not found.'],
             ]);
         }
+
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Your email address is not verified.'], 409);
+        }
+
 
         $tokenExists = DB::table('password_reset_tokens')
             ->where('email', $validatedData['email'])

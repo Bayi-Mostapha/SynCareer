@@ -11,11 +11,16 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
-// GUEST
+Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.send');
+
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
-
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware('guest')
     ->name('login');
@@ -23,21 +28,11 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->middleware('guest')
     ->name('password.email');
-
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.store');
 
-// AUTH USERS 
-Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware(['throttle:6,1'])
-        ->name('verification.send');
-
+Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
@@ -71,13 +66,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
     Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
     Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
-});
 
-//getting a private resource (image, resume)
-Route::get('/storage/{folder}/{file}', function ($folder, $file) {
-    $path = storage_path("app/$folder/$file");
-    if (!file_exists($path)) {
-        abort(404);
-    }
-    return response()->file($path);
+    //getting a private resource (image, resume)
+    Route::get('/storage/{folder}/{file}', function ($folder, $file) {
+        $path = storage_path("app/$folder/$file");
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    });
 });
