@@ -13,6 +13,7 @@ class JobOfferCandidatsController extends Controller
         if (!$user->tokenCan('company')) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
+        $this->authorize('viewCandidats', $jobOffer);
 
         $candidats = $jobOffer->candidats;
         $filteredCandidats = [];

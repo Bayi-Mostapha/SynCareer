@@ -27,6 +27,11 @@ class JobOfferPolicy
         return $company->id === $jobOffer->company_id;
     }
 
+    public function viewCandidats(Company $company, JobOffer $jobOffer)
+    {
+        return $company->id === $jobOffer->company_id;
+    }
+
     /**
      * Determine whether the user can restore the model.
      */
