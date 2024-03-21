@@ -11,99 +11,89 @@ function ResumeHeader({ styles, isEdit, avatarUrl, setAvatarUrl, formData, title
         borderRadius: '50%'
     }
     return (
-        <>
-            <table style={avatarUrl && { borderCollapse: 'separate', borderSpacing: '30px' }}>
-                <tr>
-                    <td className="relative">
-                        {avatarUrl &&
-                            <div style={imgStyles}></div>
-                        }
-                        {
-                            isEdit && avatarUrl &&
-                            <Button
-                                variant="ghost"
-                                className="absolute top-0 right-0 p-0 text-lg text-destructive hover:bg-transparent hover:opacity-85 hover:text-destructive transition-all"
-                                onClick={() => setAvatarUrl(null)}
-                            >
-                                <FaRegTrashCan />
-                            </Button>
-                        }
-                    </td>
-                    <td style={{ width: '100%' }}>
-                        <input
-                            readOnly={!isEdit}
-                            type="text"
-                            value={formData.fullname}
-                            name="fullname"
-                            onChange={handleChange}
-                            style={titleStyles}
-                        />
-                        <input
-                            readOnly={!isEdit}
-                            type="text"
-                            value={formData.jobPosition}
-                            name="jobPosition"
-                            onChange={handleChange}
-                            style={{ ...styles, fontSize: '.85rem', marginTop: '-5px' }}
-                        />
-                    </td>
-                </tr>
-            </table>
-            <table className="my-8" style={{ width: '100%' }}>
+        <div style={{ marginBottom: '15px' }}>
+            <table style={{ marginBottom: '15px' }}>
                 <tbody>
                     <tr>
-                        <td className="pl-6">
-                            <ul className="pl-5" style={{ listStyleType: 'disc', color: '#334155' }}>
-                                <li>
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={formData.phoneNumber}
-                                        name="phoneNumber"
-                                        onChange={handleChange}
-                                        style={{ ...styles, fontSize: '.8rem' }}
-                                    />
-                                </li>
-                                <li>
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={formData.email}
-                                        name="email"
-                                        onChange={handleChange}
-                                        style={{ ...styles, fontSize: '.8rem' }}
-                                    />
-                                </li>
-                            </ul>
+                        <td style={{ width: '525px' }}>
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.fullname}
+                                name="fullname"
+                                onChange={handleChange}
+                                style={titleStyles}
+                            />
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.jobPosition}
+                                name="jobPosition"
+                                onChange={handleChange}
+                                style={{ ...styles, fontSize: '17px', textTransform: 'capitalize' }}
+                            />
                         </td>
-                        <td>
-                            <ul lassName="pl-5" style={{ listStyleType: 'disc', color: '#334155' }}>
-                                <li>
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={formData.address}
-                                        name="address"
-                                        onChange={handleChange}
-                                        style={{ ...styles, fontSize: '.8rem' }}
-                                    />
-                                </li>
-                                <li>
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={formData.website}
-                                        name="website"
-                                        onChange={handleChange}
-                                        style={{ ...styles, fontSize: '.8rem' }}
-                                    />
-                                </li>
-                            </ul>
+                        <td className="relative">
+                            {avatarUrl &&
+                                <div style={imgStyles}></div>
+                            }
+                            {
+                                isEdit && avatarUrl &&
+                                <Button
+                                    variant="ghost"
+                                    className="absolute top-0 right-0 p-0 text-lg text-destructive hover:bg-transparent hover:opacity-85 hover:text-destructive transition-all"
+                                    onClick={() => setAvatarUrl(null)}
+                                >
+                                    <FaRegTrashCan />
+                                </Button>
+                            }
                         </td>
                     </tr>
                 </tbody>
             </table>
-        </>);
+            <table style={{ width: '100%' }}>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.phoneNumber}
+                                name="phoneNumber"
+                                onChange={handleChange}
+                                style={{ ...styles, fontSize: '.9rem' }}
+                            />
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.email}
+                                name="email"
+                                onChange={handleChange}
+                                style={{ ...styles, fontSize: '.9rem' }}
+                            />
+                        </td>
+                        <td>
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.address}
+                                name="address"
+                                onChange={handleChange}
+                                style={{ ...styles, fontSize: '.9rem' }}
+                            />
+                            <input
+                                readOnly={!isEdit}
+                                type="text"
+                                value={formData.website}
+                                name="website"
+                                onChange={handleChange}
+                                style={{ ...styles, fontSize: '.9rem' }}
+                            />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>);
 }
 
 export default ResumeHeader;

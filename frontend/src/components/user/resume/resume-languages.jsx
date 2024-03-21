@@ -20,14 +20,14 @@ function ResumeLanguages({ languages, setLanguages, styles, isEdit, handleTitleC
         const updatedLanguages = [
             ...languages,
             {
-                title: "english",
-                level: "advanced",
+                title: "English",
+                level: "Advanced",
             }
         ];
         setLanguages(updatedLanguages);
     };
     return (
-        <>
+        <div style={{ marginBottom: '15px' }}>
             <div>
                 {(languages && languages.length) > 0 ? (
                     <>
@@ -40,37 +40,35 @@ function ResumeLanguages({ languages, setLanguages, styles, isEdit, handleTitleC
                             onChange={handleTitleChange}
                             style={titleStyles}
                         />
-                        <ul className="pl-9" style={{ listStyleType: 'disc' }}>
-                            {languages.map((language, i) => (
-                                <li key={i} className='relative'>
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={language.title}
-                                        name="title"
-                                        onChange={(e) => handleLanguageChange(i, e)}
-                                        style={styles}
-                                    />
-                                    <input
-                                        readOnly={!isEdit}
-                                        type="text"
-                                        value={language.level}
-                                        name="level"
-                                        onChange={(e) => handleLanguageChange(i, e)}
-                                        style={{ ...styles, fontSize: '.9rem', color: '#64748b' }}
-                                    />
-                                    {
-                                        isEdit && <Button
-                                            variant="ghost"
-                                            className="py-1 px-2 absolute top-0 right-0 text-lg text-destructive hover:opacity-85 hover:text-destructive transition-all"
-                                            onClick={() => removeLanguage(i)}
-                                        >
-                                            <FaRegTrashCan />
-                                        </Button>
-                                    }
-                                </li>
-                            ))}
-                        </ul>
+                        {languages.map((language, i) => (
+                            <>
+                                <input
+                                    readOnly={!isEdit}
+                                    type="text"
+                                    value={language.title}
+                                    name="title"
+                                    onChange={(e) => handleLanguageChange(i, e)}
+                                    style={{ ...styles, fontWeight: '600' }}
+                                />
+                                <input
+                                    readOnly={!isEdit}
+                                    type="text"
+                                    value={language.level}
+                                    name="level"
+                                    onChange={(e) => handleLanguageChange(i, e)}
+                                    style={{ ...styles, fontSize: '.85rem' }}
+                                />
+                                {
+                                    isEdit && <Button
+                                        variant="ghost"
+                                        className="py-1 px-2 absolute top-0 right-0 text-lg text-destructive hover:opacity-85 hover:text-destructive transition-all"
+                                        onClick={() => removeLanguage(i)}
+                                    >
+                                        <FaRegTrashCan />
+                                    </Button>
+                                }
+                            </>
+                        ))}
                     </>
                 ) : null}
             </div>
@@ -82,7 +80,7 @@ function ResumeLanguages({ languages, setLanguages, styles, isEdit, handleTitleC
                     <FaPlus /> Add Language
                 </div>
             }
-        </>
+        </div>
     );
 }
 
