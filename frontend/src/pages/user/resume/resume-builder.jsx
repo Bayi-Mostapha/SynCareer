@@ -16,6 +16,7 @@ import { TbPencil, TbPencilOff } from "react-icons/tb";
 import { LuChevronsUpDown } from "react-icons/lu";
 import { IoCloudDownloadOutline } from "react-icons/io5"
 import { MdOutlineColorLens } from "react-icons/md";
+import { SlPicture } from "react-icons/sl";
 // html to pdf 
 import { toJpeg } from 'html-to-image';
 // react drop zone
@@ -276,7 +277,7 @@ const ResumeCreator = () => {
             </div>
             {isEdit &&
                 <>
-                    <DnDFile {...dropZone} />
+                    <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
                     <div className="my-4 flex justify-center items-center gap-4">
                         <div className="h-7 w-7 bg-[#1e40af] rounded-full cursor-pointer hover:scale-125 transition-all:"
                             onClick={() => { setColor("#1e40af") }}></div>

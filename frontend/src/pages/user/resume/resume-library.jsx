@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { axiosClient } from "@/api/axios";
 // icons 
 import { FaPlus } from "react-icons/fa6";
+import { GrDocumentPdf } from "react-icons/gr";
 // shadcn 
 import { Link } from "react-router-dom";
 import {
@@ -205,7 +206,7 @@ function Resumes() {
                                     </div>
                                 </>
                                 :
-                                <DnDFile {...dropZone} />
+                                <DnDFile {...dropZone} file="resume" icon={<GrDocumentPdf className="text-8xl text-gray-400" />}/> 
                         }
                     </DialogContent>
                 </Dialog>
