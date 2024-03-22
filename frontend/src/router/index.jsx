@@ -18,6 +18,8 @@ import ResumeContainer from '@/pages/user/resume-container';
 import Resumes from '@/pages/user/resume/resume-library';
 import ResumeCreator from '@/pages/user/resume/resume-builder';
 import JobOffer from '@/pages/company/JobOffer';
+import UserHome from '@/pages/user/UserHome';
+import ApplyJobOffer from '@/pages/user/ApplyJobOffer';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -72,7 +74,13 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: USER_HOME_LINK,
-                element: <h1>user home</h1>
+                element: <UserHome />,
+                children: [
+                    {
+                        path: ':id',
+                        element: <ApplyJobOffer />
+                    },
+                ]
             },
             {
                 path: USER_RESUMES_LINK,
@@ -85,7 +93,8 @@ export const router = createBrowserRouter([
                     {
                         path: 'create',
                         element: <ResumeCreator />
-                    }
+                    },
+                   
                 ]
             },
         ]
