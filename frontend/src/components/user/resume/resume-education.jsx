@@ -28,7 +28,7 @@ function ResumeEducation({ education, setEducation, styles, isEdit, handleTitleC
         setEducation(updatedEdu);
     };
     return (
-        <>
+        <div style={{ marginBottom: '15px' }}>
             <div>
                 {(education && education.length) > 0 ? (
                     <>
@@ -44,28 +44,30 @@ function ResumeEducation({ education, setEducation, styles, isEdit, handleTitleC
                         {education.map((edu, i) => (
                             <div key={i} className='relative'>
                                 <table>
-                                    <tr>
-                                        <td style={{ width: '80%' }}>
-                                            <input
-                                                readOnly={!isEdit}
-                                                type="text"
-                                                value={edu.major}
-                                                name="major"
-                                                onChange={(e) => handleEducationChange(i, e)}
-                                                style={{ ...styles, fontWeight: '600', }}
-                                            />
-                                        </td>
-                                        <td style={{ width: '20%' }}>
-                                            <input
-                                                readOnly={!isEdit}
-                                                type="text"
-                                                value={edu.year}
-                                                name="year"
-                                                onChange={(e) => handleEducationChange(i, e)}
-                                                style={styles}
-                                            />
-                                        </td>
-                                    </tr>
+                                    <tbody>
+                                        <tr>
+                                            <td width="450px">
+                                                <input
+                                                    readOnly={!isEdit}
+                                                    type="text"
+                                                    value={edu.major}
+                                                    name="major"
+                                                    onChange={(e) => handleEducationChange(i, e)}
+                                                    style={{ ...styles, fontWeight: '600', }}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    readOnly={!isEdit}
+                                                    type="text"
+                                                    value={edu.year}
+                                                    name="year"
+                                                    onChange={(e) => handleEducationChange(i, e)}
+                                                    style={styles}
+                                                />
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                                 <input
                                     readOnly={!isEdit}
@@ -87,8 +89,9 @@ function ResumeEducation({ education, setEducation, styles, isEdit, handleTitleC
                             </div>
                         ))}
                     </>
-                ) : null}
-            </div>
+                ) : null
+                }
+            </div >
             {isEdit &&
                 <div
                     onClick={addEducation}
@@ -97,7 +100,7 @@ function ResumeEducation({ education, setEducation, styles, isEdit, handleTitleC
                     <FaPlus /> Add Education
                 </div>
             }
-        </>
+        </div>
     );
 }
 

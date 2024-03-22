@@ -26,7 +26,7 @@ function ResumeSkills({ skills, setSkills, styles, isEdit, handleTitleChange, ti
         setSkills(updatedSkills);
     };
     return (
-        <>
+        <div style={{ marginBottom: '15px' }}>
             <div>
                 {(skills && skills.length) > 0 ? (
                     <>
@@ -73,7 +73,7 @@ function ResumeSkills({ skills, setSkills, styles, isEdit, handleTitleChange, ti
                     <FaPlus /> Add Skill
                 </div>
             }
-        </>
+        </div>
     );
 }
 

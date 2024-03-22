@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 function ResumeSummary({ formData, handleChange, handleTitleChange, titles, titleStyles, isEdit }) {
     return (
-        <>
+        <div style={{ marginBottom: '15px' }}>
             <input
                 readOnly={!isEdit}
                 type="text"
@@ -40,7 +40,7 @@ function ResumeSummary({ formData, handleChange, handleTitleChange, titles, titl
                         {formData.personalSummary}
                     </div>
             }
-        </>
+        </div>
     );
 }
 

@@ -14,31 +14,21 @@ import {
     DialogClose,
     DialogFooter
 } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 function ResumeCard({ resume, onDelete, onDownload }) {
-    function formatDateTime(string) {
-        const dateObj = new Date(string);
-
-        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-        const date = dateObj.toLocaleDateString('en-GB', options);
-
-        const hours = dateObj.getHours().toString().padStart(2, '0');
-        const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-        const time = `${hours}:${minutes}`;
-
-        return [date, time];
-    }
-
-    const [date, time] = formatDateTime(resume.created_at)
 
     return (
-        <div className="p-4 bg-background rounded-md shadow-md">
-            <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold">#{resume.id}</p>
-                <div className="flex items-center gap-1">
+        <div>
+            <div className="p-1 pr-0 flex justify-between items-end">
+                <div className="flex-1">
+                    <h2 className="font-semibold">#{resume.id}</h2>
+                    <p className="text-xs text-slate-600">Created: {resume.date}</p>
+                </div>
+                <div className="flex gap-1 mb-2">
                     <Dialog>
                         <DialogTrigger>
-                            <FaRegTrashCan className="text-destructive hover:opacity-80 active:opacity-70" />
+                            <FaRegTrashCan className="text-red-500 hover:opacity-80 active:opacity-70" />
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -57,20 +47,19 @@ function ResumeCard({ resume, onDelete, onDownload }) {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
+                    <Button
+                        disabled={resume.isDeleting || resume.isDownloading}
+                        onClick={() => { onDownload(resume.resume_name, resume.id) }}
+                        variant="ghost"
+                        className="p-0 hover:opacity-80 active:opacity-70"
+                    >
+                        <MdOutlineFileDownload className="text-xl text-slate-700" />
+                    </Button>
                 </div>
             </div>
-            <p className="text-xs text-gray-500 flex items-center gap-1"><TbCalendarTime className="text-sm" /> {date} {time}</p>
-            <div className="mt-3 h-40 overflow-auto">
-                <img className="border border-1 bg-gray-400" src={`http://localhost:8000/api/storage/resume-images/${resume.image_name}`} alt={resume.id} />
-            </div>
-            <Button
-                disabled={resume.isDeleting || resume.isDownloading}
-                onClick={() => { onDownload(resume.resume_name, resume.id) }}
-                variant="default"
-                className="mt-4 w-full flex items-center gap-1"
-            >
-                <MdOutlineFileDownload className="text-xl" /> Download
-            </Button>
+            <ScrollArea className="h-[240px] rounded-md border">
+                <img className="object-cover" src={resume.img} alt={resume.id} />
+            </ScrollArea>
         </div>
     );
 }
