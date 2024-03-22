@@ -56,8 +56,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
         ]);
     });
 
+    // resume 
     Route::get('/resumes', [ResumeController::class, 'index']);
     Route::post('/resumes', [ResumeController::class, 'store']);
+    Route::post('/upload-resume', [ResumeController::class, 'upload']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 

@@ -25,7 +25,7 @@ function ResumeCard({ resume, onDelete, onDownload }) {
                     <h2 className="font-semibold">#{resume.id}</h2>
                     <p className="text-xs text-slate-600">Created: {resume.date}</p>
                 </div>
-                <div className="flex gap-1 mb-2">
+                <div className="flex gap-2 mb-2">
                     <Dialog>
                         <DialogTrigger>
                             <FaRegTrashCan className="text-red-500 hover:opacity-80 active:opacity-70" />
@@ -53,11 +53,11 @@ function ResumeCard({ resume, onDelete, onDownload }) {
                         variant="ghost"
                         className="p-0 hover:opacity-80 active:opacity-70"
                     >
-                        <MdOutlineFileDownload className="text-xl text-slate-700" />
+                        <MdOutlineFileDownload className="text-xl text-primary" />
                     </Button>
                 </div>
             </div>
-            <ScrollArea className="h-[240px] rounded-md border">
+            <ScrollArea className="h-[300px] rounded-md bg-gray-200 shadow-sm">
                 <img className="object-cover" src={resume.img} alt={resume.id} />
             </ScrollArea>
         </div>

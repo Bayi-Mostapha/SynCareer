@@ -59,6 +59,43 @@ class ResumeController extends Controller
         ]);
     }
 
+    function upload(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->tokenCan('user')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $request->validate([
+            'resume' => 'required|mimes:pdf',
+            'image' => 'required|image'
+        ]);
+
+        try {
+            $file = $request->file('resume');
+            $fileName = 'resume_' . uniqid() . '.pdf';
+            $file->storeAs('resumes', $fileName);
+
+            $image = $request->file('image');
+            $imageName = 'image_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('resume-images', $imageName);
+
+            Resume::create([
+                'user_id' => $request->user()->id,
+                'resume_name' => $fileName,
+                'image_name' => $imageName
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Error uploading your file',
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Resume uploaded successfully',
+        ]);
+    }
+
     function download(Request $request, $filename)
     {
         $user = $request->user();

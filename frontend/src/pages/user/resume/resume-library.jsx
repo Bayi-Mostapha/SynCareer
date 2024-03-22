@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { axiosClient } from "@/api/axios";
 // icons 
 import { FaPlus } from "react-icons/fa6";
 // shadcn 
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
+    DialogClose
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button";
 // sonner 
 import { toast } from "sonner";
 // componentes
@@ -12,10 +18,75 @@ import ResumeCard from "../../../components/user/resume/resume-card";
 import ResumesSkeleton from "@/components/user/resume/resumes-skeleton";
 // libs 
 import { formatDistanceToNow } from 'date-fns';
+// react drop zone
+import { useDropzone } from 'react-dropzone'
+import DnDFile from "@/components/general/dnd-file";
+//pdf stuff
+import { toJpeg } from 'html-to-image';
+import { Document, Page, pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.js',
+    import.meta.url,
+).toString();
 
 function Resumes() {
     const [isFetching, setIsFetching] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [resumes, setResumes] = useState([])
+    const [uFile, setUFile] = useState(null)
+    const imgRef = useRef();
+
+    const onDrop = useCallback(acceptedFiles => {
+        const file = acceptedFiles[0];
+        if (file) {
+            setUFile(file)
+        } else {
+            toast.error('Please upload a pdf')
+        }
+    }, []);
+    const dropZone = useDropzone({
+        onDrop,
+        accept: {
+            'application/pdf': ['.pdf'],
+        }
+    })
+
+    function uploadResume() {
+        setIsUploading(true)
+        toJpeg(imgRef.current).then((dataUrl) => {
+            const blobData = dataURItoBlob(dataUrl);
+            const formData = new FormData();
+            formData.append('resume', uFile);
+            formData.append('image', blobData, 'resume-image.jpeg');
+            axiosClient.post('/upload-resume', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(response => {
+                toast.success(response.data.message)
+                getResumes()
+            }).catch(error => {
+                toast.error(error.response.data.message)
+            });
+        }).catch(() => {
+            toast.error('Something went wrong, please try again')
+        }).finally(() => {
+            setUFile(null)
+            setDialogOpen(false)
+            setIsUploading(false)
+        })
+    }
+    function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    }
 
     useEffect(() => {
         getResumes()
@@ -37,7 +108,7 @@ function Resumes() {
             }));
             setResumes(updatedResumes);
         } catch (error) {
-            console.log("error fetching  resume data", error);
+            toast.error("Error fetching  resumes");
         } finally {
             setIsFetching(false)
         }
@@ -56,7 +127,7 @@ function Resumes() {
             setResumes(prev => prev.filter((resume) => resume.id != id))
             toast.success(downloadResponse.data.message)
         } catch (error) {
-            console.error('Error deleting resume:', error);
+            toast.error('Error deleting resume:');
         }
     };
 
@@ -85,7 +156,7 @@ function Resumes() {
             a.click();
             URL.revokeObjectURL(url);
         } catch (error) {
-            console.log('error downloading resume', error)
+            toast.log('error downloading resume')
         } finally {
             setResumes(prev => prev.map(resume => {
                 if (resume.id === id) {
@@ -106,10 +177,39 @@ function Resumes() {
 
     return (
         <>
-            <>
-                <h2 className="text-2xl font-semibold">Resumes</h2>
-                <p className="mb-5 pb-3 border-b-2 text-sm">Create, upload and manage you resumes</p>
-            </>
+            <div className="flex justify-between mb-5 pb-3 border-b-2">
+                <div>
+                    <h2 className="text-2xl font-semibold">Resumes</h2>
+                    <p className="text-sm">Create, upload and manage you resumes</p>
+                </div>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger>Upload your resume</DialogTrigger>
+                    <DialogContent>
+                        {
+                            (uFile !== null) ?
+                                <>
+                                    <div className="mt-4 flex flex-col">
+                                        <h2 className="text-lg font-semibold">Upload Confirmation</h2>
+                                        <p className="text-sm">Your resume is now ready to upload, click to confirm upload</p>
+                                    </div>
+                                    <div className="w-full h-80 overflow-auto">
+                                        <div ref={imgRef} className="bg-white w-fit h-fit">
+                                            <Document file={uFile}>
+                                                <Page pageNumber={1} renderTextLayer={false} renderAnnotationLayer={false} />
+                                            </Document>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end items-center gap-4">
+                                        <DialogClose onClick={() => { setUFile(null) }}>Cancel</DialogClose>
+                                        <Button disabled={isUploading} variant='default' onClick={uploadResume}>Upload</Button>
+                                    </div>
+                                </>
+                                :
+                                <DnDFile {...dropZone} />
+                        }
+                    </DialogContent>
+                </Dialog>
+            </div>
             {
                 isFetching ?
                     <ResumesSkeleton />
@@ -121,8 +221,11 @@ function Resumes() {
                             <Link
                                 to={'create'}
                             >
-                                <div className="h-[240px] flex justify-center items-center border rounded-md group hover:bg-background">
-                                    <FaPlus className="p-2 text-6xl group-hover:scale-150 group-hover:text-primary transition-all rounded-full" />
+                                <div className="relative h-[300px] flex justify-center items-center rounded-md overflow-hidden group">
+                                    <div className="absolute top-0 bottom-0 left-0 right-0 z-[-1] bg-primary opacity-15 group-hover:opacity-25 transition-all"></div>
+                                    <div className="p-5 rounded-full flex items-center justify-center bg-background shadow">
+                                        <FaPlus className="text-3xl text-primary" />
+                                    </div>
                                 </div>
                             </Link>
                         </div>

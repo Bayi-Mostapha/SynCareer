@@ -46,6 +46,11 @@ const ResumeCreator = () => {
     const navigate = useNavigate();
 
     const onDrop = useCallback(acceptedFiles => {
+        if (!acceptedFiles[0]) {
+            toast.error('Please upload an image')
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = () => {
             const imageDataUrl = reader.result;
@@ -53,7 +58,12 @@ const ResumeCreator = () => {
         };
         reader.readAsDataURL(acceptedFiles[0]);
     }, [])
-    const dropZone = useDropzone({ onDrop })
+    const dropZone = useDropzone({
+        onDrop,
+        accept: {
+            'image/*': ['.jpeg', '.jpg', '.png']
+        }
+    })
 
     const toggleEditable = () => {
         setIsEdit(!isEdit);
