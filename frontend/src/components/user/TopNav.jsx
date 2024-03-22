@@ -59,22 +59,22 @@ function TopNav() {
             <h1 className="py-2 text-xl text-primary font-semibold">SynCareer</h1>
             <ul className="pt-3 ml-20 hidden lg:flex gap-4">
                 <li>
-                    <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'border-b-4  border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Home
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="t" className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to="t" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Messages
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="tt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to="tt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Interviews
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'border-b-4  border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Resume Library
                     </NavLink>
                 </li>
