@@ -5,14 +5,11 @@ import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'sonner'
-
 // routing
 import { Link, useNavigate } from 'react-router-dom';
 import { FORGOT_PASSWORD_LINK, REGISTER_LINK, USER_HOME_LINK } from '../../router';
-
 // icons 
 import { FaArrowRight } from "react-icons/fa";
-
 // shadcn 
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -20,7 +17,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import PasswordInput from '@/components/general/password-input';
-
 const schema = yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().required(),

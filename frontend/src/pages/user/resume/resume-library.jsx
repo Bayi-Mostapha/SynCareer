@@ -13,6 +13,14 @@ import {
     DialogClose
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 // sonner 
 import { toast } from "sonner";
 // componentes
@@ -26,6 +34,7 @@ import formatDistanceToNow from "@/functions/format-time";
 //pdf stuff
 import { toJpeg } from 'html-to-image';
 import { Document, Page, pdfjs } from 'react-pdf';
+import dataURItoBlob from "@/functions/uri2blob";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.js',
     import.meta.url,
@@ -54,42 +63,6 @@ function Resumes() {
         }
     })
 
-    function uploadResume() {
-        setIsUploading(true)
-        toJpeg(imgRef.current).then((dataUrl) => {
-            const blobData = dataURItoBlob(dataUrl);
-            const formData = new FormData();
-            formData.append('resume', uFile);
-            formData.append('image', blobData, 'resume-image.jpeg');
-            axiosClient.post('/upload-resume', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                toast.success(response.data.message)
-                getResumes()
-            }).catch(error => {
-                toast.error(error.response.data.message)
-            });
-        }).catch(() => {
-            toast.error('Something went wrong, please try again')
-        }).finally(() => {
-            setUFile(null)
-            setDialogOpen(false)
-            setIsUploading(false)
-        })
-    }
-    function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    }
-
     useEffect(() => {
         getResumes()
     }, [])
@@ -114,7 +87,6 @@ function Resumes() {
             setIsFetching(false)
         }
     }
-
     const deleteResume = async (id) => {
         try {
             setResumes(prev => prev.map(resume => {
@@ -130,8 +102,7 @@ function Resumes() {
         } catch (error) {
             toast.error('Error deleting resume:');
         }
-    };
-
+    }
     const downloadResume = async (fileName, id) => {
         setResumes(prev => prev.map(resume => {
             if (resume.id === id) {
@@ -167,7 +138,6 @@ function Resumes() {
             }));
         }
     }
-
     function displayResumes() {
         return resumes.map((resume) => {
             return (
@@ -175,6 +145,40 @@ function Resumes() {
             )
         })
     }
+    function uploadResume() {
+        setIsUploading(true)
+        toJpeg(imgRef.current).then((dataUrl) => {
+            const blobData = dataURItoBlob(dataUrl);
+            const formData = new FormData();
+            formData.append('resume', uFile);
+            formData.append('image', blobData, 'resume-image.jpeg');
+            axiosClient.post('/upload-resume', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(response => {
+                toast.success(response.data.message)
+                getResumes()
+            }).catch(error => {
+                toast.error(error.response.data.message)
+            });
+        }).catch(() => {
+            toast.error('Something went wrong, please try again')
+        }).finally(() => {
+            setUFile(null)
+            setDialogOpen(false)
+            setIsUploading(false)
+        })
+    }
+
+    const sortByNewest = () => {
+        const sortedResumes = [...resumes].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setResumes(sortedResumes);
+    };
+    const sortByOldest = () => {
+        const sortedResumes = [...resumes].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        setResumes(sortedResumes);
+    };
 
     return (
         <>
@@ -218,23 +222,43 @@ function Resumes() {
                 isFetching ?
                     <ResumesSkeleton />
                     :
-                    <div className="my-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                        <div className="pt-1">
-                            <h2 className="font-semibold">New Resume</h2>
-                            <p className="text-xs text-slate-600 mb-2">Create a new resume</p>
-                            <Link
-                                to={'create'}
+                    <>
+                        <div className="flex justify-end">
+                            <Select onValueChange={(e) => {
+                                if (e === "desc") {
+                                    sortByNewest()
+                                } else {
+                                    sortByOldest()
+                                }
+                            }}
                             >
-                                <div className="relative h-[300px] flex justify-center items-center rounded-md overflow-hidden group">
-                                    <div className="absolute top-0 bottom-0 left-0 right-0 z-[-1] bg-primary opacity-15 group-hover:opacity-25 transition-all"></div>
-                                    <div className="p-5 rounded-full flex items-center justify-center bg-background shadow group-hover:scale-105 group-hover:shadow-lg transition-all">
-                                        <FaPlus className="text-3xl text-primary" />
-                                    </div>
-                                </div>
-                            </Link>
+                                <SelectTrigger className="w-fit bg-background">
+                                    <SelectValue placeholder="Order by" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="desc">Newest</SelectItem>
+                                    <SelectItem value="asc">Oldest</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
-                        {displayResumes()}
-                    </div >
+                        <div className="my-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                            <div className="pt-1">
+                                <h2 className="font-semibold">New Resume</h2>
+                                <p className="text-xs text-slate-600 mb-2">Create a new resume</p>
+                                <Link
+                                    to={'create'}
+                                >
+                                    <div className="relative h-[300px] flex justify-center items-center rounded-md overflow-hidden group">
+                                        <div className="absolute top-0 bottom-0 left-0 right-0 z-[-1] bg-primary opacity-15 group-hover:opacity-25 transition-all"></div>
+                                        <div className="p-5 rounded-full flex items-center justify-center bg-background shadow group-hover:scale-105 group-hover:shadow-lg transition-all">
+                                            <FaPlus className="text-3xl text-primary" />
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+                            {displayResumes()}
+                        </div >
+                    </>
             }
         </>
     );

@@ -32,6 +32,7 @@ import ResumeExperience from "@/components/user/resume/resume-experience";
 import ResumeLanguages from "@/components/user/resume/resume-languages";
 import ResumeSkills from "@/components/user/resume/resume-skills";
 import ResumeProjects from "@/components/user/resume/resume-projects";
+import dataURItoBlob from "@/functions/uri2blob";
 
 const ResumeCreator = () => {
     const [order, setOrder] = useState(['edu', 'exp', 'prj', 'lang', 'skills']);
@@ -176,16 +177,6 @@ const ResumeCreator = () => {
             setIsSaving(false)
         }
     };
-    function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    }
 
     const styles = {
         fontFamily: 'sans-serif',
