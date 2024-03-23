@@ -3,6 +3,7 @@ import { axiosClient } from "@/api/axios";
 // icons 
 import { FaPlus } from "react-icons/fa6";
 import { GrDocumentPdf } from "react-icons/gr";
+import { IoCloudUploadOutline } from "react-icons/io5";
 // shadcn 
 import { Link } from "react-router-dom";
 import {
@@ -17,11 +18,11 @@ import { toast } from "sonner";
 // componentes
 import ResumeCard from "../../../components/user/resume/resume-card";
 import ResumesSkeleton from "@/components/user/resume/resumes-skeleton";
-// libs 
-import { formatDistanceToNow } from 'date-fns';
 // react drop zone
 import { useDropzone } from 'react-dropzone'
 import DnDFile from "@/components/general/dnd-file";
+// functions 
+import formatDistanceToNow from "@/functions/format-time";
 //pdf stuff
 import { toJpeg } from 'html-to-image';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -102,8 +103,7 @@ function Resumes() {
                 });
                 const imageUrl = URL.createObjectURL(res.data);
 
-                const date = new Date(resume.created_at);
-                const datetonow = formatDistanceToNow(date, { addSuffix: true });
+                const datetonow = formatDistanceToNow(resume.created_at);
 
                 return { ...resume, date: datetonow, isDeleting: false, isDownloading: false, img: imageUrl };
             }));
@@ -184,7 +184,10 @@ function Resumes() {
                     <p className="text-sm">Create, upload and manage you resumes</p>
                 </div>
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger>Upload your resume</DialogTrigger>
+                    <DialogTrigger className="h-fit px-3 py-2 bg-background text-primary text-sm flex items-center gap-2 shadow-sm rounded-md hover:shadow-md hover:scale-105 transition-all">
+                        <IoCloudUploadOutline className="text-lg" />
+                        <span>Upload a resume</span>
+                    </DialogTrigger>
                     <DialogContent>
                         {
                             (uFile !== null) ?
@@ -206,7 +209,7 @@ function Resumes() {
                                     </div>
                                 </>
                                 :
-                                <DnDFile {...dropZone} file="resume" icon={<GrDocumentPdf className="text-8xl text-gray-400" />}/> 
+                                <DnDFile {...dropZone} file="resume" icon={<GrDocumentPdf className="text-8xl text-gray-400" />} />
                         }
                     </DialogContent>
                 </Dialog>
@@ -224,7 +227,7 @@ function Resumes() {
                             >
                                 <div className="relative h-[300px] flex justify-center items-center rounded-md overflow-hidden group">
                                     <div className="absolute top-0 bottom-0 left-0 right-0 z-[-1] bg-primary opacity-15 group-hover:opacity-25 transition-all"></div>
-                                    <div className="p-5 rounded-full flex items-center justify-center bg-background shadow">
+                                    <div className="p-5 rounded-full flex items-center justify-center bg-background shadow group-hover:scale-105 group-hover:shadow-lg transition-all">
                                         <FaPlus className="text-3xl text-primary" />
                                     </div>
                                 </div>
