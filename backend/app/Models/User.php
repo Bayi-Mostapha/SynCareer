@@ -79,4 +79,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Resume::class);
     }
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'user_sender_id');
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class, 'user1_id');
+    }
 }

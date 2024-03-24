@@ -15,7 +15,7 @@ function UserLayout() {
             <header>
                 <TopNav />
             </header>
-            <main className="p-4 pt-24">
+            <main className="">
                 <Outlet />
             </main>
         </>

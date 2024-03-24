@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Quiz;
 use App\Models\JobOffer;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -56,5 +57,18 @@ class Company extends Authenticatable
 
     public function jobOffers(){
         $this->hasMany(JobOffer::class);
+    }
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'company_sender_id');
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class, 'user2_id');
+    }
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
     }
 }

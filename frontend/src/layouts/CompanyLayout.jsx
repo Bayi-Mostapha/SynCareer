@@ -14,7 +14,7 @@ function CompanyLayout() {
             <SideBar>
                 <SidebarItem icon={<IoHomeOutline/>} text={'home'} location={COMPANY_DASHBOARD_LINK}/>
             </SideBar>
-            <main className="p-4 pt-24 pl-24">
+            <main className="">
                 <Outlet />
             </main>
         </>
