@@ -1,6 +1,6 @@
 import { axiosClient } from "@/api/axios";
 import { columns } from "@/components/user/columns";
-import DataTable from "@/components/general/data-table";
+import DataTable from "@/components/general/data-table1";
 
 import React, { useState, useRef, useEffect } from 'react';
 import {

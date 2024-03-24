@@ -56,6 +56,9 @@ export default function DataTable({ columns, data, searchColumn }) {
                 <div>
                     <h3 className="text-gray-800 text-xl font-md">Quiz List</h3>
                 </div>
+
+            <div className="flex justify-center items-center py-4">
+
                 <Input
                     placeholder={`Seach by ${searchColumn}...`}
                     value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
@@ -64,7 +67,38 @@ export default function DataTable({ columns, data, searchColumn }) {
                     }
                     className="max-w-sm"
                 />
+
                 
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto flex items-center gap-2">
+                            Columns <IoIosArrowDown />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {table
+                            .getAllColumns()
+                            .filter(
+                                (column) => column.getCanHide()
+                            )
+                            .map((column) => {
+                                return (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) =>
+                                            column.toggleVisibility(!!value)
+                                        }
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                )
+                            })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
             </div>
             <Table>
                 <TableHeader>
@@ -109,6 +143,7 @@ export default function DataTable({ columns, data, searchColumn }) {
                 </TableBody>
             </Table>
             {/* pagination controlls */}
+
             <div className="mt-2 flex items-center justify-end gap-4 px-5">
                 {
                     table.getCanPreviousPage() &&
@@ -131,6 +166,7 @@ export default function DataTable({ columns, data, searchColumn }) {
                     </Button>
                 }
             </div>
+        </div>
         </div>
     )
 }
