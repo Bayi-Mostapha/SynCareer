@@ -147,164 +147,124 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     }
     });
   
-    Route::post('/fetchConversations', function (Request $request) {
-   
-    $type = $request->user()->tokenCan('user');
-    if($type == true){
-        $userId = $request->user()->id;
-        $user = User::find($userId);
-        $conversations = $user->conversations()
-            ->with(['user2', 'messages']) // Eager load the related user2 and messages
-            ->orderByDesc('last_message_time') // Order conversations by last_message_time in descending order
-            ->get()
-            ->map(function ($conversation) {
-                $lastMessageContent = $conversation->messages->isNotEmpty() ? $conversation->messages->last()->content : null;
-                return [
-                    'conversation_id' => $conversation->id,
-                    'profile_pic' => $conversation->user2->picture,
-                    'sender_name' => $conversation->user2->name,
-                    'user2_id' => $conversation->user2->id,
-                    'last_message_time' => date('h:i A', strtotime($conversation->last_message_time)),
-                    'last_message_content' => $lastMessageContent,
-                    'unread_messages_count' => $conversation->messages()->where('sender_role', 'company')->where('message_status', 'sent')->count(),
-                ];
-            });
-        
-    }else{
-        $userId = $request->user()->id;
-        $user = Company::find($userId);
-        $conversations = $user->conversations()
-            ->with(['user1', 'messages']) // Eager load the related user1 and messages
-            ->orderByDesc('last_message_time') // Order conversations by last_message_time in descending order
-            ->get()
-            ->map(function ($conversation) {
-                $lastMessageContent = $conversation->messages->isNotEmpty() ? $conversation->messages->last()->content : null;
-                return [
-                    'conversation_id' => $conversation->id,
-                    'jobOffer' => $conversation->user1->job_title,
-                    'profile_pic' => $conversation->user1->picture ? $conversation->user1->picture : 'http://localhost:8000/images/default.jpg',
-                    'sender_name' => $conversation->user1->last_name . " " . $conversation->user1->first_name,
-                    'user2_id' => $conversation->user1->id,
-                    'sender_job_title' => $conversation->user1->job_title,
-                    'last_message_time' => $conversation->last_message_time ?  date('h:i A', strtotime($conversation->last_message_time)) : null,
-                    'time' => $conversation->last_message_time,
-                    'last_message_content' => $lastMessageContent,
-                    'unread_messages_count' => $conversation->messages()->where('sender_role', 'user')->where('message_status', 'sent')->count(),
-                ];
-            });
-        
-    }
-    return response()->json($conversations);
-    });
-    Route::post('/fetchMessages', function (Request $request) {
-        $userId = $request->user()->id;
+
+    
+    
+    
+    Route::post('/updateMessageStatus', function (Request $request) {
         $conversationId = $request->input('conversation_id');
-        $conversation = Conversation::find($conversationId);
-        if($conversation){
-            $conversation->messages()
-            ->where('user_sender_id', '!=', $userId)
-            ->where('message_status', '!=', 'read')
+        if($request->user()->tokenCan('user')){
+            $updated = Message::where('conversation_id', $conversationId)
+            ->where('sender_role', 'company')
             ->update(['message_status' => 'read']);
-
-            $messages = $conversation->messages()
-            ->orderBy('created_at', 'asc')
-            ->select(
-                'id' , 
-                'user_sender_id',
-                'company_sender_id',
-                \DB::raw('IFNULL(user_sender_id, company_sender_id) AS sender_id'),
-                \DB::raw('IF(user_sender_id IS NOT NULL, "user", "company") AS sender_type'),
-                'message_type',
-                'content',
-                'message_status'
-            )
-            ->get();
-        
-            $prevSenderId = null;
-            foreach ($messages as $message) {
-                if ($message->sender_type !== $prevSenderId) {
-                    $message->first_group = true;
-                } else {
-                    // Otherwise, mark as false
-                    $message->first_group = false;
-                }
-                $prevSenderId = $message->sender_type;
-            }
-            $lastMessage = $messages->last();
-
-            $isLast = ($lastMessage && $lastMessage->sender_id === $request->user()->id);
-            if($messages){
-                return response()->json([
-                    'messages' => $messages,
-                    'isLast' => $isLast
-                ]);
-            }else{
-                return response()->json(['message' => 'No messages found or no update needed']);
-            }
+        }else{
+            $updated = Message::where('conversation_id', $conversationId)
+            ->where('sender_role', 'user')
+            ->update(['message_status' => 'read']);
         }
-        return response()->json(['message' => 'No messages found or no update needed', 'isLast' => false ]);
-    });
-    
-    
-    // Route::post('/updateMessageStatus', function (Request $request) {
-    //     $conversationId = $request->input('conversation_id');
-    //     if($request->user()->tokenCan('user')){
-    //         $updated = Message::where('conversation_id', $conversationId)
-    //         ->where('sender_role', 'company')
-    //         ->update(['message_status' => 'read']);
-    //     }else{
-    //         $updated = Message::where('conversation_id', $conversationId)
-    //         ->where('sender_role', 'user')
-    //         ->update(['message_status' => 'read']);
-    //     }
 
-    //     if ($updated) {
-    //         return response()->json(['message' => 'Message status updated successfully']);
-    //     } else {
-    //         return response()->json(['message' => 'No messages found or no update needed']);
-    //     }
-    // });
+        if ($updated) {
+            return response()->json(['message' => 'Message status updated successfully']);
+        } else {
+            return response()->json(['message' => 'No messages found or no update needed']);
+        }
+    });
+
     Route::get('/conversations', function (Request $request) {
         $userId = $request->user()->id;
     
-        // Fetch conversations
-        $conversations = Conversation::with(['user2', 'messages'])
-        ->where('user2_id', $userId)
-        ->orderBy('last_message_time', 'desc')
-        ->get();
-    
-       
-        // Prepare response data
-        $responseData = [];
-        foreach ($conversations as $conversation) {
-            $lastMessage = $conversation->messages->last();
-            $unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->Where('user_sender_id','!=', 'null')->count();
-            
-            $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
-            $lastMessageTime = $lastMessage ? date('h:i A', strtotime($lastMessage->created_at)) : null;
-            $conversationData = [
-                'conversation_id' => $conversation->id,
-                'user_id' => $conversation->user1_id,
-                'profile_pic' => $conversation->user1->picture,
-                'name' => $conversation->user1->first_name .' '.$conversation->user1->last_name,
-                'last_message' => $lastMessage ? $lastMessage->content : null,
-                'last_message_time' => $conversation->last_message_time,
-                'unread_messages_count' => $unreadMessagesCount,
-                'actual_user_last_sender' => $actualUserLastSender,
-                'messages' => $conversation->messages->map(function ($message) {
-                    return [
-                        'message_id' => $message->id,
-                        'content' => $message->content,
-                        'sender_role' => $message->sender_role,
-                        'message_type' => $message->message_type,
-                        'message_status' => $message->message_status,
-                    ];
-                }),
-                // Add other necessary fields
-            ];
-    
-            $responseData[] = $conversationData;
-        }
+
+        if($request->user()->tokenCan('company')){
+         // Fetch conversations
+         $conversations = Conversation::with(['user2', 'messages'])
+         ->where('user2_id', $userId)
+         ->orderBy('last_message_time', 'desc')
+         ->get();
+ 
+     // Prepare response data
+     $responseData = [];
+     foreach ($conversations as $conversation) {
+         $lastMessage = $conversation->messages->last();
+         $unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->where('user_sender_id', '!=', null)->count();
+         $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
+         // Initialize lastSender as null for each conversation
+         $lastSender = null;
+ 
+         $conversationData = [
+             'conversation_id' => $conversation->id,
+             'user_id' => $conversation->user1_id,
+             'profile_pic' => $conversation->user1->picture,
+             'job_title' => $conversation->user1->job_title,
+             'name' => $conversation->user1->first_name . ' ' . $conversation->user1->last_name,
+             'last_message' => $lastMessage ? $lastMessage->content : null,
+             'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
+             'actual_user_last_sender' => $actualUserLastSender,
+             'unread_messages_count' => $unreadMessagesCount,
+             'messages' => $conversation->messages->map(function ($message) use (&$lastSender) {
+                 // Check if the sender of the current message is the same as the sender of the last message
+                 $isFirstMessage = $lastSender !== $message->sender_role || $lastSender === null;
+                 $lastSender = $message->sender_role;
+ 
+                 return [
+                     'message_id' => $message->id,
+                     'content' => $message->content,
+                     'sender_role' => $message->sender_role,
+                     'message_type' => $message->message_type,
+                     'message_status' => $message->message_status,
+                     'is_first_message' => $isFirstMessage,
+                 ];
+             }),
+             // Add other necessary fields
+         ];
+ 
+         $responseData[] = $conversationData;
+     }
+       }else{
+       // Fetch conversations
+$conversations = Conversation::with(['user1', 'messages'])
+->where('user1_id', $userId)
+->orderBy('last_message_time', 'desc')
+->get();
+
+// Prepare response data
+$responseData = [];
+foreach ($conversations as $conversation) {
+$lastMessage = $conversation->messages->last();
+$unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->where('company_sender_id', '!=', null)->count();
+$actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
+// Initialize lastSender as null for each conversation
+$lastSender = null;
+
+$conversationData = [
+    'conversation_id' => $conversation->id,
+    'user_id' => $conversation->user2_id,
+    'profile_pic' => $conversation->user2->picture,
+    'job_title' => $conversation->user2->job_title,
+    'name' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
+    'last_message' => $lastMessage ? $lastMessage->content : null,
+    'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
+    'actual_user_last_sender' => $actualUserLastSender,
+    'unread_messages_count' => $unreadMessagesCount,
+    'messages' => $conversation->messages->map(function ($message) use (&$lastSender) {
+        // Check if the sender of the current message is the same as the sender of the last message
+        $isFirstMessage = $lastSender !== $message->sender_role || $lastSender === null;
+        $lastSender = $message->sender_role;
+
+        return [
+            'message_id' => $message->id,
+            'content' => $message->content,
+            'sender_role' => $message->sender_role,
+            'message_type' => $message->message_type,
+            'message_status' => $message->message_status,
+            'is_first_message' => $isFirstMessage,
+        ];
+    }),
+    // Add other necessary fields
+];
+
+$responseData[] = $conversationData;
+}
+       }
     
         return response()->json($responseData);
     });

@@ -1,12 +1,12 @@
 // ChatMessage.jsx
 import React from 'react';
 
-const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,conversation_id,onClickContact , userId ,selected,online,jobOffer}) => {
+const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,conversation_id,onClickContact , userId ,selected,online,jobTitle,isLast}) => {
 
 
   return (
    
-    <div  onClick={() => onClickContact(conversation_id,profileImageUrl,sender,jobOffer,userId)} className={`flex items-start justify-between ${selected == conversation_id ? 'bg-blue-100' : 'bg-gray-100'} py-3 px-8 cursor-pointer`}>
+    <div  onClick={() => onClickContact(conversation_id,profileImageUrl,sender,jobTitle,userId,isLast)} className={`flex items-start justify-between ${selected == conversation_id ? 'bg-blue-100' : 'bg-gray-100'} py-3 px-8 cursor-pointer`}>
       
       <div className="w-10 h-10  rounded-full relative flex items-center justify-center">
         <img className="rounded-full object-cover w-full h-full" src={profileImageUrl} alt="profile" />
