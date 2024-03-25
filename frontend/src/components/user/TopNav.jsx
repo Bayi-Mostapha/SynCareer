@@ -2,8 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { Button } from "@/components/ui/button"
 import { IoIosLogOut, IoIosMenu } from "react-icons/io";
-import { NavLink } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK } from "@/router";
+import { Link, NavLink } from "react-router-dom";
+import { USER_HOME_LINK, USER_RESUMES_LINK , USER_PROFILE_LINK} from "@/router";
 
 import {
     DropdownMenu,
@@ -98,6 +98,9 @@ function TopNav() {
                 <DropdownMenuContent className=' hidden lg:block'>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                        <Link to={USER_PROFILE_LINK}>Profile</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                         <Button className="flex gap-1" onClick={() => { userContext.logout() }}>
                             Log out

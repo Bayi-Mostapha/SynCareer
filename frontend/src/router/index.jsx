@@ -20,6 +20,7 @@ import ResumeCreator from '@/pages/user/resume/resume-builder';
 import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
 import ApplyJobOffer from '@/pages/user/ApplyJobOffer';
+import ProfilePage from '@/pages/user/Profile';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -38,6 +39,10 @@ export const RESET_PASSWORD_LINK = '/reset-password/:email';
 // user 
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
+
+export const USER_PROFILE_LINK = '/user/profile';
+
+
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -96,6 +101,10 @@ export const router = createBrowserRouter([
                     },
                    
                 ]
+            },
+            {
+                path: USER_PROFILE_LINK,
+                element: <ProfilePage />,
             },
         ]
     },

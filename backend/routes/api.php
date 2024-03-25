@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ResumeController;
@@ -70,6 +71,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
 
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
+
+    //profilepage
+    Route::put('/profile', [ProfileController::class, 'update']);
+      
+
+
 
     //getting a private resource (image, resume)
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {
