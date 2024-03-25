@@ -29,6 +29,9 @@ import { Input } from "@/components/ui/input"
 import { IoIosArrowDown } from "react-icons/io";
 
 export default function DataTable({ columns, data, searchColumn }) {
+
+    
+
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
     const [columnVisibility, setColumnVisibility] = useState([])
@@ -54,7 +57,7 @@ export default function DataTable({ columns, data, searchColumn }) {
         <div className="my-4">
             <div className="flex justify-center items-center py-4">
                 <Input
-                    placeholder={`Seach by ${searchColumn}...`}
+                    placeholder={`Seach by Job Title...`}
                     value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
                     onChange={(event) =>
                         table.getColumn(searchColumn)?.setFilterValue(event.target.value)

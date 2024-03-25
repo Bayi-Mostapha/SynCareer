@@ -21,6 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 // table 
 import DataTable from "@/components/general/data-table";
 import { columns } from '@/components/company/job-offers-table/columns';
+import { useEffect, useState } from 'react';
 
 const schema = yup.object().shape({
     job_title: yup.string().required(),
@@ -42,6 +43,8 @@ function JobOffer() {
     const { formState, handleSubmit, control } = form;
     const { isSubmitting, isValid } = formState;
 
+    
+
     const onSubmit = async (data) => {
         try {
             const response = await axiosClient.post('/joboffers', data);
@@ -53,20 +56,24 @@ function JobOffer() {
         }
     };
 
-    const data = [
-        {
-            id: "4",
-            amount: 100,
-            status: "pending",
-            email: "m@example.com",
-        },
-        {
-            id: "52wed8s9",
-            amount: 45,
-            status: "done",
-            email: "a@example.com",
-        },
-    ]
+
+    const [jobOffers, setJobOffers] = useState([]);
+
+    useEffect(() => {
+        const fetchJobOffers = async () => {
+            try {
+                const response = await axiosClient.get('joboffers');
+                setJobOffers(response.data);
+            } catch (error) {
+                console.error('Error fetching job offers:', error);
+            }
+        };
+
+        fetchJobOffers();
+    }, []);
+  
+    
+   
 
     return (
         <>
@@ -179,7 +186,7 @@ function JobOffer() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <DataTable columns={columns} data={data} searchColumn={"email"} />
+            <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} />
         </>
     );
 }
