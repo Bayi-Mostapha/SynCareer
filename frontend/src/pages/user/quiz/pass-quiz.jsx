@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { axiosClient } from "@/api/axios";
+import { set } from 'react-hook-form';
 
 
 function PassQuiz() {
@@ -8,7 +9,8 @@ function PassQuiz() {
     const [currentQuestion, setCurrentQuestion] = useState(0); // State to keep track of current question
     const [selectedOptions, setSelectedOptions] = useState([]); // State to store selected options
     const [errors, setErrors] = useState(null); // State to store errors
-    const [counter, setCounter] = useState(5); // State for the counter
+    const [counter, setCounter] = useState(0); // State for the counter
+    const [flag, setFlag] = useState(false); // State for the counter
     const InputRadioA = useRef();
     const InputRadioB = useRef();
     const InputRadioC = useRef();
@@ -16,24 +18,44 @@ function PassQuiz() {
 
     const getQuizData = async () => {
         try {
-            const { data } = await axiosClient.post('/quizzes/31',{});
+            const { data } = await axiosClient.get('/quizzes/1',{});
             setQuizData(data);
             console.log(data);
         } catch (error) {
-            console.log('Error fetching conversations:', error);
+            console.log('quiz fetching error ', error);
         }
     };
 
     const handleStartQuiz = () => {
+        console.log(currentQuestion);
         setStartQuiz(true);
-    };
 
+    };
+    const calculateScore = async ( ) => {
+        try {
+            const payload = {
+                selectedAnswers: selectedOptions,
+                quizId: 1
+            };
+            console.log('payload' ,selectedOptions);
+            const response = await axiosClient.post('/calculateScore', payload);
+            const { success, score } = response.data;
+
+            if (success) {
+                console.log('Score:', score);
+            } else {   
+                console.error('Failed to calculate score');
+            }
+        } catch (error) {
+            console.error('Error calculating score:', error);
+        }
+    };
     const handleNext = () => {
         setCurrentQuestion(currentQuestion + 1);
-        console.log('bro 1')
         console.log(currentQuestion)
         console.log(quizData.length)
-        if (quizData.length - 1 <= currentQuestion ){
+        if (quizData.data.length - 1 <= currentQuestion ){
+            setFlag(true);
             setStartQuiz(false);
         }
         if (quizData.length > currentQuestion + 1 ) {
@@ -51,6 +73,7 @@ function PassQuiz() {
               answer = InputRadioD.current.value ;
            } 
            const selectedOptionsForCurrentQuestion = {
+            id: quizData.data[currentQuestion].id,
             selected: answer
         };
             setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
@@ -78,6 +101,7 @@ function PassQuiz() {
                answer = InputRadioD.current.value ;
             }
             const selectedOptionsForCurrentQuestion = {
+                id: quizData.data[currentQuestion].id,
              selected: answer
          };
              setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
@@ -93,7 +117,7 @@ function PassQuiz() {
                     const newCounter = prevCounter + 1;
                     console.log('Counter:', newCounter);
             
-                    if (newCounter === 10) {
+                    if (newCounter === quizData.duration) {
                         console.log('Counter reached 10!');
                         document.getElementById('nextBtn').click();
                         return  0 ;
@@ -133,8 +157,13 @@ function PassQuiz() {
         getQuizData();
     }, []);
     useEffect(() => {
-        console.log(selectedOptions)
-    }, [selectedOptions]);
+        if(flag){
+            calculateScore();
+            setFlag(false);
+        }
+       
+       
+    }, [flag]);
 
     return (
         <>
@@ -156,16 +185,16 @@ function PassQuiz() {
                 ) : (
                     <div>
                         <p>{counter}</p>
-                        <p>{quizData[currentQuestion].question_content}</p>
+                        <p>{quizData.data[currentQuestion].question_content}</p>
                         <div>
                             <input
                                 type="radio"
                                 name="options"
                                 id={"option_a"}
                                 ref={InputRadioA}
-                                value={quizData[currentQuestion].option_a}
+                                value={quizData.data[currentQuestion].option_a}
                             />
-                            <label htmlFor={"option_a"}>{quizData[currentQuestion].option_a}</label>
+                            <label htmlFor={"option_a"}>{quizData.data[currentQuestion].option_a}</label>
                         </div>
                         <div>
                             <input
@@ -173,9 +202,9 @@ function PassQuiz() {
                                 name="options"
                                 id={"option_b"}
                                 ref={InputRadioB}
-                                value={quizData[currentQuestion].option_b}
+                                value={quizData.data[currentQuestion].option_b}
                             />
-                            <label htmlFor={"option_b"}>{quizData[currentQuestion].option_b}</label>
+                            <label htmlFor={"option_b"}>{quizData.data[currentQuestion].option_b}</label>
                         </div>
                         <div>
                             <input
@@ -183,9 +212,9 @@ function PassQuiz() {
                                 name="options"
                                 id={"option_c"}
                                 ref={InputRadioC}
-                                value={quizData[currentQuestion].option_c}
+                                value={quizData.data[currentQuestion].option_c}
                             />
-                            <label htmlFor={"option_c"}>{quizData[currentQuestion].option_c}</label>
+                            <label htmlFor={"option_c"}>{quizData.data[currentQuestion].option_c}</label>
                         </div>
                         <div>
                             <input
@@ -193,9 +222,9 @@ function PassQuiz() {
                                 name="options"
                                 id={"option_d"}
                                 ref={InputRadioD}
-                                value={quizData[currentQuestion].option_d}
+                                value={quizData.data[currentQuestion].option_d}
                             />
-                            <label htmlFor={"option_d"}>{quizData[currentQuestion].option_d}</label>
+                            <label htmlFor={"option_d"}>{quizData.data[currentQuestion].option_d}</label>
                         </div>
                         <div>
                             {errors ?

@@ -57,27 +57,35 @@ export default function ChatContainer() {
     const MessageInput = useRef(); 
     const lastMessageRef = useRef(null);
 
-    const sendUsersOnline = async (users) => {
-        try {
-            const { data } = await axiosClient.post('/onlineUsers',{
-                users : users  
-            });
+    // const sendUsersOnline = async (users) => {
+    //     try {
+    //         const { data } = await axiosClient.post('/onlineUsers',{
+    //             users : users  
+    //         });
           
-        } catch (error) {
-            console.log('Error fetching conversations:', error);
-        }
+    //     } catch (error) {
+    //         console.log('Error fetching conversations:', error);
+    //     }
         
-    };
+    // };
+    const [onlineUsers, setOnlineUsers] = useState([]);
     useEffect(() => {
         const channel = window.Echo.join(`online`);
 
         channel.here((users) => {
             console.log('Users currently in the channel:', users);
-            sendUsersOnline(users);
+            const filteredUserIds = users.filter(user => user.role === 'company').map(user => user.id);
+            setOnlineUsers(filteredUserIds);
         }).joining((user) => {
             console.log('User joining:', user);
+            if (user.role === 'user') {
+                setOnlineUsers(prevUserIds => [...prevUserIds, user.id]);
+            }
         }).leaving((user) => {
             console.log('User leaving:', user);
+            if (user.role === 'user') {
+                setOnlineUsers(prevUserIds => prevUserIds.filter(id => id !== user.id));
+            }
         });
         // Return a cleanup function to leave the channel when the component unmounts
         return () => {
@@ -108,6 +116,12 @@ export default function ChatContainer() {
     }, []);
 
     useEffect(() => {
+        console.log('bro id is  ', actualConversationId);
+        if (actualConversationId !== null) {
+            setPreviousActualConversationId(actualConversationId);
+        }
+        window.Echo.leave('private.user.' + previousActualConversationId);
+
     window.Echo.private('private.user.' + actualConversationId).listen('.chatUser', (e) => {
         // fetchMessage();
         console.log('hey from user '+actualConversationId);
@@ -131,6 +145,7 @@ export default function ChatContainer() {
             updateMessageStatus();
             fetchData();
         }
+       
     });
     window.Echo.private('onlineData').listen('.onlinee', (e) => {
         console.log(e.users);
@@ -251,6 +266,7 @@ const handleClickContact = (convId, profilePic, sender, jobTitle, id) => {
                             conversation_id={conversation.conversation_id}
                             userId={conversation.user2_id}
                             selected={conversation.selected}
+                            online={onlineUsers.includes(conversation.user2_id)}
                         />
                     ))}
             
@@ -269,14 +285,14 @@ const handleClickContact = (convId, profilePic, sender, jobTitle, id) => {
     message.sender_id === userContext.user.id && 
     message.sender_type === userContext.user.type ? (
         <ChatBubbleSend
-            key={message.id}
+            key={index}
             message={message.content}
             first={message.first_group}
              
         />
     ) : (
         <ChatBubbleReceive
-        key={message.id}
+        key={index}
         message={message.content}
         first={message.first_group}
         profileImageUrl={profileImageUrl}

@@ -1,16 +1,21 @@
 // ChatMessage.jsx
 import React from 'react';
 
-const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,conversation_id,onClickContact , userId ,selected}) => {
+const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,conversation_id,onClickContact , userId ,selected,online,jobOffer}) => {
 
 
   return (
    
-    <div  onClick={() => onClickContact(conversation_id,profileImageUrl,sender,"google",userId)} className={`flex items-start justify-between ${selected == conversation_id ? 'bg-blue-100' : 'bg-gray-100'} py-3 px-8 cursor-pointer`}>
+    <div  onClick={() => onClickContact(conversation_id,profileImageUrl,sender,jobOffer,userId)} className={`flex items-start justify-between ${selected == conversation_id ? 'bg-blue-100' : 'bg-gray-100'} py-3 px-8 cursor-pointer`}>
       
       <div className="w-10 h-10  rounded-full relative flex items-center justify-center">
         <img className="rounded-full object-cover w-full h-full" src={profileImageUrl} alt="profile" />
-        <div className='w-3 h-3 rounded-full bg-green-600 top-1 z-30 absolute -right-1'></div>
+        {
+          online ? <div className='w-3 h-3 rounded-full bg-green-600 top-1 z-30 absolute -right-1'></div>
+          :
+               ''
+        }
+        
       </div>
       <div className="flex flex-col basis-5/6">
         <div className="flex justify-between items-center w-full pb-2">
@@ -21,7 +26,7 @@ const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,
             </div>
           )}
           {unreadCount <= 0 && (
-            <p className="text-xs text-tline font-small ">{timestamp}</p>
+            <p className="text-xs text-tline font-small ">{timestamp ? timestamp : ''}</p>
           )}
         </div>
         <div className="h-5 ">

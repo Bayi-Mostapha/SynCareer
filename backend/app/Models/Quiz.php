@@ -20,6 +20,7 @@ class Quiz extends Model
         'name',
         'duration',
         'nbr_applicants',
+        'nbr_question'
     ];
 
     // Define the relationship with the Company model

@@ -1,7 +1,6 @@
 import { axiosClient } from "@/api/axios";
 import { columns } from "@/components/user/columns";
 import DataTable from "@/components/general/data-table1";
-
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Dialog,
@@ -50,8 +49,6 @@ function QuizTable() {
         options: []
     });
     const [open, setOpen] = useState(false);
-    // const [selectedValue, setSelectedValue] = useState(null);
-    // const [nbr, setNbr] = useState(1)
 
     // fetch quizzes from database 
     const fetchQuizes = async () => {
@@ -76,10 +73,12 @@ function QuizTable() {
             console.error('Error uploading quiz:', error);
         }
     };
-    // call fetch quizzes function 
     useEffect(() => {
-        fetchQuizes();
-    }, [])
+        const intervalId = setInterval(fetchQuizes, 3000); // Call fetchQuizzes every 3 seconds
+    
+        // Cleanup function to clear the interval when the component unmounts or when the dependency changes
+        return () => clearInterval(intervalId);
+    }, []);
 
     // const [isOpen, setIsOpen] = useState(false);
 

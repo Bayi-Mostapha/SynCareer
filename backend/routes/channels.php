@@ -55,7 +55,17 @@ Broadcast::channel('private.chat.{id}', function ($user, $id) {
     return false; 
 });
 Broadcast::channel('online', function ($user) {
-    return ['id' => $user->id, 'name' => $user->name];
+    if ($user->tokenCan('user')) {
+        return [
+            'id' => $user->id,
+            'name' => $user->first_name . ' ' . $user->last_name,
+            'role' => 'user'
+        ];
+    }
+    if ($user->tokenCan('company')) {
+        return ['id' => $user->id, 'name' => $user->name,'role' => 'company' ];
+    }
+   
 });
 Broadcast::channel('onlineData', function ($user) {
     return true;

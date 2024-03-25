@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Message;
 use App\Models\Question;
 use App\Events\OnlineUser;
+use App\Models\PassesQuiz;
 use App\Events\SendMessage;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
@@ -180,11 +181,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $lastMessageContent = $conversation->messages->isNotEmpty() ? $conversation->messages->last()->content : null;
                 return [
                     'conversation_id' => $conversation->id,
-                    'profile_pic' => $conversation->user1->picture,
+                    'jobOffer' => $conversation->user1->job_title,
+                    'profile_pic' => $conversation->user1->picture ? $conversation->user1->picture : 'http://localhost:8000/images/default.jpg',
                     'sender_name' => $conversation->user1->last_name . " " . $conversation->user1->first_name,
                     'user2_id' => $conversation->user1->id,
                     'sender_job_title' => $conversation->user1->job_title,
-                    'last_message_time' => date('h:i A', strtotime($conversation->last_message_time)),
+                    'last_message_time' => $conversation->last_message_time ?  date('h:i A', strtotime($conversation->last_message_time)) : null,
                     'time' => $conversation->last_message_time,
                     'last_message_content' => $lastMessageContent,
                     'unread_messages_count' => $conversation->messages()->where('sender_role', 'user')->where('message_status', 'sent')->count(),
@@ -199,6 +201,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $conversationId = $request->input('conversation_id');
         $conversation = Conversation::find($conversationId);
         if($conversation){
+            $conversation->messages()
+            ->where('user_sender_id', '!=', $userId)
+            ->where('message_status', '!=', 'read')
+            ->update(['message_status' => 'read']);
+
             $messages = $conversation->messages()
             ->orderBy('created_at', 'asc')
             ->select(
@@ -239,30 +246,77 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     
     
-    Route::post('/updateMessageStatus', function (Request $request) {
-        $conversationId = $request->input('conversation_id');
-        if($request->user()->tokenCan('user')){
-            $updated = Message::where('conversation_id', $conversationId)
-            ->where('sender_role', 'company')
-            ->update(['message_status' => 'read']);
-        }else{
-            $updated = Message::where('conversation_id', $conversationId)
-            ->where('sender_role', 'user')
-            ->update(['message_status' => 'read']);
-        }
+    // Route::post('/updateMessageStatus', function (Request $request) {
+    //     $conversationId = $request->input('conversation_id');
+    //     if($request->user()->tokenCan('user')){
+    //         $updated = Message::where('conversation_id', $conversationId)
+    //         ->where('sender_role', 'company')
+    //         ->update(['message_status' => 'read']);
+    //     }else{
+    //         $updated = Message::where('conversation_id', $conversationId)
+    //         ->where('sender_role', 'user')
+    //         ->update(['message_status' => 'read']);
+    //     }
 
-        if ($updated) {
-            return response()->json(['message' => 'Message status updated successfully']);
-        } else {
-            return response()->json(['message' => 'No messages found or no update needed']);
+    //     if ($updated) {
+    //         return response()->json(['message' => 'Message status updated successfully']);
+    //     } else {
+    //         return response()->json(['message' => 'No messages found or no update needed']);
+    //     }
+    // });
+    Route::get('/conversations', function (Request $request) {
+        $userId = $request->user()->id;
+    
+        // Fetch conversations
+        $conversations = Conversation::with(['user2', 'messages'])
+            ->where('user1_id', $userId)
+            ->orWhere('user2_id', $userId)
+            ->orderBy('last_message_time', 'desc')
+            ->get();
+    
+        // Prepare response data
+        $responseData = [];
+        foreach ($conversations as $conversation) {
+            $lastMessage = $conversation->messages->last();
+            $unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->count();
+            
+            // Flag to determine if the actual user is the last sender
+            $actualUserLastSender = $lastMessage && $lastMessage->user_sender_id == $userId;
+            
+            // Flag to determine the number of last messages sent by the user or the other user
+            $lastMessagesByUserCount = $conversation->messages->where('user_sender_id', $userId)->count();
+    
+            // Format last message time
+            $lastMessageTime = $lastMessage ? date('h:i A', strtotime($lastMessage->created_at)) : null;
+    
+            $conversationData = [
+                'conversation_id' => $conversation->id,
+                'user_id' => $userId == $conversation->user1_id ? $conversation->user2_id : $conversation->user1_id,
+                'name' => $userId == $conversation->user1_id ? $conversation->user2->name : $conversation->user1->name,
+                'last_message' => $lastMessage ? $lastMessage->content : null,
+                'last_message_time' => $lastMessageTime,
+                'unread_messages_count' => $unreadMessagesCount,
+                'actual_user_last_sender' => $actualUserLastSender,
+                'last_messages_by_user_count' => $lastMessagesByUserCount,
+                'messages' => $conversation->messages->map(function ($message) {
+                    return [
+                        'message_id' => $message->id,
+                        'content' => $message->content,
+                        'sender_role' => $message->sender_role,
+                        'message_type' => $message->message_type,
+                        'message_status' => $message->message_status,
+                    ];
+                }),
+                // Add other necessary fields
+            ];
+    
+            $responseData[] = $conversationData;
         }
+    
+        return response()->json($responseData);
     });
-    Route::post('/onlineUsers', function (Request $request) {
-        $users = $request->input('users');
-        broadcast(new OnlineUser(
-           $users
-        ));
-    });
+    
+    
     Route::post('/getQuizzes', function (Request $request) {
         $companyId = $request->user()->id;
         $quizzes = Quiz::where('company', $companyId)
@@ -279,7 +333,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $quiz = Quiz::create([
             'company' => $companyId,
             'name' => $quizDataArray['name'],
-            'duration' => $quizDataArray['duration'], // Use 'duration' instead of 'size'
+            'duration' => $quizDataArray['duration'],
+            'nbr_question' => $quizDataArray['size'] 
         ]);
         
         foreach ($questions as $questionData) {
@@ -298,17 +353,152 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
-        $quiz = Quiz::with('questions')->findOrFail($id);
-
-       
-        return response()->json([
+        // Retrieve the PassesQuiz record by its ID
+        $passesQuiz = PassesQuiz::findOrFail($id);
+    
+        // Check if the PassesQuiz record has a status of "inpassed"
+        if ($passesQuiz->status === 'passed') {
+            // If the status is "inpassed", return a response indicating that the quiz cannot be retrieved
+            return response()->json('bad');
+        }
+    
+        // Retrieve the associated quiz using the relationship defined in the PassesQuiz model
+        $quiz = $passesQuiz->quiz;
+    
+        // Check if the quiz is empty
+        if (!$quiz) {
+            // If the quiz is empty, return an appropriate response
+            return response()->json('Quiz not found');
+        }
+    
+        // Load the questions relationship for the quiz
+        $quiz->load('questions');
+    
+        // Prepare the response data
+        $responseData = [
             'id' => $quiz->id,
             'name' => $quiz->name,
             'duration' => $quiz->duration,
-            // 'size' => $quiz->nbr_question,
+            'size' => $quiz->nbr_question,
             'data' => $quiz->questions,
-        ]);
+        ];
+    
+        // Return the response with the quiz details
+        return response()->json($responseData);
     });
+    
+    
+    Route::post('/calculateScore', function (Request $request) {
+        try {
+            $selectedAnswers = $request->input('selectedAnswers');
+            $quizId = $request->input('quizId');
+    
+            // Get the correct answers for the quiz based on the quiz ID
+            $correctAnswers = Question::where('quiz_id', $quizId)->pluck('answer', 'id')->toArray();
+    
+            $score = 0;
+            $totalQuestions = count($correctAnswers);
+    
+            // Iterate over the selected answers
+            foreach ($selectedAnswers as $answer) {
+                $questionId = $answer['id'];
+                $selectedAnswer = $answer['selected'];
+    
+                // Check if the selected answer matches the correct answer
+                if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] === $selectedAnswer) {
+                    $score++; // Increment the score if the answer is correct
+                }
+            }
+    
+            // Calculate the percentage score
+            $percentageScore = ($score / $totalQuestions) * 100;
+            // or you can search by user id and quiz id 
+            // $passesQuiz = PassesQuiz::findOrFail($passesQuizId);
+
+            // // Update the score and status
+            // $passesQuiz->update([
+            //     'score' => $newScore,
+            //     'status' => 'passed',
+            // ]);
+
+            // PassesQuiz::create([
+            //     'quiz_id' => $quizId,
+            //     'user_id' => $userId,
+            //     'score' => 0,
+            //     'status' => 'unpassed',
+            // ]);
+            return response()->json(['success' => true, 'score' => $percentageScore]);
+        } catch (\Exception $e) {
+            // Log the error to Laravel logs
+            \Log::error('Error calculating score: ' . $e->getMessage());
+    
+            // Return an error response to the client
+            return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
+        }
+    });
+    
+Route::post('/updateQuiz', function (Request $request) {
+    try {
+        $quizData = $request->input('quizData');
+        $questions = $request->input('questions');
+        $quizId = $request->input('quizId');
+
+        // Attempt to find the quiz by its ID
+        $quiz = Quiz::findOrFail($quizId);
+
+        // Delete existing questions related to the quiz
+        try {
+            $quiz->questions()->delete();
+        } catch (\Exception $e) {
+            // Log the error to Laravel logs
+            \Log::error('Error deleting questions for quiz: ' . $e->getMessage());
+            throw $e; // Re-throw the exception to be caught by the outer catch block
+        }
+
+        // Update quiz details
+        try {
+            $quiz->update([
+                'name' => $quizData['quizName'],
+                'duration' => $quizData['durationPerSecond'],
+                'nbr_question' => $quizData['numberOfQuestions']
+            ]);
+        } catch (\Exception $e) {
+            // Log the error to Laravel logs
+            \Log::error('Error updating quiz details: ' . $e->getMessage());
+            throw $e; // Re-throw the exception to be caught by the outer catch block
+        }
+
+        // Create new questions for the quiz
+        foreach ($questions as $questionData) {
+            try {
+                $question = Question::create([
+                    'quiz_id' => $quizId,
+                    'question_content' => $questionData['question'],
+                    'option_a' => $questionData['options'][0],
+                    'option_b' => $questionData['options'][1],
+                    'option_c' => $questionData['options'][2],
+                    'option_d' => $questionData['options'][3],
+                    'answer' => $questionData['answer'],
+                ]);
+            } catch (\Exception $e) {
+                // Log the error to Laravel logs
+                \Log::error('Error creating question: ' . $e->getMessage());
+                throw $e; // Re-throw the exception to be caught by the outer catch block
+            }
+        }
+
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        // Log the error to Laravel logs
+        \Log::error('Error uploading quiz: ' . $e->getMessage());
+
+        // Return an error response to the client
+        return response()->json(['success' => false, 'error' =>$e->getMessage()], 500);
+    }
+});
+
+
+
     Route::delete('/quizzes/{quiz}', function(Quiz $quiz){
         if (!$quiz) {
             return response()->json(['message' => 'Quiz not found.'], 404);
