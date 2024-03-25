@@ -21,7 +21,7 @@ function TopNav() {
     const userContext = useContext(authContext);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 md:py-0 flex items-center bg-background shadow-md">
+        <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 md:py-0 flex items-center bg-background shadow">
             <DropdownMenu>
                 <DropdownMenuTrigger className='ml-auto'>
                     <div className="py-4 flex gap-3">

@@ -3,30 +3,45 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
+use App\Models\Company;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use App\Models\User;
 
 class VerifyEmailController extends Controller
 {
-    /**
-     * Mark the authenticated user's email address as verified.
-     */
-    public function __invoke(EmailVerificationRequest $request): RedirectResponse
+    public function __invoke(Request $request)
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(
-                config('app.frontend_url').RouteServiceProvider::HOME.'?verified=1'
-            );
+        if (!$request->route('type')) {
+            return response()->json(['message' => 'something is wrong'], 403);
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+        if ($request->route('type') === 'company') {
+            $user = Company::find($request->route('id'));
+        } else if ($request->route('type') === 'user') {
+            $user = User::find($request->route('id'));
         }
 
-        return redirect()->intended(
-            config('app.frontend_url').RouteServiceProvider::HOME.'?verified=1'
-        );
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 403);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'email already verified'], 403);
+        }
+
+        if (!hash_equals((string) $user->getKey(), (string) $request->route('id'))) {
+            return response()->json(['message' => 'something went wrong, try again'], 422);
+        }
+
+        if (!hash_equals(sha1($user->getEmailForVerification()), (string) $request->route('hash'))) {
+            return response()->json(['message' => 'something went wrong, try again'], 422);
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
+
+        return response()->json(['message' => 'email verified successfully'], 202);
     }
 }

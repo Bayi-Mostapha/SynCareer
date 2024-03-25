@@ -8,9 +8,11 @@ use App\Models\JobOffer;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\EmailVerificationNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Company extends Authenticatable
+class Company extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -55,8 +57,20 @@ class Company extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function jobOffers(){
-        $this->hasMany(JobOffer::class);
+    public function sendEmailVerificationNotification()
+    {
+        // We override the default notification and will use our own
+        $this->notify(new EmailVerificationNotification("company"));
+    }
+
+    /**
+     * Define a relationship with JobOffer model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jobOffers()
+    {
+        return $this->hasMany(JobOffer::class);
     }
     public function sentMessages()
     {

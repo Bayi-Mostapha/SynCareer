@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -33,6 +34,10 @@ class AuthenticatedSessionController extends Controller
         }
 
         $user = Auth::guard($authenticatedGuard)->user();
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Your email address is not verified.'], 409);
+        }
+
         $user->tokens()->delete();
         $token = $user->createToken('api-token', [$authenticatedGuard])->plainTextToken;
 

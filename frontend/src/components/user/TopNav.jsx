@@ -2,8 +2,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { Button } from "@/components/ui/button"
 import { IoIosLogOut, IoIosMenu } from "react-icons/io";
-import { NavLink } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK ,USER_CHAT_LINK} from "@/router";
+import { Link, NavLink } from "react-router-dom";
+import { USER_HOME_LINK, USER_RESUMES_LINK , USER_PROFILE_LINK} from "@/router";
 
 import {
     DropdownMenu,
@@ -55,26 +55,26 @@ function TopNav() {
         };
     }, [])
     return (
-        <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 lg:py-0 flex items-center bg-background">
+        <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 lg:py-0 flex items-center bg-background shadow-sm">
             <h1 className="py-2 text-xl text-primary font-semibold">SynCareer</h1>
             <ul className="pt-3 ml-20 hidden lg:flex gap-4">
                 <li>
-                    <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'border-b-4  border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Home
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to={USER_CHAT_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to="t" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Messages
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="tt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to="tt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Interviews
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'border-b-4  border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Resume Library
                     </NavLink>
                 </li>
@@ -98,6 +98,9 @@ function TopNav() {
                 <DropdownMenuContent className=' hidden lg:block'>
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                        <Link to={USER_PROFILE_LINK}>Profile</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                         <Button className="flex gap-1" onClick={() => { userContext.logout() }}>
                             Log out

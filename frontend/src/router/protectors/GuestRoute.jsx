@@ -3,7 +3,7 @@ import { authContext } from "../../contexts/AuthWrapper";
 import { useNavigate } from "react-router-dom";
 
 import { goHome } from './goHome'
-import SynCareerLoader from "@/pages/loading-page";
+import SynCareerLoadingPage from "@/pages/loading-page";
 
 export default function GuestRoute({ children }) {
     const {
@@ -22,5 +22,5 @@ export default function GuestRoute({ children }) {
         }
     }, [isLoggedIn, isFetchingUser, user.type]);
 
-    return (!isLoggedIn && !isFetchingUser) ? children : <SynCareerLoader />;
+    return (!isLoggedIn && !isFetchingUser) ? children : <SynCareerLoadingPage />;
 }

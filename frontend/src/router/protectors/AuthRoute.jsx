@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { LOGIN_LINK } from "..";
 import { goHome } from './goHome'
-import SynCareerLoader from "@/pages/loading-page";
+import SynCareerLoadingPage from "@/pages/loading-page";
 
 export default function AuthRoute({ children, type }) {
     const {
@@ -25,5 +25,5 @@ export default function AuthRoute({ children, type }) {
         }
     }, [isLoggedIn, isFetchingUser, user.type, type]);
 
-    return (isLoggedIn && !isFetchingUser && user.type === type) ? children : <SynCareerLoader />;
+    return (isLoggedIn && !isFetchingUser && user.type === type) ? children : <SynCareerLoadingPage />;
 }
