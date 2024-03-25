@@ -76,6 +76,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
       
 
 
