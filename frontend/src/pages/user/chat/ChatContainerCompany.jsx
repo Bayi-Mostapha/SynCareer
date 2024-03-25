@@ -44,6 +44,7 @@ export default function ChatContainer() {
     const MessageInput = useRef(); 
     const lastMessageRef = useRef(null);
 
+    const [Data, setData] = useState();
     
     useEffect(() => {
         if(actualConversationId !== 0){
@@ -71,6 +72,7 @@ export default function ChatContainer() {
             const { data } = await axiosClient.get('/conversations');
            
             console.log('yeeees',data);
+            setData(data)
         } catch (error) {
             console.log('Error fetching conversations:', error);
         }

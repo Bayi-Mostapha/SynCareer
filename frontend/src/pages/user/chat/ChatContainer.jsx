@@ -154,9 +154,11 @@ export default function ChatContainer() {
     fetchMessage();
     fetchData();
     return () => {
-        window.Echo.leave('private.user.' + actualConversationId);
+        if (previousActualConversationId) {
+            window.Echo.leave(`private.user.${previousActualConversationId}`);
+        }
     };
-  }, [actualConversationId])
+  }, [actualConversationId,previousActualConversationId])
 
   
   const handleClick = async () => {

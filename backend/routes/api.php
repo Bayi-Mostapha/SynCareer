@@ -269,35 +269,28 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
         // Fetch conversations
         $conversations = Conversation::with(['user2', 'messages'])
-            ->where('user1_id', $userId)
-            ->orWhere('user2_id', $userId)
-            ->orderBy('last_message_time', 'desc')
-            ->get();
+        ->where('user2_id', $userId)
+        ->orderBy('last_message_time', 'desc')
+        ->get();
     
+       
         // Prepare response data
         $responseData = [];
         foreach ($conversations as $conversation) {
             $lastMessage = $conversation->messages->last();
-            $unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->count();
+            $unreadMessagesCount = $conversation->messages->where('message_status', '!=', 'read')->Where('user_sender_id','!=', 'null')->count();
             
-            // Flag to determine if the actual user is the last sender
-            $actualUserLastSender = $lastMessage && $lastMessage->user_sender_id == $userId;
-            
-            // Flag to determine the number of last messages sent by the user or the other user
-            $lastMessagesByUserCount = $conversation->messages->where('user_sender_id', $userId)->count();
-    
-            // Format last message time
+            $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
             $lastMessageTime = $lastMessage ? date('h:i A', strtotime($lastMessage->created_at)) : null;
-    
             $conversationData = [
                 'conversation_id' => $conversation->id,
-                'user_id' => $userId == $conversation->user1_id ? $conversation->user2_id : $conversation->user1_id,
-                'name' => $userId == $conversation->user1_id ? $conversation->user2->name : $conversation->user1->name,
+                'user_id' => $conversation->user1_id,
+                'profile_pic' => $conversation->user1->picture,
+                'name' => $conversation->user1->first_name .' '.$conversation->user1->last_name,
                 'last_message' => $lastMessage ? $lastMessage->content : null,
-                'last_message_time' => $lastMessageTime,
+                'last_message_time' => $conversation->last_message_time,
                 'unread_messages_count' => $unreadMessagesCount,
                 'actual_user_last_sender' => $actualUserLastSender,
-                'last_messages_by_user_count' => $lastMessagesByUserCount,
                 'messages' => $conversation->messages->map(function ($message) {
                     return [
                         'message_id' => $message->id,
