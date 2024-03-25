@@ -72,8 +72,6 @@ class JobOfferController extends Controller
         return response()->json(['message' => 'Job offer updated successfully', 'jobOffer' => $jobOffer]);
     }
 
-
-
     public function destroy(Request $request, JobOffer $jobOffer)
     {
         $user = $request->user();

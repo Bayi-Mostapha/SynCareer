@@ -16,6 +16,7 @@ import { TbPencil, TbPencilOff } from "react-icons/tb";
 import { LuChevronsUpDown } from "react-icons/lu";
 import { IoCloudDownloadOutline } from "react-icons/io5"
 import { MdOutlineColorLens } from "react-icons/md";
+import { SlPicture } from "react-icons/sl";
 // html to pdf 
 import { toJpeg } from 'html-to-image';
 // react drop zone
@@ -31,6 +32,7 @@ import ResumeExperience from "@/components/user/resume/resume-experience";
 import ResumeLanguages from "@/components/user/resume/resume-languages";
 import ResumeSkills from "@/components/user/resume/resume-skills";
 import ResumeProjects from "@/components/user/resume/resume-projects";
+import dataURItoBlob from "@/functions/uri2blob";
 
 const ResumeCreator = () => {
     const [order, setOrder] = useState(['edu', 'exp', 'prj', 'lang', 'skills']);
@@ -46,6 +48,11 @@ const ResumeCreator = () => {
     const navigate = useNavigate();
 
     const onDrop = useCallback(acceptedFiles => {
+        if (!acceptedFiles[0]) {
+            toast.error('Please upload an image')
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = () => {
             const imageDataUrl = reader.result;
@@ -53,7 +60,12 @@ const ResumeCreator = () => {
         };
         reader.readAsDataURL(acceptedFiles[0]);
     }, [])
-    const dropZone = useDropzone({ onDrop })
+    const dropZone = useDropzone({
+        onDrop,
+        accept: {
+            'image/*': ['.jpeg', '.jpg', '.png']
+        }
+    })
 
     const toggleEditable = () => {
         setIsEdit(!isEdit);
@@ -165,16 +177,6 @@ const ResumeCreator = () => {
             setIsSaving(false)
         }
     };
-    function dataURItoBlob(dataURI) {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    }
 
     const styles = {
         fontFamily: 'sans-serif',
@@ -266,7 +268,7 @@ const ResumeCreator = () => {
             </div>
             {isEdit &&
                 <>
-                    <DnDFile {...dropZone} />
+                    <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
                     <div className="my-4 flex justify-center items-center gap-4">
                         <div className="h-7 w-7 bg-[#1e40af] rounded-full cursor-pointer hover:scale-125 transition-all:"
                             onClick={() => { setColor("#1e40af") }}></div>
