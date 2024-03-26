@@ -1,5 +1,6 @@
 import { axiosClient } from "@/api/axios";
 import { columns } from "@/components/company/candidats-table/columns";
+import CompanyPaddedContent from "@/components/company/padded-content";
 import DataTable from "@/components/general/data-table";
 import SynCareerLoader from "@/components/general/syncareer-loader";
 import { useEffect, useState } from "react";
@@ -26,7 +27,7 @@ function JobOfferCandidats() {
         fetchCandidats()
     }, [])
     return (
-        <>
+        <CompanyPaddedContent>
             <h1 className="text-lg font-semibold">Candidats for job offer #{id}</h1>
             {isFetching ?
                 <div className="h-96 w-full flex justify-center items-center">
@@ -35,7 +36,7 @@ function JobOfferCandidats() {
                 :
                 <DataTable columns={columns} data={data} searchColumn={"job_title"} />
             }
-        </>
+        </CompanyPaddedContent>
     );
 }
 

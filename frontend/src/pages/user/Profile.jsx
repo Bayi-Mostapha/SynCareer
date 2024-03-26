@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import UserPaddedContent from '@/components/user/padded-content';
 
 function ProfilePage() {
     const [image, setImage] = useState(null);
@@ -69,10 +70,8 @@ function ProfilePage() {
     };
 
     return (
-        <>
-
+        <UserPaddedContent>
             <Form {...form}>
-
                 <form className='w-full sm:w-96 px-10 sm:p-0 flex flex-col gap-2' onSubmit={handleSubmit(submit)} >
                     <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
                     <FormField
@@ -190,7 +189,7 @@ function ProfilePage() {
                     </Button>
                 </form>
             </Form>
-        </>
+        </UserPaddedContent>
     );
 }
 

@@ -6,6 +6,7 @@ import { MdOutlineBookmarkBorder } from "react-icons/md";
 import { USER_HOME_LINK } from "@/router";
 import { Link, Outlet } from "react-router-dom";
 import { toast } from "sonner";
+import UserPaddedContent from "@/components/user/padded-content";
 
 function UserHome() {
     const [jobOffers, setJobOffers] = useState([]);
@@ -88,23 +89,25 @@ function UserHome() {
     }
 
     return (
-        <div className="flex flex-col gap-2 p-4">
-            <div className="px-[20%] pb-6">
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="w-full border border-gray-300 rounded-md p-4"
-                />
-            </div>
-            <div className="flex gap-2">
-                <div >
-                    {displayJobOffers()}
+        <UserPaddedContent>
+            <div className="flex flex-col gap-2 p-4">
+                <div className="px-[20%] pb-6">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="w-full border border-gray-300 rounded-md p-4"
+                    />
                 </div>
-                <Outlet />
+                <div className="flex gap-2">
+                    <div >
+                        {displayJobOffers()}
+                    </div>
+                    <Outlet />
+                </div>
             </div>
-        </div>
+        </UserPaddedContent>
     );
 }
 

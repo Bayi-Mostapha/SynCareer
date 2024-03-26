@@ -126,7 +126,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
-                element: <h1>dashboard</h1>
+                element: <CompanyDashboard />
             },
             {
                 path: JOBOFFER_LINK_BASE,
@@ -141,6 +141,10 @@ export const router = createBrowserRouter([
                     },
                 ]
             },
+            {
+                path: '/company/chat',
+                element: <ChatCompany />
+            }
         ]
     },
     {
