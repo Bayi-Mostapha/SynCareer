@@ -18,7 +18,7 @@ function PassQuiz() {
 
     const getQuizData = async () => {
         try {
-            const { data } = await axiosClient.get('/quizzes/1',{});
+            const { data } = await axiosClient.get('/quizzes/1', {});
             setQuizData(data);
             console.log(data);
         } catch (error) {
@@ -31,19 +31,19 @@ function PassQuiz() {
         setStartQuiz(true);
 
     };
-    const calculateScore = async ( ) => {
+    const calculateScore = async () => {
         try {
             const payload = {
                 selectedAnswers: selectedOptions,
                 quizId: 1
             };
-            console.log('payload' ,selectedOptions);
+            console.log('payload', selectedOptions);
             const response = await axiosClient.post('/calculateScore', payload);
             const { success, score } = response.data;
 
             if (success) {
                 console.log('Score:', score);
-            } else {   
+            } else {
                 console.error('Failed to calculate score');
             }
         } catch (error) {
@@ -54,83 +54,83 @@ function PassQuiz() {
         setCurrentQuestion(currentQuestion + 1);
         console.log(currentQuestion)
         console.log(quizData.length)
-        if (quizData.data.length - 1 <= currentQuestion ){
+        if (quizData.data.length - 1 <= currentQuestion) {
             setFlag(true);
             setStartQuiz(false);
         }
-        if (quizData.length > currentQuestion + 1 ) {
+        if (quizData.length > currentQuestion + 1) {
             let answer = '';
-           if (InputRadioA.current.checked) {
-             answer = InputRadioA.current.value ;
-           } else
-           if (InputRadioB.current.checked) {
-             answer = InputRadioB.current.value ;
-           } else
-           if (InputRadioC.current.checked) {
-              answer = InputRadioC.current.value ;
-           } else
-           if (InputRadioD.current.checked) {
-              answer = InputRadioD.current.value ;
-           } 
-           const selectedOptionsForCurrentQuestion = {
-            id: quizData.data[currentQuestion].id,
-            selected: answer
-        };
+            if (InputRadioA.current.checked) {
+                answer = InputRadioA.current.value;
+            } else
+                if (InputRadioB.current.checked) {
+                    answer = InputRadioB.current.value;
+                } else
+                    if (InputRadioC.current.checked) {
+                        answer = InputRadioC.current.value;
+                    } else
+                        if (InputRadioD.current.checked) {
+                            answer = InputRadioD.current.value;
+                        }
+            const selectedOptionsForCurrentQuestion = {
+                id: quizData.data[currentQuestion].id,
+                selected: answer
+            };
             setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
-    
-             // Proceed to next question
-             setErrors(null);
-    
+
+            // Proceed to next question
+            setErrors(null);
+
             InputRadioA.current.checked = false;
             InputRadioB.current.checked = false;
             InputRadioC.current.checked = false;
             InputRadioD.current.checked = false;
             setErrors(null);
-        }else{
+        } else {
             let answer = '';
             if (InputRadioA.current.checked) {
-              answer = InputRadioA.current.value ;
+                answer = InputRadioA.current.value;
             } else
-            if (InputRadioB.current.checked) {
-              answer = InputRadioB.current.value ;
-            } else
-            if (InputRadioC.current.checked) {
-               answer = InputRadioC.current.value ;
-            } else
-            if (InputRadioD.current.checked) {
-               answer = InputRadioD.current.value ;
-            }
+                if (InputRadioB.current.checked) {
+                    answer = InputRadioB.current.value;
+                } else
+                    if (InputRadioC.current.checked) {
+                        answer = InputRadioC.current.value;
+                    } else
+                        if (InputRadioD.current.checked) {
+                            answer = InputRadioD.current.value;
+                        }
             const selectedOptionsForCurrentQuestion = {
                 id: quizData.data[currentQuestion].id,
-             selected: answer
-         };
-             setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
-            
+                selected: answer
+            };
+            setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
+
         }
-       
+
     };
-    
+
     useEffect(() => {
         if (startQuiz) {
             const interval = setInterval(() => {
                 setCounter(prevCounter => {
                     const newCounter = prevCounter + 1;
                     console.log('Counter:', newCounter);
-            
+
                     if (newCounter === quizData.duration) {
                         console.log('Counter reached 10!');
                         document.getElementById('nextBtn').click();
-                        return  0 ;
+                        return 0;
                     }
                     return newCounter;
                 });
             }, 1000);
-        
+
             return () => clearInterval(interval);
         }
     }, [startQuiz]);
-    
-    
+
+
     const isAtLeastOneOptionSelected = () => {
         return (
             InputRadioA.current.checked ||
@@ -157,12 +157,12 @@ function PassQuiz() {
         getQuizData();
     }, []);
     useEffect(() => {
-        if(flag){
+        if (flag) {
             calculateScore();
             setFlag(false);
         }
-       
-       
+
+
     }, [flag]);
 
     return (
@@ -177,7 +177,7 @@ function PassQuiz() {
                             </>
                         ) : (
                             <div className="flex items-center justify-center flex-col">
-                                <h1>error 404</h1>
+                                <h1>error 401</h1>
                                 <p>You are not allowed to pass this quiz</p>
                             </div>
                         )}

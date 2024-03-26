@@ -34,7 +34,6 @@ export default function CompanyDashboard() {
                     </CardContent>
                     <CardFooter>
                         <p className="text-sm text-gray-500">Increase compared to last week</p>
-
                     </CardFooter>
                 </Card>
                 <Card>
@@ -53,7 +52,6 @@ export default function CompanyDashboard() {
                     </CardContent>
                     <CardFooter>
                         <p className="text-sm text-gray-500">You closed 96 out of 100 deals</p>
-
                     </CardFooter>
                 </Card>
             </div>
@@ -124,7 +122,6 @@ export default function CompanyDashboard() {
                     </CardHeader>
                     <CardContent>
                         <CurvedlineChart className="w-full h-[300px]" />
-
                     </CardContent>
                 </Card>
             </div>

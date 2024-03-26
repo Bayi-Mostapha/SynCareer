@@ -43,10 +43,7 @@ export const RESET_PASSWORD_LINK = '/reset-password/:email';
 // user 
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
-
 export const USER_PROFILE_LINK = '/user/profile';
-
-
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 // company 
@@ -107,7 +104,7 @@ export const router = createBrowserRouter([
                         path: 'create',
                         element: <ResumeCreator />
                     },
-                   
+
                 ]
             },
             {
@@ -130,6 +127,19 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_DASHBOARD_LINK,
                 element: <h1>dashboard</h1>
+            },
+            {
+                path: JOBOFFER_LINK_BASE,
+                children: [
+                    {
+                        path: '',
+                        element: <JobOffer />
+                    },
+                    {
+                        path: ':id',
+                        element: <JobOfferCandidats />
+                    },
+                ]
             },
         ]
     },
