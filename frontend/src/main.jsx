@@ -12,10 +12,10 @@ import { Toaster } from 'sonner'
 import { AuthWrapper } from "./contexts/AuthWrapper";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <React.StrictMode>
+   
         <AuthWrapper>
             <Toaster position="bottom-right" richColors closeButton />
             <RouterProvider router={router} />
         </AuthWrapper>
-    </React.StrictMode>
+    
 );

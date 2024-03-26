@@ -17,7 +17,7 @@ function CompanyLayout() {
                 <SidebarItem icon={<IoHomeOutline />} text={'Home'} location={COMPANY_DASHBOARD_LINK} />
                 <SidebarItem icon={<PiBriefcaseBold />} text={'Job Upload'} location={JOBOFFER_LINK_BASE} />
             </SideBar>
-            <main className="p-4 pt-24 pl-24">
+            <main className="">
                 <Outlet />
             </main>
         </>

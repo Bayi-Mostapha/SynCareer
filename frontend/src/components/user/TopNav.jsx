@@ -153,7 +153,7 @@ function TopNav() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="t" className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
+                                <NavLink to={USER_CHAT_LINK} className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
                                     Messages
                                 </NavLink>
                             </li>

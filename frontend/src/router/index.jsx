@@ -21,6 +21,10 @@ import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
 import ApplyJobOffer from '@/components/user/home/ApplyJobOffer';
 import ProfilePage from '@/pages/user/Profile';
+import Chat from '@/pages/user/chat/ChatContainer';
+import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
+import QuizTable from '@/pages/user/quiz/quizs-table';
+import PassQuiz from '@/pages/user/quiz/pass-quiz';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -43,9 +47,13 @@ export const USER_RESUMES_LINK = '/user/resumes';
 export const USER_PROFILE_LINK = '/user/profile';
 
 
+export const USER_CHAT_LINK = '/user/chat';
+export const USER_PASSQUIZ_LINK = '/user/quiz';
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
+export const COMPANY_CHAT_LINK = '/company/chat';
+export const COMPANY_QUIZ_LINK = '/company/quiz';
 // dashboard 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
@@ -106,6 +114,14 @@ export const router = createBrowserRouter([
                 path: USER_PROFILE_LINK,
                 element: <ProfilePage />,
             },
+            {
+                path: USER_CHAT_LINK,
+                element: <Chat />
+            },
+            {
+                path: USER_PASSQUIZ_LINK,
+                element: <PassQuiz />
+            }
         ]
     },
     {
@@ -113,21 +129,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
-                element: <CompanyDashboard />
-            },
-
-            {
-                path: JOBOFFER_LINK_BASE,
-                children: [
-                    {
-                        path: '',
-                        element: <JobOffer />
-                    },
-                    {
-                        path: ':id',
-                        element: <JobOfferCandidats />
-                    },
-                ]
+                element: <h1>dashboard</h1>
             },
         ]
     },
