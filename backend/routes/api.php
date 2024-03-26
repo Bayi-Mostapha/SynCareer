@@ -73,6 +73,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
 
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
+    Route::post('/apply/{jobOffer}', [JobOfferCandidatsController::class, 'apply']);
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);

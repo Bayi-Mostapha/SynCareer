@@ -19,7 +19,7 @@ import Resumes from '@/pages/user/resume/resume-library';
 import ResumeCreator from '@/pages/user/resume/resume-builder';
 import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
-import ApplyJobOffer from '@/pages/user/ApplyJobOffer';
+import ApplyJobOffer from '@/components/user/home/ApplyJobOffer';
 import ProfilePage from '@/pages/user/Profile';
 
 // protectors 

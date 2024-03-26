@@ -30,7 +30,7 @@ class JobOffer extends Model
     public function candidats()
     {
         return $this->belongsToMany(User::class, 'job_offer_candidats', 'job_offer_id', 'user_id')
-            ->withPivot('matching_percentage');
+            ->withPivot('matching_percentage', 'resume_id');
     }
 
     public function reports()
