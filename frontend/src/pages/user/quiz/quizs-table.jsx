@@ -20,12 +20,10 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import SynCareerLoader from "@/pages/loading-page";
-
+import SynCareerLoader from "@/components/general/syncareer-loader";
 
 function QuizTable() {
     const [data, setData] = useState([]);
@@ -102,7 +100,7 @@ function QuizTable() {
             newErrors.name = "Name is required.";
         }
         if (quizData.size == "") {
-            newErrors.size = "Number of question is required.";
+            newErrors.size = "Number of questions is required.";
         } else {
             if (quizData.size == 0) {
                 newErrors.size = "Number can't be 0";
@@ -370,15 +368,15 @@ function QuizTable() {
                     {/* ////////////////////////////////// */}
                 </div>
             </div>
-            {isFetching ?
-                <div className="absolute top-0 bottom-0 left-0 right-0 z-50">
-                    <SynCareerLoader />
-                </div>
-                :
-                <div className="border border-gray-200 rounded-md overflow-x-auto">
+            <div className="border border-gray-200 rounded-md overflow-x-auto">
+                {isFetching ?
+                    <div className="flex items-center justify-center p-10">
+                        <SynCareerLoader />
+                    </div>
+                    :
                     <DataTable columns={columns} data={data} searchColumn={"name"} />
-                </div>
-            }
+                }
+            </div>
         </div>
     );
 }

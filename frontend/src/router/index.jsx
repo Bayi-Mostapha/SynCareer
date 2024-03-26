@@ -116,7 +116,7 @@ export const router = createBrowserRouter([
                 element: <Chat />
             },
             {
-                path: USER_PASSQUIZ_LINK,
+                path: USER_PASSQUIZ_LINK + "/:id",
                 element: <PassQuiz />
             }
         ]
@@ -142,8 +142,12 @@ export const router = createBrowserRouter([
                 ]
             },
             {
-                path: '/company/chat',
+                path: COMPANY_CHAT_LINK,
                 element: <ChatCompany />
+            },
+            {
+                path: COMPANY_QUIZ_LINK,
+                element: <QuizTable />
             }
         ]
     },

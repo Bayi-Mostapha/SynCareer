@@ -17,6 +17,7 @@ function JobOfferCandidats() {
             setisFetching(true);
             const res = await axiosClient.get(`/candidats/${id}`)
             setData(res.data)
+            console.log(res.data)
         } catch (error) {
             toast.error(error.response.data.message)
         } finally {

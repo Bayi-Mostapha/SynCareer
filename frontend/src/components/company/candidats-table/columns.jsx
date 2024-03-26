@@ -37,6 +37,11 @@ export const columns = [
     {
         accessorKey: "job_title",
         header: "Job title",
+        cell: ({ row }) => {
+            return <div>
+                {row.getValue("job_title") || '-'}
+            </div>
+        },
     },
     {
         accessorKey: "email",
@@ -53,11 +58,25 @@ export const columns = [
         },
     },
     {
+        accessorKey: "details",
+        header: "Details",
+        cell: ({ row }) => {
+            return <div>
+                {
+                    row.original.resume_id ?
+                        'button ' + row.original.resume_id
+                        :
+                        'link ' + row.original.id
+                }
+            </div>
+        },
+    },
+    {
         id: "actions",
         accessorKey: "action",
         header: "Action",
         cell: ({ row }) => {
-            const jobOffer = row.original
+            const candidat = row.original
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -67,15 +86,7 @@ export const columns = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(jobOffer.id)}
-                        >
-                            Delete
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            Update
-                        </DropdownMenuItem>
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

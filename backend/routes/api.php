@@ -391,9 +391,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
             // ]);
             return response()->json(['success' => true, 'score' => $percentageScore]);
         } catch (\Exception $e) {
-            // Log the error to Laravel logs
-            \Log::error('Error calculating score: ' . $e->getMessage());
-
             // Return an error response to the client
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
@@ -412,8 +409,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
             try {
                 $quiz->questions()->delete();
             } catch (\Exception $e) {
-                // Log the error to Laravel logs
-                \Log::error('Error deleting questions for quiz: ' . $e->getMessage());
                 throw $e; // Re-throw the exception to be caught by the outer catch block
             }
 
@@ -425,8 +420,6 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
                     'nbr_question' => $quizData['numberOfQuestions']
                 ]);
             } catch (\Exception $e) {
-                // Log the error to Laravel logs
-                \Log::error('Error updating quiz details: ' . $e->getMessage());
                 throw $e; // Re-throw the exception to be caught by the outer catch block
             }
 
@@ -443,17 +436,12 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
                         'answer' => $questionData['answer'],
                     ]);
                 } catch (\Exception $e) {
-                    // Log the error to Laravel logs
-                    \Log::error('Error creating question: ' . $e->getMessage());
                     throw $e; // Re-throw the exception to be caught by the outer catch block
                 }
             }
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            // Log the error to Laravel logs
-            \Log::error('Error uploading quiz: ' . $e->getMessage());
-
             // Return an error response to the client
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }

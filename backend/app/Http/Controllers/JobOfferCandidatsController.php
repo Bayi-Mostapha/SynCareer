@@ -20,10 +20,12 @@ class JobOfferCandidatsController extends Controller
         $filteredCandidats = [];
         foreach ($candidats as $candidat) {
             $filteredCandidat = [
+                "id" => $candidat['id'],
                 'first_name' => $candidat['first_name'],
                 'last_name' => $candidat['last_name'],
                 'email' => $candidat['email'],
                 'job_title' => $candidat['job_title'],
+                'resume_id' => $candidat['pivot']['resume_id'],
                 'matching' => $candidat['pivot']['matching_percentage'],
             ];
             $filteredCandidats[] = $filteredCandidat;

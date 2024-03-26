@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Quiz;
 use App\Models\Company;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Model;

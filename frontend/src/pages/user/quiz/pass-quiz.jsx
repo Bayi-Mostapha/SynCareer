@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { axiosClient } from "@/api/axios";
 import { set } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
 
 function PassQuiz() {
+    const { id } = useParams()
+
     const [quizData, setQuizData] = useState(null); // State to store quiz data
     const [startQuiz, setStartQuiz] = useState(false); // State to store quiz data
     const [currentQuestion, setCurrentQuestion] = useState(0); // State to keep track of current question
@@ -16,9 +19,9 @@ function PassQuiz() {
     const InputRadioC = useRef();
     const InputRadioD = useRef();
 
-    const getQuizData = async () => {
+    const getQuizData = async (id) => {
         try {
-            const { data } = await axiosClient.get('/quizzes/1', {});
+            const { data } = await axiosClient.get(`/quizzes/${id}`, {});
             setQuizData(data);
             console.log(data);
         } catch (error) {
@@ -35,7 +38,7 @@ function PassQuiz() {
         try {
             const payload = {
                 selectedAnswers: selectedOptions,
-                quizId: 1
+                quizId: id
             };
             console.log('payload', selectedOptions);
             const response = await axiosClient.post('/calculateScore', payload);
@@ -154,7 +157,7 @@ function PassQuiz() {
     };
 
     useEffect(() => {
-        getQuizData();
+        getQuizData(id);
     }, []);
     useEffect(() => {
         if (flag) {
