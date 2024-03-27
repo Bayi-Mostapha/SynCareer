@@ -73,6 +73,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     });
 
     // resume 
+    Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
     Route::post('/resumes', [ResumeController::class, 'store']);
     Route::post('/upload-resume', [ResumeController::class, 'upload']);
@@ -89,6 +90,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
     Route::post('/apply/{jobOffer}', [JobOfferCandidatsController::class, 'apply']);
+    Route::get('/candidat/{user}', [JobOfferCandidatsController::class, 'show']);
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);
@@ -463,7 +465,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {
         $path = storage_path("app/$folder/$file");
         if (!file_exists($path)) {
-            abort(404);
+            return response()->json(['message' => 'File does not exist'], 404);
         }
         return response()->file($path);
     });

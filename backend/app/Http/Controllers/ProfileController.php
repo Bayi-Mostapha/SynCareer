@@ -35,7 +35,7 @@ class ProfileController extends Controller
         $imageName = '';
         if ($request->hasFile('picture')) {
             $image = $request->file('picture');
-            $imageName = 'image_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $imageName = 'user_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->storeAs('user-pictures', $imageName);
         } else {
             return response()->json(['message' => 'Please provide an image'], 422);

@@ -14,24 +14,25 @@ import Register from '../pages/auth/Register';
 import ForgotPassword from '@/pages/auth/forgot-password';
 import ResetPassword from '@/pages/auth/reset-password';
 import NotFound from '../pages/NotFound';
-import ResumeContainer from '@/pages/user/resume-container';
 import Resumes from '@/pages/user/resume/resume-library';
 import ResumeCreator from '@/pages/user/resume/resume-builder';
 import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
 import ApplyJobOffer from '@/components/user/home/ApplyJobOffer';
-import ProfilePage from '@/pages/user/Profile';
+import ProfilePage from '@/pages/user/profile-settings';
 import Chat from '@/pages/user/chat/ChatContainer';
 import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
 import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
+import JobOfferCandidats from '@/pages/company/job-offer-candidats';
+import Profile from '@/pages/company/profile';
+import ViewResume from '@/pages/company/view-resume';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 
 // links 
 // auth 
@@ -51,7 +52,9 @@ export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
 export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
-// dashboard 
+export const VIEW_USER_PROFILE_BASE = 'view-user/';
+export const VIEW_USER_RESUME_BASE = 'view-resume/';
+// admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
 
@@ -94,7 +97,6 @@ export const router = createBrowserRouter([
             },
             {
                 path: USER_RESUMES_LINK,
-                element: <ResumeContainer />,
                 children: [
                     {
                         path: '',
@@ -137,7 +139,20 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: ':id',
-                        element: <JobOfferCandidats />
+                        children: [
+                            {
+                                path: '',
+                                element: <JobOfferCandidats />
+                            },
+                            {
+                                path: VIEW_USER_PROFILE_BASE + ':uid',
+                                element: <Profile />
+                            },
+                            {
+                                path: VIEW_USER_RESUME_BASE + ':rid',
+                                element: <ViewResume />
+                            }
+                        ]
                     },
                 ]
             },
@@ -148,7 +163,7 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
-            }
+            },
         ]
     },
     {
