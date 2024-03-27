@@ -62,10 +62,6 @@ export const columns = [
         header: 'Years of Experience',
     },
     {
-        accessorKey: 'role_desc',
-        header: 'Role Description',
-    },
-    {
         id: 'actions',
         accessorKey: 'action',
         header: 'Action',

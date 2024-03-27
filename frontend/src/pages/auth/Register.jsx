@@ -104,6 +104,7 @@ function Register() {
             toast.success(data.message);
             navigate(LOGIN_LINK);
         } catch (error) {
+            console.log(error)
             const errorMessages = Object.entries(error.response.data.errors).flatMap(([field, messages]) =>
                 messages.map((message) =>
                     <li key={message}>

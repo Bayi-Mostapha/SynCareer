@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 // icons 
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
+import { Link } from "react-router-dom";
+import { VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
 
 export const columns = [
     {
@@ -37,6 +39,11 @@ export const columns = [
     {
         accessorKey: "job_title",
         header: "Job title",
+        cell: ({ row }) => {
+            return <div>
+                {row.getValue("job_title") || '-'}
+            </div>
+        },
     },
     {
         accessorKey: "email",
@@ -53,11 +60,29 @@ export const columns = [
         },
     },
     {
+        accessorKey: "details",
+        header: "Details",
+        cell: ({ row }) => {
+            return <div>
+                {
+                    row.original.resume_id ?
+                        <Link to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
+                            view resume
+                        </Link>
+                        :
+                        <Link to={VIEW_USER_PROFILE_BASE + row.original.id}>
+                            view profile
+                        </Link>
+                }
+            </div>
+        },
+    },
+    {
         id: "actions",
         accessorKey: "action",
         header: "Action",
         cell: ({ row }) => {
-            const jobOffer = row.original
+            const candidat = row.original
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -67,15 +92,7 @@ export const columns = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(jobOffer.id)}
-                        >
-                            Delete
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            Update
-                        </DropdownMenuItem>
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

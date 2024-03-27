@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { IoIosLogOut, IoIosMenu } from "react-icons/io";
 import { Link, NavLink } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK , USER_PROFILE_LINK} from "@/router";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_PROFILE_LINK, USER_CHAT_LINK } from "@/router";
 
 import {
     DropdownMenu,
@@ -64,7 +64,7 @@ function TopNav() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="t" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={USER_CHAT_LINK} className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Messages
                     </NavLink>
                 </li>
@@ -102,7 +102,7 @@ function TopNav() {
                         <Link to={USER_PROFILE_LINK}>Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <Button className="flex gap-1" onClick={() => { userContext.logout() }}>
+                        <Button variant='ghost' className="flex gap-1" onClick={() => { userContext.logout() }}>
                             Log out
                             <IoIosLogOut />
                         </Button>
@@ -139,7 +139,10 @@ function TopNav() {
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <Button className="flex gap-1" onClick={() => { userContext.logout() }}>
+                                    <Link to={USER_PROFILE_LINK}>Profile</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Button variant='ghost' className="flex gap-1" onClick={() => { userContext.logout() }}>
                                         Log out
                                         <IoIosLogOut />
                                     </Button>
@@ -163,7 +166,7 @@ function TopNav() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="ttt" className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
+                                <NavLink to={USER_RESUMES_LINK} className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
                                     Resume Library
                                 </NavLink>
                             </li>

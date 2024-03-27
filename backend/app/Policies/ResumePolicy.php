@@ -7,6 +7,10 @@ use App\Models\User;
 
 class ResumePolicy
 {
+    public function apply(User $user, Resume $resume): bool
+    {
+        return $user->id === $resume->user_id;
+    }
     /**
      * Determine whether the user can delete the model.
      */

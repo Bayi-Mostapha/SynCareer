@@ -239,7 +239,7 @@ useEffect(()=>{
     if(searchValue == ''){
         setFilteredContacts(false);
     }
-    const Contacts = data.filter(contact => {
+    const Contacts = data?.filter(contact => {
         return contact.name.toLowerCase().includes(searchValue.toLowerCase());
     });
     setFilteredContacts(Contacts);
@@ -260,15 +260,15 @@ const handleInputChange = (e) => {
             <p className="font-medium text-2xl text-black mb-1">Messages</p>
             <p className="text-sm  text-unread mb-1">{totalUnreadMessagesCount} Unread</p>
           </div>
-          <div class="relative px-9 mb-7 mt-3">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
-                    <svg class="w-5 h-5 ml-9 text-gray-300 dark:text-gray-300 " ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <div className="relative px-9 mb-7 mt-3">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
+                    <svg className="w-5 h-5 ml-9 text-gray-300 dark:text-gray-300 " ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
                 </div>
                 <input 
                     type="text"  
-                    class="block w-full p-3  ps-10 text-sm placeholder:text-gray300 text-gray-800 border-none  rounded-lg bg-white outline-none" 
+                    className="block w-full p-3  ps-10 text-sm placeholder:text-gray300 text-gray-800 border-none  rounded-lg bg-white outline-none" 
                     placeholder="Search" 
                     value={searchValue}
                     onChange={handleInputChange}

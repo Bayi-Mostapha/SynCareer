@@ -11,6 +11,19 @@ use Illuminate\Support\Facades\Storage;
 
 class ResumeController extends Controller
 {
+    function show(Resume $resume)
+    {
+        if (!$resume) {
+            return response()->json(['message' => 'Resume not found'], 404);
+        }
+
+        $filePath = storage_path('app/resumes/' . $resume->resume_name);
+        if (!file_exists($filePath)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        return response()->file($filePath);
+    }
+
     function index(Request $request)
     {
         $resumes = $request->user()->resumes;

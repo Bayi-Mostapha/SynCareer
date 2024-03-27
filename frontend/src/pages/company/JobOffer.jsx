@@ -22,6 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import DataTable from "@/components/general/data-table";
 import { columns } from '@/components/company/job-offers-table/columns';
 import { useEffect, useState } from 'react';
+import CompanyPaddedContent from '@/components/company/padded-content';
 
 const schema = yup.object().shape({
     job_title: yup.string().required(),
@@ -43,7 +44,7 @@ function JobOffer() {
     const { formState, handleSubmit, control } = form;
     const { isSubmitting, isValid } = formState;
 
-    
+
 
     const onSubmit = async (data) => {
         try {
@@ -71,12 +72,12 @@ function JobOffer() {
 
         fetchJobOffers();
     }, []);
-  
-    
-   
+
+
+
 
     return (
-        <>
+        <CompanyPaddedContent>
             <div className="flex justify-end">
                 <Dialog>
                     <DialogTrigger>
@@ -187,7 +188,7 @@ function JobOffer() {
                 </Dialog>
             </div>
             <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} />
-        </>
+        </CompanyPaddedContent>
     );
 }
 
