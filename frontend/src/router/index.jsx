@@ -25,6 +25,7 @@ import Chat from '@/pages/user/chat/ChatContainer';
 import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
 import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
+import Calendar from '@/pages/user/calendar/calendar-fill';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -32,6 +33,7 @@ import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
+
 
 // links 
 // auth 
@@ -54,6 +56,8 @@ export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
 export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
+export const COMPANY_CALENDAR_LINK = '/company/calendar';
+
 // dashboard 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
@@ -130,6 +134,10 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_DASHBOARD_LINK,
                 element: <h1>dashboard</h1>
+            },
+            {
+                path: COMPANY_CALENDAR_LINK,
+                element: <Calendar/>
             },
         ]
     },
