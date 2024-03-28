@@ -34,7 +34,6 @@ import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 
 
 // links 
