@@ -34,7 +34,6 @@ import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 
 
 // links 
@@ -168,10 +167,6 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
-            },
-            {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
             },
             {
                 path: COMPANY_CALENDAR_LINK,
