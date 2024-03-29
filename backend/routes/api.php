@@ -86,8 +86,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // resume 
     Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
-    Route::post('/store-resume', [ResumeController::class, 'store']);
+    Route::post('/resumes', [ResumeController::class, 'store']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
+    Route::get('/download-resume-id/{resume}', [ResumeController::class, 'downloadById']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
     // joboffers

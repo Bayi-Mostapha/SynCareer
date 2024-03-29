@@ -5,6 +5,7 @@ import CompanyPaddedContent from "@/components/company/padded-content";
 import { Document, Page } from "react-pdf";
 import { toast } from "sonner";
 import { JOBOFFER_LINK_BASE } from "@/router";
+import { Button } from "@/components/ui/button";
 
 function ViewResume() {
     const { id, rid } = useParams();
@@ -29,12 +30,37 @@ function ViewResume() {
                     navigate(`${JOBOFFER_LINK_BASE}/${id}`)
                 }
             })
+    }
 
+    const downloadResume = async () => {
+        try {
+            const downloadResponse = await axiosClient.get(`/download-resume-id/${rid}`, {
+                responseType: 'blob',
+                headers: {
+                    'Content-Type': 'application/pdf',
+                },
+            });
+
+            const blob = new Blob([downloadResponse.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'candidat-resume.pdf';
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.log(error)
+            toast.error('error downloading resume')
+        }
     }
 
     return (
         <CompanyPaddedContent>
             <Link to={`${JOBOFFER_LINK_BASE}/${id}`}>Go back</Link>
+            <Button onClick={downloadResume}>
+                Download
+            </Button>
             {
                 file &&
                 <Document
