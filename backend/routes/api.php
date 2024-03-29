@@ -382,7 +382,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
             $score = 0;
             $totalQuestions = count($correctAnswers);
-            return response()->json($totalQuestions);
 
             // Iterate over the selected answers
             foreach ($selectedAnswers as $answer) {
