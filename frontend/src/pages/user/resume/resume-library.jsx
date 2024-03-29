@@ -35,6 +35,7 @@ import formatDistanceToNow from "@/functions/format-time";
 import { toJpeg } from 'html-to-image';
 import { Document, Page, pdfjs } from 'react-pdf';
 import dataURItoBlob from "@/functions/uri2blob";
+import UserPaddedContent from "@/components/user/padded-content";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.js',
     import.meta.url,
@@ -181,7 +182,7 @@ function Resumes() {
     };
 
     return (
-        <>
+        <UserPaddedContent>
             <div className="flex justify-between mb-5 pb-3 border-b-2">
                 <div>
                     <h2 className="text-2xl font-semibold">Resumes</h2>
@@ -260,7 +261,7 @@ function Resumes() {
                         </div >
                     </>
             }
-        </>
+        </UserPaddedContent>
     );
 }
 

@@ -4,10 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
 use App\Models\Resume;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class JobOfferCandidatsController extends Controller
 {
+    public function show(Request $request, User $user)
+    {
+        $current_user = $request->user();
+        if (!$current_user->tokenCan('company')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return response()->json($user);
+    }
+
     public function index(Request $request, JobOffer $jobOffer)
     {
         $user = $request->user();

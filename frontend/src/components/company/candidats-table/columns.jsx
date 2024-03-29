@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 // icons 
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
+import { Link } from "react-router-dom";
+import { VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
 
 export const columns = [
     {
@@ -64,9 +66,13 @@ export const columns = [
             return <div>
                 {
                     row.original.resume_id ?
-                        'button ' + row.original.resume_id
+                        <Link to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
+                            view resume
+                        </Link>
                         :
-                        'link ' + row.original.id
+                        <Link to={VIEW_USER_PROFILE_BASE + row.original.id}>
+                            view profile
+                        </Link>
                 }
             </div>
         },

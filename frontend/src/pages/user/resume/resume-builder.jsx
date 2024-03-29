@@ -33,6 +33,7 @@ import ResumeLanguages from "@/components/user/resume/resume-languages";
 import ResumeSkills from "@/components/user/resume/resume-skills";
 import ResumeProjects from "@/components/user/resume/resume-projects";
 import dataURItoBlob from "@/functions/uri2blob";
+import UserPaddedContent from "@/components/user/padded-content";
 
 const ResumeCreator = () => {
     const [order, setOrder] = useState(['edu', 'exp', 'prj', 'lang', 'skills']);
@@ -238,7 +239,7 @@ const ResumeCreator = () => {
     }
 
     return (
-        <>
+        <UserPaddedContent>
             <h2 className="mb-4 text-3xl font-semibold">Resume Builder</h2>
             <div className="mb-3 flex justify-end items-center gap-2">
                 <TooltipProvider>
@@ -294,7 +295,7 @@ const ResumeCreator = () => {
                     </Reorder.Group>
                 </div>
             </div >
-        </>
+        </UserPaddedContent>
     );
 };
 

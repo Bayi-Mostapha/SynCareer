@@ -21,7 +21,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -40,6 +39,7 @@ Route::post('/email/verification-notification', [EmailVerificationNotificationCo
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
+
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware('guest')
     ->name('login');
@@ -47,11 +47,21 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->middleware('guest')
     ->name('password.email');
+
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.store');
 
-Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
+// AUTH USERS 
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+        ->middleware(['throttle:6,1'])
+        ->name('verification.send');
+
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
@@ -75,9 +85,9 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     });
 
     // resume 
+    Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
-    Route::post('/resumes', [ResumeController::class, 'store']);
-    Route::post('/upload-resume', [ResumeController::class, 'upload']);
+    Route::post('/store-resume', [ResumeController::class, 'store']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
@@ -91,6 +101,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
     Route::post('/apply/{jobOffer}', [JobOfferCandidatsController::class, 'apply']);
+    Route::get('/candidat/{user}', [JobOfferCandidatsController::class, 'show']);
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);
@@ -469,7 +480,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {
         $path = storage_path("app/$folder/$file");
         if (!file_exists($path)) {
-            abort(404);
+            return response()->json(['message' => 'File does not exist'], 404);
         }
         return response()->file($path);
     });
