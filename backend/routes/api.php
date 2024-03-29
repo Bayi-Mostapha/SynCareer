@@ -543,17 +543,45 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
         return response()->json(['success' => true, 'message' => 'Slots inserted successfully'], 200);
     });
-    
     Route::get('/getCalendar/{id}', function (Request $request, $id) {
+        $userId = $request->user()->id;
         try {
-            $calendar = CalendarSlot::findOrFail($id);
+            $calendar = Calendar::findOrFail($id);
+            $calendarData = [];
+
+            $days = CalendarSlot::where('status', 'reserved')
+            ->where('company_id', $calendar->company_id)
+            ->distinct()
+            ->pluck('day')
+            ->toArray();
+
+            foreach ($calendar->slots as $slot) {
+                $day = $slot->day;
+                $slotData = [
+                    'starttime' => $slot->start_time,
+                    'endtime' => $slot->end_time
+                ];
     
-            $days = $calendar->days->pluck('day')->toArray();
+                // Check if the day already exists in $calendarData
+                if (array_key_exists($day, $calendarData)) {
+                    // If the day already exists, push the slot data to its slots array
+                    array_push($calendarData[$day]['slots'], $slotData);
+                } else {
+                    // If the day doesn't exist, create a new entry with the day and slots array
+                    $calendarData[$day] = [
+                        'day' => $day,
+                        'slots' => [$slotData]
+                    ];
+                }
+            }
     
-            return response()->json($days);
+            // Convert the associative array to indexed array and return
+            $calendarData = array_values($calendarData);
+            return response()->json(['calendar'=>$calendarData,'days'=>$days]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Calendar not found'], 404);
         }
     });
+   
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
