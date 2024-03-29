@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('calendar_slots', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('calendar_id');
             $table->unsignedBigInteger('company_id');
             $table->date('day');
             $table->time('start_time');
             $table->time('end_time');
             $table->enum('status', ['free', 'reserved']);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('calendar_id')->references('id')->on('calendars')->onDelete('cascade');
             $table->timestamps();
         });
     }

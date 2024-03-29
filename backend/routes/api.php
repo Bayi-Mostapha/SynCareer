@@ -5,10 +5,12 @@ use App\Models\Quiz;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Message;
+use App\Models\Calendar;
 use App\Models\Question;
 use App\Events\OnlineUser;
 use App\Models\PassesQuiz;
 use App\Events\SendMessage;
+use App\Models\CalendarSlot;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageAppear;
@@ -366,7 +368,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             $selectedAnswers = $request->input('selectedAnswers');
             $quizId = $request->input('quizId');
 
-            // Get the correct answers for the quiz based on the quiz ID
+            
             $correctAnswers = Question::where('quiz_id', $quizId)->pluck('answer', 'id')->toArray();
 
             $score = 0;
@@ -377,9 +379,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $questionId = $answer['id'];
                 $selectedAnswer = $answer['selected'];
 
-                // Check if the selected answer matches the correct answer
+                // Check if the selected answer matches the correct answer  
                 if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] === $selectedAnswer) {
-                    $score++; // Increment the score if the answer is correct
+                    $score++; 
                 }
             }
 
@@ -407,6 +409,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         }
     });
 
+    Route::get('/reserved-slots', function (Request $request) {
+        $reservedSlots = CalendarSlot::where('status', 'reserved')
+                                      ->where('company_id', $request->user()->id)
+                                      ->distinct()
+                                      ->pluck('day')
+                                      ->toArray();
+        
+        return response()->json($reservedSlots);
+    });
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -477,6 +488,72 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['message' => 'File does not exist'], 404);
         }
         return response()->file($path);
+    });
+
+    Route::post('/send-calendar', function(Request $request) {
+        $selectedDays = $request->input('selectedDays');
+        $calendar = Calendar::create([
+            'company_id' => $request->user()->id,
+        ]);
+        foreach ($selectedDays as $selectedDay) {
+            try {
+                $day = Carbon::parse($selectedDay['day']); // No need for toDateString()
+                if ($day === null) {
+                    return response()->json(['success' => false, 'message' => 'Invalid day format'], 400);
+                }
+    
+                $slots = $selectedDay['slots'];
+                
+                foreach ($slots as $slot) {
+                    try {
+                        $startTime = Carbon::parse($slot['startTime']);
+                        $endTime = Carbon::parse($slot['endTime']);
+                        // Duration in minutes
+                        
+                        // Iterate until the end time is reached
+                        while ($startTime < $endTime) {
+                            // Calculate end time based on duration
+                            $endTimeSlot = $startTime->copy()->addMinutes(60);
+                            if ($endTimeSlot > $endTime) {
+                                $endTimeSlot = $endTime;
+                            }else{
+                                CalendarSlot::create([
+                                    'calendar_id' => $calendar->id,
+                                    'company_id' => $request->user()->id,
+                                    'day' => $day,
+                                    'start_time' => $startTime->format('H:i'),
+                                    'end_time' => $endTimeSlot->format('H:i'),
+                                    'status' => 'free', 
+                                ]);
+                            }
+                            
+                            
+                            
+                            // Move to the next start time
+                            $startTime = $endTimeSlot;
+                        }
+                    } catch (\Exception $e) {
+                        return response()->json(['success' => false, 'message' => 'Failed to insert slot: ' . $e->getMessage()], 500);
+                    }
+                }
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Failed to process day: ' . $e->getMessage()], 500);
+            }
+        }
+    
+        return response()->json(['success' => true, 'message' => 'Slots inserted successfully'], 200);
+    });
+    
+    Route::get('/getCalendar/{id}', function (Request $request, $id) {
+        try {
+            $calendar = CalendarSlot::findOrFail($id);
+    
+            $days = $calendar->days->pluck('day')->toArray();
+    
+            return response()->json($days);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Calendar not found'], 404);
+        }
     });
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
