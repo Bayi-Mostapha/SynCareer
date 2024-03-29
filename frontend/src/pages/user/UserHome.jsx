@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { axiosClient } from "@/api/axios";
 // icons 
+import { IoSearch } from "react-icons/io5";
 import { MdOutlineBookmarkBorder } from "react-icons/md";
 // routing 
 import { USER_HOME_LINK } from "@/router";
@@ -79,7 +80,7 @@ function UserHome() {
                         </div>
 
                         <div>
-                            <p className="text-gray-600">{jobOffer.role_desc}</p>
+                          
                             <p className="text-gray-600">{postedTime}</p>
                         </div>
                     </div>
@@ -91,16 +92,18 @@ function UserHome() {
     return (
         <UserPaddedContent>
             <div className="flex flex-col gap-2 p-4">
-                <div className="px-[20%] pb-6">
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        className="w-full border border-gray-300 rounded-md p-4"
-                    />
+                <div className="relative flex items-center w-full  mb-4">
+                <IoSearch className="text-[20px] mx-[25%]  absolute left-3 top-1/2 transform -translate-y-1/2 text-[#2D2D2D]" />
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="mx-[25%] pl-10 pr-4 py-4 w-full border border-gray-300 rounded-lg"
+                />
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-4 mx-auto">
                     <div >
                         {displayJobOffers()}
                     </div>

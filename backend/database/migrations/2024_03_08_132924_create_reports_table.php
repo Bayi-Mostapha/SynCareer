@@ -16,9 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('job_offer_id');
             $table->string('type');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->timestamps();
-    
+
             $table->unique(['user_id', 'job_offer_id']);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
