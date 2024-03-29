@@ -51,7 +51,7 @@ function QuizTable() {
     // fetch quizzes from database 
     const fetchQuizes = async () => {
         try {
-            const { data } = await axiosClient.post('/getQuizzes', {});
+            const { data } = await axiosClient.get('/quizzes');
             setisFetching(false);
             setData(data)
         } catch (error) {
@@ -65,7 +65,8 @@ function QuizTable() {
                 quizData: quizData,
                 questions: questions
             };
-            await axiosClient.post('/uploadQuiz', payload);
+            const res = await axiosClient.post('/uploadQuiz', payload);
+            console.log(res)
         } catch (error) {
             // Handle error
             console.error('Error uploading quiz:', error);
@@ -227,7 +228,6 @@ function QuizTable() {
             initialize();
             fetchQuizes();
         }
-        console.log(questions);
     }, [questions]);
 
     const initialize = () => {

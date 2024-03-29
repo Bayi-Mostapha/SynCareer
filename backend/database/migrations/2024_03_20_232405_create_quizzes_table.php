@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company');
-            $table->foreign('company')->references('id')->on('companies');
+            $table->unsignedBigInteger('company_id');
+            $table->foreign('company_id')->references('id')->on('companies');
             $table->string('name');
             $table->integer('duration');
             $table->string('nbr_question');

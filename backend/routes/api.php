@@ -13,7 +13,6 @@ use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageAppear;
 use App\Events\SendMessageCompany;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\ResumeController;
@@ -21,6 +20,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -106,7 +106,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
 
-    // Reda 
+    // Reda chat app
     Route::post('/sendMessage', function (Request $request) {
         $user = $request->user();
         $message = $request->validate([
@@ -172,7 +172,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             ));
         }
     });
-
     Route::post('/updateMessageStatus', function (Request $request) {
         $conversationId = $request->input('conversation_id');
         if ($request->user()->tokenCan('user')) {
@@ -191,7 +190,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['message' => 'No messages found or no update needed']);
         }
     });
-
     Route::get('/conversations', function (Request $request) {
         $userId = $request->user()->id;
 
@@ -291,12 +289,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json($responseData);
     });
 
-    Route::post('/getQuizzes', function (Request $request) {
-        $companyId = $request->user()->id;
-        $quizzes = Quiz::where('company', $companyId)
-            ->select('id', 'name', 'nbr_applicants', 'created_at')
-            ->get();
-
+    // Reda quiz
+    Route::get('/quizzes', function (Request $request) {
+        $company = $request->user();
+        $quizzes = $company->quizzes;
         return response()->json($quizzes);
     });
     Route::post('/uploadQuiz', function (Request $request) {
@@ -305,14 +301,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $questions = $request->input('questions');
 
         $quiz = Quiz::create([
-            'company' => $companyId,
+            'company_id' => $companyId,
             'name' => $quizDataArray['name'],
             'duration' => $quizDataArray['duration'],
             'nbr_question' => $quizDataArray['size']
         ]);
 
         foreach ($questions as $questionData) {
-            $question = Question::create([
+            Question::create([
                 'quiz_id' => $quiz->id,
                 'question_content' => $questionData['question'],
                 'option_a' => $questionData['options'][0],
@@ -324,6 +320,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         }
 
         return response()->json(['message' => 'Quiz data received successfully']);
+    });
+    Route::post('/send-quiz', function (Request $request) {
+        $validated_data = $request->validate([
+            'quiz_id' => 'required|exists:quizzes,id',
+            'user_id' => 'required|exists:users,id'
+        ]);
+        $validated_data['status'] = 'unpassed';
+        $validated_data['score'] = 0;
+
+        PassesQuiz::create($validated_data);
+
+        // event(new SendQuizToUser())
+
+        return response()->json(['message' => 'quiz sent to user successfully']);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
         // Retrieve the PassesQuiz record by its ID
@@ -344,9 +354,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json('Quiz not found');
         }
 
-        // Load the questions relationship for the quiz
-        $quiz->load('questions');
-
         // Prepare the response data
         $responseData = [
             'id' => $quiz->id,
@@ -359,8 +366,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         // Return the response with the quiz details
         return response()->json($responseData);
     });
-
-
     Route::post('/calculateScore', function (Request $request) {
         try {
             $selectedAnswers = $request->input('selectedAnswers');
@@ -371,6 +376,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
             $score = 0;
             $totalQuestions = count($correctAnswers);
+            return response()->json($totalQuestions);
 
             // Iterate over the selected answers
             foreach ($selectedAnswers as $answer) {
@@ -406,7 +412,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
     });
-
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -457,9 +462,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     });
-
-
-
     Route::delete('/quizzes/{quiz}', function (Quiz $quiz) {
         if (!$quiz) {
             return response()->json(['message' => 'Quiz not found.'], 404);
@@ -471,6 +473,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json(['message' => 'Quiz deleted successfully.']);
     });
 
+    //getting a private ressource
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {
         $path = storage_path("app/$folder/$file");
         if (!file_exists($path)) {
