@@ -20,16 +20,26 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+// ********************************************************* NOTIFICATIONS
+
+Broadcast::channel('user.notifications.{id}', function ($user, $id) {
+    // Notification belongs to a specific User
+    return (int) $user->id === (int) $id;
+});
+
+// ********************************************************* CHAT
+
 Broadcast::channel('private.user.{id}', function ($user, $id) {
     $conversation = Conversation::find($id);
     // Check if the company exists and if it has a conversation with the given ID
     if ($conversation) {
         // Check if the conversation exists and if it's associated with the company
         if ($user->tokenCan('user') == true) {
-            return true; 
+            return true;
         }
     }
-    return false; 
+    return false;
 });
 Broadcast::channel('private.company.{id}', function ($user, $id) {
     $conversation = Conversation::find($id);
@@ -37,22 +47,22 @@ Broadcast::channel('private.company.{id}', function ($user, $id) {
     if ($conversation) {
         // Check if the conversation exists and if it's associated with the company
         if ($user->tokenCan('company') == true) {
-            return true; 
+            return true;
         }
     }
-    return false; 
+    return false;
 });
 Broadcast::channel('private.chat.{id}', function ($user, $id) {
     $userId = User::find($id);
-    if($userId){
+    if ($userId) {
         if ($user->tokenCan('user')) {
-            return true; 
+            return true;
         }
         if ($user->tokenCan('company')) {
-            return true; 
+            return true;
         }
     }
-    return false; 
+    return false;
 });
 Broadcast::channel('online', function ($user) {
     if ($user->tokenCan('user')) {
@@ -63,13 +73,9 @@ Broadcast::channel('online', function ($user) {
         ];
     }
     if ($user->tokenCan('company')) {
-        return ['id' => $user->id, 'name' => $user->name,'role' => 'company' ];
+        return ['id' => $user->id, 'name' => $user->name, 'role' => 'company'];
     }
-   
 });
 Broadcast::channel('onlineData', function ($user) {
     return true;
 });
-
-
-

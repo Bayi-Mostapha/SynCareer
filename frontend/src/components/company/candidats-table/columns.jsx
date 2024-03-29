@@ -16,8 +16,30 @@ import { VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
 
 export const columns = [
     {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: "matching",
-        header: "",
+        header: "MP",
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("matching"));
             const formatted = new Intl.NumberFormat("en-US", {
