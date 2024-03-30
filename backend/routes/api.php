@@ -510,6 +510,37 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
 
+    Route::post('/sendMessageFile', function(Request $request){
+        $user = $request->user();
+        $conversationId = $request->input('conversationId');
+        $userId = $request->input('userId');
+        $userType = $request->input('userType');
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            $path = $file->store('fileUploads', 'public');
+            $message = new Message();
+            $message->conversation_id = $conversationId;
+            $message->content = '';
+            $message->message_type = 'file';
+            $message->file_path = $path;
+
+            if ($user->tokenCan('user') == true) {
+                $message->sender_role = "user";
+                $message->user_sender_id = $user->id;
+            }else{
+                $message->sender_role = "company";
+                $message->company_sender_id = $user->id;
+            }
+            
+            $message->message_status = 'sent';
+            $message->save();
+
+            return response()->json(['path' => $path], 200);
+        }
+
+        return response()->json(['error' => 'File not provided'], 400);
+    });
 
    
 });

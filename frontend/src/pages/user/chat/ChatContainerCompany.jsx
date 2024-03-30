@@ -12,6 +12,7 @@ import { useContext } from 'react';
 import { authContext } from '@/contexts/AuthWrapper';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { FaFileCirclePlus } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
 
 
 window.Echo = new Echo({
@@ -250,6 +251,44 @@ useEffect(()=>{
 const handleInputChange = (e) => {
     setSearchValue(e.target.value);
 };
+
+
+
+
+
+    const [file, setFile] = useState(null);
+    const [fileFlag, setFileFlag] = useState(false);
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+        MessageInput.current.value = e.target.files[0].name  ;
+        setFileFlag(!fileFlag);
+    };
+    const fileCancel = () => {
+        setFileFlag(!fileFlag);
+        setFile(null);
+        MessageInput.current.value = ""  ;
+    }
+    const handleUpload = async () => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('conversationId', actualConversationId);
+            formData.append('userId', userId);
+            formData.append('userType', userContext.user.type);
+            const response = await axiosClient.post('/sendMessageFile', formData , {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            });
+
+            console.log('File uploaded:', response.data);
+            // Handle success (e.g., show a success message)
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            // Handle error (e.g., show an error message)
+        }
+    };
     return (
       <div className="relative">
       <div className="flex flex-col h-screen bg-background ml-16">
@@ -349,24 +388,32 @@ const handleInputChange = (e) => {
                 <div className="basis-3/5 lg:basis-5/6 ">
                     <ScrollArea>
                         <textarea
+                         disabled={fileFlag ? true : false}
                         ref={MessageInput}
                         id="large-input"
                         placeholder="Type your message here..."
-                        className="h-full outline-none block w-full p-2 text-gray-700 border-none rounded-lg text-base resize-none ml-3"
+                        className={` h-full outline-none block w-full p-2 text-gray-700 border-none rounded-lg text-base resize-none ml-3`}
                         ></textarea>
                     </ScrollArea>
                 </div>
                 <div className="flex  justify-center items-end basis-1/6">
-                   
-                    {/* className="w-9 mr-2 cursor-pointer" */}
-                    <FaFileCirclePlus />
-                    <button
-                    onClick={handleClick}
+                { fileFlag
+                    ? 
+                    <MdCancel className="mr-2 cursor-pointer" size={35}  onClick={fileCancel}/> 
+                    : 
+                    <label htmlFor="file">
+                    <FaFileCirclePlus className="mr-2 cursor-pointer" size={35} />
+                </label>
+                }
+                
+                <input type="file" onChange={handleFileChange} hidden id='file' />
+                <button
+                    onClick={fileFlag ? handleUpload : handleClick}
                     type="button"
                     className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-6 py-2.5"
                     >
                     Send
-                    </button>
+                </button>
                 </div>
             </div>
         </div>
