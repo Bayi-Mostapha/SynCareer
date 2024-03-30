@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('quiz_id');
             $table->unsignedBigInteger('user_id');
             $table->string('score');
-            $table->enum('status', ['passed', 'inpassed']);
+            $table->enum('status', ['passed', 'unpassed']);
             // Define foreign keys
             $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

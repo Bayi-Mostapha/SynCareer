@@ -1,24 +1,20 @@
 import { axiosClient } from '../../api/axios';
-// form 
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-// sonner 
-import { toast } from 'sonner'
-// shadcn 
-import { Button } from "@/components/ui/button"
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-// table 
 import DataTable from "@/components/general/data-table";
 import { columns } from '@/components/company/job-offers-table/columns';
 import { useEffect, useState } from 'react';
@@ -33,30 +29,36 @@ const schema = yup.object().shape({
     role_desc: yup.string().required(),
 });
 
+
+
 function JobOffer() {
     const form = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            email: '',
-            password: '',
+            job_title: '',
+            location: '',
+            workplace_type: '',
+            workhours_type: '',
+            exp_years: '',
+            role_desc: '',
         }
     });
-    const { formState, handleSubmit, control } = form;
+    const { formState, handleSubmit, control, reset } = form;
     const { isSubmitting, isValid } = formState;
-
-
 
     const onSubmit = async (data) => {
         try {
             const response = await axiosClient.post('/joboffers', data);
             console.log(response.data);
             toast.success('Job offer posted successfully!');
+            reset(); // Reset the form after successful submission
         } catch (error) {
             console.error('Error posting job offer:', error);
             toast.error('Failed to post job offer. Please try again later.');
         }
     };
 
+   
 
     const [jobOffers, setJobOffers] = useState([]);
 
@@ -72,9 +74,6 @@ function JobOffer() {
 
         fetchJobOffers();
     }, []);
-
-
-
 
     return (
         <CompanyPaddedContent>
@@ -191,5 +190,6 @@ function JobOffer() {
         </CompanyPaddedContent>
     );
 }
+
 
 export default JobOffer;
