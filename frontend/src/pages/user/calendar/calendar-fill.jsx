@@ -83,6 +83,7 @@ function MyDatePicker() {
     setInputHidden(true); 
   };
   const sendCalendar = async () => {
+    console.log("selected ",selectedDays)
     try {
       const response = await axiosClient.post('/send-calendar',{
         selectedDays: selectedDays, 
@@ -161,25 +162,23 @@ const handleDeleteSlot = (index) => {
 const handleBackClick = () => {
   setCurrentSection(currentSection - 1);
 };
-
+  useEffect(()=>{
+  console.log(selectedDays);
+  },[selectedDays])
+  useEffect(()=>{
+    if (allDaysSelected){
+      if (selectedDays.length > 0) {
+        const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
+        const updatedSelectedDays = selectedDays.map(day => ({
+          ...day,
+          slots: selectedDaySlots
+        }));
+        setSelectedDays(updatedSelectedDays);
+      }
+    }
+  },[allDaysSelected])
 const handleCheckboxChange = () => {
   setAllDaysSelected(!allDaysSelected);
-  if (allDaysSelected) {
-    const updatedSelectedDays = selectedDays.map(day => ({
-      ...day,
-      slots: []
-    }));
-    setSelectedDays(updatedSelectedDays);
-  } else {
-    if (selectedDays.length > 0) {
-      const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
-      const updatedSelectedDays = selectedDays.map(day => ({
-        ...day,
-        slots: selectedDaySlots
-      }));
-      setSelectedDays(updatedSelectedDays);
-    }
-  }
 };
   return (
     <div className="ml-20 mt-24 py-10 px-5 ">

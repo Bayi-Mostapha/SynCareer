@@ -18,7 +18,7 @@ function ScheduleInterview() {
 
     const fetchReservedSlots = async () => {
         try {
-            const response = await axiosClient.get('/getCalendar/1');
+           const response = await axiosClient.get('/getCalendar/1');
            console.log(response.data);
            setdays(response.data.days);
            setReservedSlots(response.data.calendar);
@@ -60,7 +60,6 @@ function ScheduleInterview() {
     const sendCalendarData = () => {
       axiosClient.post('/scheduale-interview', {
           slotId: selectOption.current.value,
-          calendarId: 1
       })
       .then(response => {
           console.log('Request sent successfully:', response.data);

@@ -11,6 +11,7 @@ import { axiosClient } from '@/api/axios';
 import { useContext } from 'react';
 import { authContext } from '@/contexts/AuthWrapper';
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { FaFileCirclePlus } from "react-icons/fa6";
 
 
 window.Echo = new Echo({
@@ -356,9 +357,9 @@ const handleInputChange = (e) => {
                     </ScrollArea>
                 </div>
                 <div className="flex  justify-center items-end basis-1/6">
-                    <button
-                    className="w-9 mr-2 cursor-pointer"
-                    ><img className="w-full " src="http://localhost:8000/images/fileup.png" alt="" /></button>
+                   
+                    {/* className="w-9 mr-2 cursor-pointer" */}
+                    <FaFileCirclePlus />
                     <button
                     onClick={handleClick}
                     type="button"
