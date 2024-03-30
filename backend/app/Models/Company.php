@@ -57,6 +57,11 @@ class Company extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return 'c' . $this->getAuthIdentifier();
+    }
+
     public function sendEmailVerificationNotification()
     {
         // We override the default notification and will use our own

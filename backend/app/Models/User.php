@@ -58,6 +58,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return 'u' . $this->getAuthIdentifier();
+    }
+
     public function sendEmailVerificationNotification()
     {
         // We override the default notification and will use our own

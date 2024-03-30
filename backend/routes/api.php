@@ -509,8 +509,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/send-calendar', [CalendarController::class, 'sendCalendar']);
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
-
-
-   
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);

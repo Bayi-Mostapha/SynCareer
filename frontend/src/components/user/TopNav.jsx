@@ -3,11 +3,9 @@ import { axiosClient } from "@/api/axios";
 import { authContext } from "@/contexts/AuthWrapper";
 import Echo from 'laravel-echo';
 // shadcn 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { IoIosLogOut, IoIosMenu } from "react-icons/io";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK, USER_PROFILE_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK } from "@/router";
+import { IoIosMenu } from "react-icons/io";
+import { NavLink, useNavigate } from "react-router-dom";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK } from "@/router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,10 +24,12 @@ import { ScrollArea } from "../ui/scroll-area";
 import { IoIosNotificationsOutline } from "react-icons/io";
 // functions 
 import formatDistanceToNow from "@/functions/format-time";
+import ProfileNavigator from "../general/profile-navigator";
+
 
 function TopNav() {
     const navigate = useNavigate()
-    const { user, logout } = useContext(authContext);
+    const { user } = useContext(authContext);
     const [open, setOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [newNotification, setNewNotification] = useState(false);
@@ -204,35 +204,7 @@ function TopNav() {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-
-            <DropdownMenu>
-                <DropdownMenuTrigger className='hidden lg:block'>
-                    <div className="py-4 flex gap-3">
-                        <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" />
-                            <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col items-start">
-                            {user.first_name}
-                            <span className="text-gray-500 text-xs">
-                                {user.email}
-                            </span>
-                        </div>
-                    </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className=' hidden lg:block'>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <Link to={USER_PROFILE_LINK}>Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-1" onClick={() => { logout() }}>
-                        Log out
-                        <IoIosLogOut />
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-
+            <ProfileNavigator type='ud' />
             {/* mobile nav  */}
             <Sheet>
                 <SheetTrigger className="lg:hidden">
@@ -241,33 +213,7 @@ function TopNav() {
                 {
                     open &&
                     <SheetContent>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <div className="py-4 flex gap-3">
-                                    <Avatar>
-                                        <AvatarImage src="https://github.com/shadcn.png" />
-                                        <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex flex-col items-start">
-                                        {user.first_name}
-                                        <span className="text-gray-500 text-xs">
-                                            {user.email}
-                                        </span>
-                                    </div>
-                                </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Link to={USER_PROFILE_LINK}>Profile</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="flex gap-1" onClick={() => { logout() }}>
-                                    Log out
-                                    <IoIosLogOut />
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <ProfileNavigator type='um' />
                         <ul className="py-4">
                             <li>
                                 <NavLink to={USER_HOME_LINK} className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>

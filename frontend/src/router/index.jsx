@@ -35,6 +35,8 @@ import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
+import CompanyVideoCall from '@/pages/company/companyVideoCall';
+import UserVideoCall from '@/pages/user/userVideoCall';
 
 
 // links 
@@ -129,9 +131,13 @@ export const router = createBrowserRouter([
             },
             {
                 path: USER_CALENDAR_LINK,
-                element: <UserCalendar/>
+                element: <UserCalendar />
             },
         ]
+    },
+    {
+        path: '/user/call',
+        element: <AuthRoute type="user"><UserVideoCall /></AuthRoute>
     },
     {
         element: <AuthRoute type="company"><CompanyLayout /></AuthRoute>,
@@ -176,9 +182,13 @@ export const router = createBrowserRouter([
             },
             {
                 path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
+                element: <Calendar />
             }
         ]
+    },
+    {
+        path: '/company/call',
+        element: <AuthRoute type="company"><CompanyVideoCall /></AuthRoute>
     },
     {
         element: <AuthRoute type="admin"><AdminLayout /></AuthRoute>,

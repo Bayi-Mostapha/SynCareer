@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import { axiosClient } from "../api/axios";
+import getUserPicture from "@/functions/get-user-pic";
 
 export const authContext = createContext({
     currLocation: '',
@@ -24,14 +25,22 @@ export function AuthWrapper({ children }) {
         setIsFetchingUser(true);
         try {
             const userResponse = await axiosClient.get('/user');
-            setIsLoggedIn(true);
-            const newUser = { ...userResponse.data.user, type: userResponse.data.type };
+
+            let picture = await getUserPicture(userResponse.data.user?.picture)
+
+            const newUser = {
+                ...userResponse.data.user,
+                picture: picture,
+                type: userResponse.data.type
+            };
+            console.log(newUser)
             setUser(newUser);
+            setIsLoggedIn(true);
         } catch (err) {
             setIsLoggedIn(false);
             setUser({});
             localStorage.removeItem('token');
-            console.error("error from AuthWrapper: ", err);
+            console.error("Error from AuthWrapper:", err);
         } finally {
             setIsFetchingUser(false);
         }

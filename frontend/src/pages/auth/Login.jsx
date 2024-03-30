@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import PasswordInput from '@/components/general/password-input';
+import getUserPicture from '@/functions/get-user-pic';
 const schema = yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().required(),
@@ -40,12 +41,21 @@ function Login() {
     const submit = async (data) => {
         try {
             const response = await axiosClient.post('/login', data);
-            userContext.setUser({ ...response.data.user, type: response.data.type });
+            const picture = await getUserPicture(response.data.user?.picture)
+            userContext.setUser({
+                ...response.data.user,
+                picture,
+                type: response.data.type
+            });
             userContext.setIsLoggedIn(true);
             localStorage.setItem('token', response.data.token);
             navigate(USER_HOME_LINK);
         } catch (error) {
-            toast.error(error.response.data.message);
+            if (error.response) {
+                toast.error(error.response.data.message);
+            } else {
+                console.error(error)
+            }
         }
     };
 
