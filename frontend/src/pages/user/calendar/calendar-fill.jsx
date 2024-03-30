@@ -8,31 +8,31 @@ import { toast } from 'sonner'
 import { axiosClient } from '@/api/axios';
 
 function MyDatePicker() {
-  
   const [selectedDays, setSelectedDays] = useState([]);
   const calendarRef = useRef(null);
-  const durationRef = useRef(null);
 
-  // const [nbrDays, setNbrDays] = useState(0);
   const [currentSection, setCurrentSection] = useState(0);
   const [inputHidden, setInputHidden] = useState(false); 
   const [flag, setFlag] = useState(false); 
-
   const [startTime, setStartTime] = useState(null); 
-const [endTime, setEndTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [times, setTimes] = useState([]);
   const [reservedSlots, setReservedSlots] = useState([]);
+  const [reservedSlotsForCurrentDay,setReservedSlotsForCurrentDay] = useState(null)
+  const [allDaysSelected, setAllDaysSelected] = useState(false);
+
+  const startTimeRef = useRef();
+  const endTimeRef = useRef();
+
   const fetchReservedSlots = async () => {
     try {
         const response = await axiosClient.get('/reserved-slots');
         setReservedSlots(response.data);
-        console.log('heyyyy',response.data)
     } catch (error) {
         console.error('Error fetching reserved slots:', error);
-        // Handle error
     }
-};
-   const initializeFlatpickr = () => {
+  };
+  const initializeFlatpickr = () => {
     if (calendarRef.current) {
       flatpickr(calendarRef.current, {
         mode: 'multiple', 
@@ -52,33 +52,28 @@ const [endTime, setEndTime] = useState(null);
       });
     }
   }; 
-useEffect(() => {  
-  fetchReservedSlots();
-}, []);
-useEffect(() => {  
-  initializeFlatpickr();
-}, [flag,reservedSlots]);
-const [reservedSlotsForCurrentDay,setReservedSlotsForCurrentDay] = useState(null)
-useEffect(() => {
-  if (selectedDays[currentSection]) {
-    const currentDay = selectedDays[currentSection].day;
-    const startTime = 8;
-    const endTime = 20;
-    const newTimes = [];
-    for (let i = startTime; i < endTime; i++) {
-      const time = `${i}:00`;
-      newTimes.push(time);
+
+  useEffect(() => {  
+    fetchReservedSlots();
+  }, []);
+
+  useEffect(() => {  
+    initializeFlatpickr();
+  }, [flag,reservedSlots]);
+
+  useEffect(() => {
+    if (selectedDays[currentSection]) {
+      const currentDay = selectedDays[currentSection].day;
+      const startTime = 8;
+      const endTime = 20;
+      const newTimes = [];
+      for (let i = startTime; i < endTime; i++) {
+        const time = `${i}:00`;
+        newTimes.push(time);
+      }
+      setTimes(newTimes);
     }
-    setTimes(newTimes);
-  }
-}, [currentSection,inputHidden]);
-
-useEffect(() => {
-  console.log('here')
-console.log(reservedSlotsForCurrentDay)
-}, [reservedSlotsForCurrentDay]);
-
-
+  }, [currentSection,inputHidden]);
 
   useEffect(() => {
     console.log(selectedDays);
@@ -110,60 +105,41 @@ console.log(reservedSlotsForCurrentDay)
       setInputHidden(false); 
       setSelectedDays([]);
       setCurrentSection(0);
-      // setTimes([]);
       calendarRef.current.value = ''; 
-      durationRef.current.value = ''; 
-     setFlag(true); 
-      
+      setFlag(true); 
     } else {
       setCurrentSection(currentSection + 1);
     }
   };
-  const startTimeRef = useRef();
-  const endTimeRef = useRef();
+  
 
   
  const handleAddClick = () => {
   const selectedDay = selectedDays[currentSection];
-  
-  // Check if both start and end times are selected
   if (!startTime || !endTime) {
     toast.error('Please select both start and end times.');
     return;
   }
- 
-  // Find overlapping slots
   const overlappingSlots = selectedDay.slots.filter(slot => {
-    // Parse the start and end times to extract the hour component
     const slotStartHour = parseInt(slot.startTime.split(':')[0], 10);
     const slotEndHour = parseInt(slot.endTime.split(':')[0], 10);
     const newStartHour = parseInt(startTime.split(':')[0], 10);
     const newEndHour = parseInt(endTime.split(':')[0], 10);
 
-    // Check if the new slot's start time falls within the existing slot's range
     const startTimeOverlap = newStartHour >= slotStartHour && newStartHour < slotEndHour;
 
-    // Check if the new slot's end time falls within the existing slot's range
     const endTimeOverlap = newEndHour > slotStartHour && newEndHour <= slotEndHour;
 
-    // Check if the new slot completely overlaps the existing slot
     const completeOverlap = newStartHour <= slotStartHour && newEndHour >= slotEndHour;
 
-    // Return true if any of the overlap conditions are met
     return startTimeOverlap || endTimeOverlap || completeOverlap;
 });
-
-
  
   if (overlappingSlots.length > 0) {
     toast.error('slot time overlap.');
     return;
   }
- 
- 
 
-
-  // Add the new time slot (either the original one or the merged one) to the filtered slots
   const updatedSlots = [...selectedDay.slots, { startTime: startTime, endTime: endTime }];
   const updatedSelectedDays = [...selectedDays];
   updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
@@ -185,20 +161,16 @@ const handleDeleteSlot = (index) => {
 const handleBackClick = () => {
   setCurrentSection(currentSection - 1);
 };
-const [allDaysSelected, setAllDaysSelected] = useState(false);
 
 const handleCheckboxChange = () => {
   setAllDaysSelected(!allDaysSelected);
   if (allDaysSelected) {
-    // Deselect all days
     const updatedSelectedDays = selectedDays.map(day => ({
       ...day,
       slots: []
     }));
     setSelectedDays(updatedSelectedDays);
-    
   } else {
-    // Select all days
     if (selectedDays.length > 0) {
       const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
       const updatedSelectedDays = selectedDays.map(day => ({
@@ -214,7 +186,6 @@ const handleCheckboxChange = () => {
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
         <Label htmlFor="inputDays" className='py-2 px-4 border border-gray-100 rounded-md'>Select Days</Label>
         <Input id="inputDays" type="text" ref={calendarRef} className="hidden" />
-        <Input id="interview_duration" type="number" ref={durationRef} className="mt-5 w-1/3" placeholder="Enter Interview Duration."/>
       </div>
       <div className={`${!inputHidden ? 'hidden' : ''} flex flex-col `}>
           <p className='font-medium '>Day {currentSection + 1}: {selectedDays[currentSection]?.day}</p>
@@ -245,14 +216,14 @@ const handleCheckboxChange = () => {
             <button onClick={handleAddClick} className="py-2 px-5 rounded-md bg-white text-black border border-black hover:bg-black hover:text-white">ADD</button>
            </div>
            <div className="my-3">
-    <div className="font-medium">Selected slots:</div>
-    {selectedDays[currentSection]?.slots.map((slot, index) => (
-      <div key={index} className="flex items-center my-1">
-        <div>{slot.startTime} - {slot.endTime}</div>
-        <button onClick={() => handleDeleteSlot(index)} className="ml-2 py-1 px-3 rounded-md bg-red-500 text-white">Delete</button>
-      </div>
-    ))}
-  </div>
+            <div className="font-medium">Selected slots:</div>
+              {selectedDays[currentSection]?.slots.map((slot, index) => (
+                <div key={index} className="flex items-center my-1">
+                  <div>{slot.startTime} - {slot.endTime}</div>
+                  <button onClick={() => handleDeleteSlot(index)} className="ml-2 py-1 px-3 rounded-md bg-red-500 text-white">Delete</button>
+                </div>
+              ))}
+            </div>
            <div className={` flex items-center my-3 ${currentSection > 0 ? 'hidden' : ''}`}>
               <input id="link-checkbox" 
               type="checkbox" value=""  checked={allDaysSelected}

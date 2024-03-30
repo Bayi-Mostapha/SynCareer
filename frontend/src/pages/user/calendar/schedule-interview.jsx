@@ -4,19 +4,17 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { toast } from 'sonner'
 import { axiosClient } from '@/api/axios';
 
 function ScheduleInterview() {
     const [selectedDays, setSelectedDays] = useState([]);
     const [reservedSlots, setReservedSlots] = useState([]);
     const [days, setdays] = useState([]);
-    const [inputHidden, setInputHidden] = useState(false); 
     const [times , setTimes ] = useState([]); 
     const [flag , setFlag] = useState(true); 
 
-
     const calendarRef = useRef(null);
+    const selectOption = useRef();
 
     const fetchReservedSlots = async () => {
         try {
@@ -26,93 +24,72 @@ function ScheduleInterview() {
            setReservedSlots(response.data.calendar);
         } catch (error) {
             console.error('Error fetching reserved slots:', error);
-            // Handle error
         }
     };
-
     useEffect(() => {
-        
-        
-        fetchReservedSlots()
-        
+      fetchReservedSlots()
     }, [flag]);
+
     const initializeFlatpickr = () => {
-        if (calendarRef.current) {
-          flatpickr(calendarRef.current, {
-            mode: 'single', 
-            dateFormat: 'Y-m-d',
-            enable: days,
-            clickOpens: true,
-            onChange: (selectedDates) => {
-              const localSelectedDates = selectedDates.map(date => {
-                const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-                return {
-                  day: localDate.toISOString().slice(0, 10),
-                  slots: []
-                };
-              });
-              setSelectedDays(localSelectedDates); 
-            }
-          });
-        }
-      }; 
+      if (calendarRef.current) {
+        flatpickr(calendarRef.current, {
+          mode: 'single', 
+          dateFormat: 'Y-m-d',
+          enable: days,
+          clickOpens: true,
+          onChange: (selectedDates) => {
+            const localSelectedDates = selectedDates.map(date => {
+              const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+              return {
+                day: localDate.toISOString().slice(0, 10),
+                slots: []
+              };
+            });
+            setSelectedDays(localSelectedDates); 
+          }
+        });
+      }
+    }; 
     useEffect(() => {  
       fetchReservedSlots();
     }, []);
     useEffect(() => {  
       initializeFlatpickr();
     }, [days]);
-    
 
-    const selectOption = useRef()
     const sendCalendarData = () => {
-       
-       console.log('reeeeeeeeeeeeeeda ',selectOption.current.value);
-        axiosClient.post('/scheduale-interview', {
-            slotId: selectOption.current.value,
-            calendarId: 1
-        })
-            .then(response => {
-                // Handle success
-                console.log('Request sent successfully:', response.data);
-            })
-            .catch(error => {
-                // Handle error
-                console.error('Error sending request:', error);
-            });
+      axiosClient.post('/scheduale-interview', {
+          slotId: selectOption.current.value,
+          calendarId: 1
+      })
+      .then(response => {
+          console.log('Request sent successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error sending request:', error);
+      });
     };
-
     const handleNextClick1 = () => {
         sendCalendarData();
     };
-      useEffect(() => {
-        if(selectedDays !== ''){
-            const newOptions = [];
-            const filteredReservedSlots = reservedSlots.filter(slot => slot.day === selectedDays[0].day);
-     console.log('reda',filteredReservedSlots)
-    
-            filteredReservedSlots.forEach(slot => {
-                slot.slots.forEach(part => {
-                    const startTime = part.starttime;
-                    const endTime = part.endtime;
-                    const id = part.id;
-                    const optionText = `${startTime} - ${endTime}`;
-                    
-                    newOptions.push({ optionText, id});
-                   
-                })
-            });
-            setTimes(newOptions);
-            console.log('reda ddd',newOptions)
-        }else{
-           setTimes([]);
-        }
-      }, [selectedDays]);
-//       useEffect(() => {
-// console.log('reda',filteredReservedSlots)
-//       }, [filteredReservedSlots]);
-      
-      
+    useEffect(() => {
+      if(selectedDays !== ''){
+          const newOptions = [];
+          const filteredReservedSlots = reservedSlots.filter(slot => slot.day === selectedDays[0].day);
+          filteredReservedSlots.forEach(slot => {
+              slot.slots.forEach(part => {
+                  const startTime = part.starttime;
+                  const endTime = part.endtime;
+                  const id = part.id;
+                  const optionText = `${startTime} - ${endTime}`;
+                  newOptions.push({ optionText, id});
+              })
+          });
+          setTimes(newOptions);
+      }else{
+          setTimes([]);
+      }
+    }, [selectedDays]);
     return (
         <div className="ml-20 mt-24">
             <div className={`mb-5 `}>
@@ -132,15 +109,12 @@ function ScheduleInterview() {
                     <option key={index} value={slot.id}>{slot.optionText}</option>
                     ))}
             </select>
-
-            
            </div>
       </div>
-    <div className=''>
-      <Button onClick={handleNextClick1} className={``}>Next</Button>
+      <div className=''>
+        <Button onClick={handleNextClick1} className={``}>Next</Button>
+      </div>
     </div>
-        </div>
     );
 }
-
 export default ScheduleInterview;
