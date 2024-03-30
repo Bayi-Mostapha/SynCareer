@@ -3,6 +3,8 @@ import React from 'react';
 
 const ChatBubbleSend = ({message,first ,path}) => {
   const handleDownload = (filePath) => {
+    console.log('File path:', filePath);
+
     // Create a temporary anchor element
     const downloadLink = document.createElement('a');
     downloadLink.href = filePath;
@@ -13,7 +15,7 @@ const ChatBubbleSend = ({message,first ,path}) => {
     // Trigger the click event
     downloadLink.click();
 
-    // Clean up
+    
     document.body.removeChild(downloadLink);
 };
   return (

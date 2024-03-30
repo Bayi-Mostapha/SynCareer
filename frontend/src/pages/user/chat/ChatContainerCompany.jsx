@@ -156,39 +156,7 @@ export default function ChatContainer() {
             userType : userContext.user.type
         });
 
-        const newMessage = {
-            message_id: msg ,
-            content: msg,
-            sender_role: userContext.user.type,
-            message_type: "text",
-            message_status: "sent",
-            is_first_message: isLast ? false : true
-        };
-        if (Array.isArray(data)) {
-            const conversationToUpdateIndex = data.findIndex(conversation => conversation.conversation_id === actualConversationId);
         
-            if (conversationToUpdateIndex !== -1) {
-                // Clone the data array to avoid mutating the state directly
-                const updatedData = [...data];
-        
-                // Clone the conversation object to avoid mutating the state directly
-                const updatedConversation = { ...updatedData[conversationToUpdateIndex] };
-        
-                // Push the new message into the messages array of the conversation
-                updatedConversation.messages.push(newMessage);
-        
-                // Update the conversation within the updatedData array
-                updatedData[conversationToUpdateIndex] = updatedConversation;
-        
-                // Update the state with the updated data for the specific conversation
-                setData(updatedData);
-                console.log(updatedData);
-            } else {
-                console.error("Conversation not found.");
-            }
-        } else {
-            console.error("Data is not an array or is undefined.");
-        }
         
         setIsLast(true);
 
@@ -273,15 +241,22 @@ const handleInputChange = (e) => {
         try {
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('fileName', file.name);
             formData.append('conversationId', actualConversationId);
             formData.append('userId', userId);
             formData.append('userType', userContext.user.type);
+
+            
             const response = await axiosClient.post('/sendMessageFile', formData , {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
             });
-
+           
+            fetchDataGlobale();
+            
+            setIsLast(true);
+            fileCancel();
             console.log('File uploaded:', response.data);
             // Handle success (e.g., show a success message)
         } catch (error) {
@@ -289,6 +264,9 @@ const handleInputChange = (e) => {
             // Handle error (e.g., show an error message)
         }
     };
+    useEffect(()=>{
+        updateMessageStatus();
+    },[actualConversationId])
     return (
       <div className="relative">
       <div className="flex flex-col h-screen bg-background ml-16">
@@ -369,6 +347,7 @@ const handleInputChange = (e) => {
                 key={message.content}
                 message={message.content}
                 first={message.is_first_message}
+                path={message.path}
             />
             ) : (
             <ChatBubbleReceive
@@ -377,6 +356,7 @@ const handleInputChange = (e) => {
                 first={message.is_first_message}
                 profileImageUrl={profileImageUrl}
                 sender={username}
+                path={message.path}
             />
             )
         ))}
