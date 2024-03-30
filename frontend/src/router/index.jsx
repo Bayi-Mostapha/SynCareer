@@ -126,7 +126,11 @@ export const router = createBrowserRouter([
             {
                 path: USER_PASSQUIZ_LINK + "/:id",
                 element: <PassQuiz />
-            }
+            },
+            {
+                path: USER_CALENDAR_LINK,
+                element: <UserCalendar/>
+            },
         ]
     },
     {
@@ -173,11 +177,7 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_CALENDAR_LINK,
                 element: <Calendar/>
-            },
-            {
-                path: USER_CALENDAR_LINK,
-                element: <UserCalendar/>
-            },
+            }
         ]
     },
     {

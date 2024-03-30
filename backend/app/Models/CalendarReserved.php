@@ -13,13 +13,13 @@ class CalendarReserved extends Model
     use HasFactory;
     protected $table = 'calendar_reserved'; 
     protected $fillable = [
-        'calendar_id',
+        'slot_id',
         'user_id',
     ];
 
     public function calendar()
     {
-        return $this->belongsTo(Calendar::class);
+        return $this->belongsTo(CalendarSlot::class);
     }
 
     public function user()

@@ -185,7 +185,30 @@ const handleDeleteSlot = (index) => {
 const handleBackClick = () => {
   setCurrentSection(currentSection - 1);
 };
+const [allDaysSelected, setAllDaysSelected] = useState(false);
 
+const handleCheckboxChange = () => {
+  setAllDaysSelected(!allDaysSelected);
+  if (allDaysSelected) {
+    // Deselect all days
+    const updatedSelectedDays = selectedDays.map(day => ({
+      ...day,
+      slots: []
+    }));
+    setSelectedDays(updatedSelectedDays);
+    
+  } else {
+    // Select all days
+    if (selectedDays.length > 0) {
+      const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
+      const updatedSelectedDays = selectedDays.map(day => ({
+        ...day,
+        slots: selectedDaySlots
+      }));
+      setSelectedDays(updatedSelectedDays);
+    }
+  }
+};
   return (
     <div className="ml-20 mt-24 py-10 px-5 ">
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
@@ -230,8 +253,11 @@ const handleBackClick = () => {
       </div>
     ))}
   </div>
-           <div class="flex items-center my-3">
-              <input id="link-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+           <div className={` flex items-center my-3 ${currentSection > 0 ? 'hidden' : ''}`}>
+              <input id="link-checkbox" 
+              type="checkbox" value=""  checked={allDaysSelected}
+              onChange={handleCheckboxChange}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
               <label for="link-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">apply to all days.</label>
            </div>
       </div>
