@@ -16,8 +16,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
-  
+} from "@/components/ui/dialog"
+
 import { JOBOFFER_LINK_BASE } from '@/router';
 import { BsThreeDots } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -41,20 +41,20 @@ const schema = yup.object().shape({
     workhours_type: yup.string().required('Workhours type is required'),
     exp_years: yup.number().required('Years of experience is required').integer('Years of experience must be an integer'),
     // Add validation rules for other fields as needed
-  });
-  
-  const handleDelete = async (jobOfferId) => {
-      try {
-          await axiosClient.delete(`/joboffers/${jobOfferId}`);
-          // If successful, update jobOffers state to reflect the deletion
-          toast.success('Job offer deleted successfully');
-      } catch (error) {
-          console.error('Error deleting job offer:', error);
-          toast.error('Failed to delete job offer. Please try again later.');
-      }
-  };
+});
 
-  
+const handleDelete = async (jobOfferId) => {
+    try {
+        await axiosClient.delete(`/joboffers/${jobOfferId}`);
+        // If successful, update jobOffers state to reflect the deletion
+        toast.success('Job offer deleted successfully');
+    } catch (error) {
+        console.error('Error deleting job offer:', error);
+        toast.error('Failed to delete job offer. Please try again later.');
+    }
+};
+
+
 export const columns = [
     {
         accessorKey: 'id',
@@ -123,124 +123,125 @@ export const columns = [
             };
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="p-0 text-gray-400 hover:bg-transparent">
-                            <BsThreeDots />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <Link to={`${JOBOFFER_LINK_BASE}/${jobOffer.id}`}>View Candidates</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDelete(jobOffer.id)}>Delete</DropdownMenuItem>
-                        <Dialog>
+                <Dialog>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="p-0 text-gray-400 hover:bg-transparent">
+                                <BsThreeDots />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <Link to={`${JOBOFFER_LINK_BASE}/${jobOffer.id}`}>View Candidates</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(jobOffer.id)}>Delete</DropdownMenuItem>
                             <DialogTrigger className='ml-2 text-[14px]'>Update</DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Update a Job Offer</DialogTitle>
-                                </DialogHeader>
-                                <Form onSubmit={handleSubmit(onUpdate)}>
-                                <ScrollArea className="h-[400px] p-5">
-                                    <FormField
-                                        control={control}
-                                        name="job_title"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Job title</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                    <FormField
-                                        control={control}
-                                        name="location"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Location</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                    <FormField
-                                        control={control}
-                                        name="workplace_type"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Workplace type</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                    <FormField
-                                        control={control}
-                                        name="workhours_type"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Workhours type</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                    <FormField
-                                        control={control}
-                                        name="exp_years"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Experience years</FormLabel>
-                                                    <FormControl>
-                                                        <Input type='text' {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                    <FormField
-                                        control={control}
-                                        name="role_desc"
-                                        render={({ field }) => {
-                                            return (
-                                                <FormItem>
-                                                    <FormLabel>Role description</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )
-                                        }}
-                                    />
-                                </ScrollArea>
-                                    <Button type="submit">Submit</Button>
-                                </Form>
-                            </DialogContent>
-                        </Dialog>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Update a Job Offer</DialogTitle>
+                        </DialogHeader>
+                        <Form onSubmit={handleSubmit(onUpdate)}>
+                            <ScrollArea className="h-[400px] p-5">
+                                <FormField
+                                    control={control}
+                                    name="job_title"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Job title</FormLabel>
+                                                <FormControl>
+                                                    <Input type='text' {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                                <FormField
+                                    control={control}
+                                    name="location"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Location</FormLabel>
+                                                <FormControl>
+                                                    <Input type='text' {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                                <FormField
+                                    control={control}
+                                    name="workplace_type"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Workplace type</FormLabel>
+                                                <FormControl>
+                                                    <Input type='text' {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                                <FormField
+                                    control={control}
+                                    name="workhours_type"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Workhours type</FormLabel>
+                                                <FormControl>
+                                                    <Input type='text' {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                                <FormField
+                                    control={control}
+                                    name="exp_years"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Experience years</FormLabel>
+                                                <FormControl>
+                                                    <Input type='text' {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                                <FormField
+                                    control={control}
+                                    name="role_desc"
+                                    render={({ field }) => {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>Role description</FormLabel>
+                                                <FormControl>
+                                                    <Textarea {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
+                                />
+                            </ScrollArea>
+                            <Button type="submit">Submit</Button>
+                        </Form>
+                    </DialogContent>
+                </Dialog >
+
             );
         },
     },

@@ -58,7 +58,7 @@ function JobOffer() {
         }
     };
 
-   
+
 
     const [jobOffers, setJobOffers] = useState([]);
 

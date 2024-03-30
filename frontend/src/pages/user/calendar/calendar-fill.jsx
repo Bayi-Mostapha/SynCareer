@@ -83,9 +83,8 @@ function MyDatePicker() {
     setInputHidden(true);
   };
   const sendCalendar = async () => {
-    console.log("selected ",selectedDays)
+    console.log("selected ", selectedDays)
     try {
-      console.log('your selected days', selectedDays)
       const response = await axiosClient.post('/send-calendar', {
         selectedDays: selectedDays,
       });
@@ -153,21 +152,21 @@ function MyDatePicker() {
     endTimeRef.current.selectedIndex = 0;
   };
 
-const handleDeleteSlot = (index) => {
-  const selectedDay = selectedDays[currentSection];
-  const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
-  const updatedSelectedDays = [...selectedDays];
-  updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
-  setSelectedDays(updatedSelectedDays);
-};
-const handleBackClick = () => {
-  setCurrentSection(currentSection - 1);
-};
-  useEffect(()=>{
-  console.log(selectedDays);
-  },[selectedDays])
-  useEffect(()=>{
-    if (allDaysSelected){
+  const handleDeleteSlot = (index) => {
+    const selectedDay = selectedDays[currentSection];
+    const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
+    const updatedSelectedDays = [...selectedDays];
+    updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
+    setSelectedDays(updatedSelectedDays);
+  };
+  const handleBackClick = () => {
+    setCurrentSection(currentSection - 1);
+  };
+  useEffect(() => {
+    console.log(selectedDays);
+  }, [selectedDays])
+  useEffect(() => {
+    if (allDaysSelected) {
       if (selectedDays.length > 0) {
         const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
         const updatedSelectedDays = selectedDays.map(day => ({
@@ -177,10 +176,10 @@ const handleBackClick = () => {
         setSelectedDays(updatedSelectedDays);
       }
     }
-  },[allDaysSelected])
-const handleCheckboxChange = () => {
-  setAllDaysSelected(!allDaysSelected);
-};
+  }, [allDaysSelected])
+  const handleCheckboxChange = () => {
+    setAllDaysSelected(!allDaysSelected);
+  };
   return (
     <div className="ml-20 mt-24 py-10 px-5 ">
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
@@ -234,10 +233,10 @@ const handleCheckboxChange = () => {
       </div>
       <div className=''>
         <Button onClick={handleBackClick} className={`${!inputHidden || currentSection < 1 ? 'hidden' : ''}`}>Back</Button>
-        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}>Next</Button>
+        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}> Next</Button >
         <Button onClick={handleNextClick1} className={`${!inputHidden ? 'hidden' : ''}`}>Next</Button>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 
