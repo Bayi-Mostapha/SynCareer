@@ -1,5 +1,6 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { axiosClient } from "@/api/axios";
+// tanstack 
 import {
     flexRender,
     getCoreRowModel,
@@ -23,15 +24,44 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner";
 // icons 
 import { IoIosArrowDown } from "react-icons/io";
 
-export default function DataTable({ columns, data, searchColumn }) {
+export default function SelectionTable({ columns, data, searchColumn }) {
+    const [quizzes, setQuizzes] = useState([]);
+    const [isFetching, setisFetching] = useState(false);
+
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
     const [columnVisibility, setColumnVisibility] = useState([])
+    const [rowSelection, setRowSelection] = useState({})
+
+    useEffect(() => {
+        const fetchQuizzes = async () => {
+            try {
+                setisFetching(true);
+                const res = await axiosClient.get(`/quizzes`)
+                setQuizzes(res.data)
+            } catch (error) {
+                toast.error(error.response.data.message)
+            } finally {
+                setisFetching(false)
+            }
+        }
+        fetchQuizzes()
+    }, [])
 
     const table = useReactTable({
         data,
@@ -43,15 +73,58 @@ export default function DataTable({ columns, data, searchColumn }) {
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
+            rowSelection
         },
     });
 
+    const displayQuizzes = () => {
+        return quizzes.map((item) => {
+            return <div
+                key={"quiz_" + item.id}
+                className="p-2 cursor-pointer hover:bg-muted rounded"
+                onClick={() => { sendQuiz(item.id) }}
+            >
+                {item.name}
+            </div>
+        })
+    }
+
+    const sendQuiz = async (quiz_id) => {
+        const users_ids = table.getFilteredSelectedRowModel().rows.map(row => row.original.id);
+
+        const formData = new FormData();
+        formData.append('users_ids', JSON.stringify(users_ids))
+        formData.append('quiz_id', quiz_id)
+        try {
+            let res = await axiosClient.post('/send-quiz', formData)
+            console.log(res)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div className="my-4">
+            <Dialog>
+                <DialogTrigger>send quiz</DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Your quizzes</DialogTitle>
+                        <DialogDescription>
+                            Choose a quiz to send it to selected users
+                        </DialogDescription>
+                        <ScrollArea className="h-96">
+                            {displayQuizzes()}
+                        </ScrollArea>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+
             <div className="flex justify-center items-center py-4">
                 <Input
                     placeholder={`Seach by Job Title...`}
@@ -89,6 +162,10 @@ export default function DataTable({ columns, data, searchColumn }) {
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
+            </div>
+            <div className="my-2 text-xs text-muted-foreground">
+                {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                {table.getFilteredRowModel().rows.length} row(s) selected.
             </div>
             <Table>
                 <TableHeader>

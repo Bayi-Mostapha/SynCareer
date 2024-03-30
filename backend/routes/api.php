@@ -1,36 +1,31 @@
 <?php
 
-use Carbon\Carbon;
 use App\Models\Quiz;
-use App\Models\User;
-use App\Models\Company;
 use App\Models\Message;
-use App\Models\Calendar;
 use App\Models\Question;
-use App\Events\OnlineUser;
 use App\Models\PassesQuiz;
 use App\Events\SendMessage;
-use App\Models\CalendarSlot;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageAppear;
-use App\Models\CalendarReserved;
+use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
-use Illuminate\Support\Facades\Log;
+use App\Events\UserQuizNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\UserNotificationController;
 use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\ReportController;
-
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -58,14 +53,6 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 
 // AUTH USERS 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware(['throttle:6,1'])
-        ->name('verification.send');
-
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
@@ -88,11 +75,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         ]);
     });
 
+    //notifications
+    Route::get('/user-notifications', [UserNotificationController::class, 'index']);
+    Route::post('/user-notifications', [UserNotificationController::class, 'markAllRead']);
+    Route::post('/user-notifications/{notification}', [UserNotificationController::class, 'markRead']);
+
     // resume 
     Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
-    Route::post('/store-resume', [ResumeController::class, 'store']);
+    Route::post('/resumes', [ResumeController::class, 'store']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
+    Route::get('/download-resume-id/{resume}', [ResumeController::class, 'downloadById']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
     // joboffers
@@ -334,16 +327,35 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/send-quiz', function (Request $request) {
         $validated_data = $request->validate([
             'quiz_id' => 'required|exists:quizzes,id',
-            'user_id' => 'required|exists:users,id'
+            'users_ids.*' => 'required|exists:users,id'
         ]);
-        $validated_data['status'] = 'unpassed';
-        $validated_data['score'] = 0;
 
-        PassesQuiz::create($validated_data);
+        foreach (json_decode($request['users_ids']) as $userId) {
+            $data = [
+                'user_id' => $userId,
+                'quiz_id' => $validated_data['quiz_id'],
+                'status' => 'unpassed',
+                'score' => 0
+            ];
 
-        // event(new SendQuizToUser())
+            $quiz = Quiz::findOrFail($data['quiz_id']);
+            $passes_quiz = PassesQuiz::create($data);
 
-        return response()->json(['message' => 'quiz sent to user successfully']);
+            UserNotification::create([
+                'user_id' => $data['user_id'],
+                'from' => $quiz->company->name,
+                'type' => 'quiz',
+                'content' => $passes_quiz->id
+            ]);
+
+            broadcast(new UserQuizNotification(
+                $data['user_id'],
+                $quiz->company->name,
+                $passes_quiz->id
+            ));
+        }
+
+        return response()->json(['message' => 'quiz sent to user(s) successfully']);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
         // Retrieve the PassesQuiz record by its ID

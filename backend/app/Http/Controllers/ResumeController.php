@@ -126,6 +126,15 @@ class ResumeController extends Controller
         return response()->download($filePath, $filename);
     }
 
+    function downloadById(Resume $resume)
+    {
+        $filePath = storage_path('app/resumes/' . $resume->resume_name);
+        if (!file_exists($filePath)) {
+            abort(404);
+        }
+        return response()->download($filePath, $resume->resume_name);
+    }
+
     function deleteResume(Request $request, Resume $resume)
     {
         $user = $request->user();

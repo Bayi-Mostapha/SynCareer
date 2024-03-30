@@ -129,7 +129,7 @@ function Resumes() {
             a.click();
             URL.revokeObjectURL(url);
         } catch (error) {
-            toast.log('error downloading resume')
+            toast.error('error downloading resume')
         } finally {
             setResumes(prev => prev.map(resume => {
                 if (resume.id === id) {
