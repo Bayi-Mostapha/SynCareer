@@ -212,14 +212,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-
+                $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user1_id,
                     'profile_pic' => $conversation->user1->picture,
                     'job_title' => $conversation->user1->job_title,
                     'name' => $conversation->user1->first_name . ' ' . $conversation->user1->last_name,
-                    'last_message' => $lastMessage ? $lastMessage->content : null,
+                    'last_message' => $lastMessage ? $fileMessage : null,
                     'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
                     'actual_user_last_sender' => $actualUserLastSender,
                     'unread_messages_count' => $unreadMessagesCount,
@@ -227,14 +227,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                         // Check if the sender of the current message is the same as the sender of the last message
                         $isFirstMessage = $lastSender !== $message->sender_role || $lastSender === null;
                         $lastSender = $message->sender_role;
-
+           
                         return [
                             'message_id' => $message->id,
-                            'content' => $message->content,
+                            'content' => $message->content ? $message->content : $message->file_path,
                             'sender_role' => $message->sender_role,
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
+                            'path' => $message->file_path
                         ];
                     }),
                     // Add other necessary fields
@@ -257,14 +258,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-
+                $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user2_id,
                     'profile_pic' => $conversation->user2->picture,
                     'job_title' => $conversation->user2->job_title,
                     'name' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
-                    'last_message' => $lastMessage ? $lastMessage->content : null,
+                    'last_message' => $lastMessage ? $fileMessage : null,
                     'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
                     'actual_user_last_sender' => $actualUserLastSender,
                     'unread_messages_count' => $unreadMessagesCount,
@@ -280,6 +281,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
+                            'path' => $message->file_path
                         ];
                     }),
                     // Add other necessary fields
@@ -509,5 +511,41 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/send-calendar', [CalendarController::class, 'sendCalendar']);
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
+
+    Route::post('/sendMessageFile', function(Request $request){
+        $user = $request->user();
+        $conversationId = $request->input('conversationId');
+        $userId = $request->input('userId');
+        $userType = $request->input('userType');
+        $fileName  = $request->input('fileName');
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            $path = $file->storeAs('fileUploads', $fileName, 'public');
+            
+            $message = new Message();
+            $message->conversation_id = $conversationId;
+            $message->content = '';
+            $message->message_type = 'file';
+            $message->file_path = $path;
+
+            if ($user->tokenCan('user') == true) {
+                $message->sender_role = "user";
+                $message->user_sender_id = $user->id;
+            }else{
+                $message->sender_role = "company";
+                $message->company_sender_id = $user->id;
+            }
+            
+            $message->message_status = 'sent';
+            $message->save();
+
+            return response()->json(['path' => $path], 200);
+        }
+
+        return response()->json(['error' => 'File not provided'], 400);
+    });
+
+   
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
