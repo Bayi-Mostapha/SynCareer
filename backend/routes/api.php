@@ -1,25 +1,22 @@
 <?php
 
-use Carbon\Carbon;
 use App\Models\Quiz;
-use App\Models\User;
-use App\Models\Company;
 use App\Models\Message;
-use App\Models\Calendar;
 use App\Models\Question;
-use App\Events\OnlineUser;
 use App\Models\PassesQuiz;
 use App\Events\SendMessage;
-use App\Models\CalendarSlot;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageAppear;
+use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
+use App\Events\UserQuizNotification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\JobOfferController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
