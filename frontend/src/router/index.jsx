@@ -28,6 +28,7 @@ import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import Profile from '@/pages/company/profile';
 import ViewResume from '@/pages/company/view-resume';
 import Calendar from '@/pages/user/calendar/calendar-fill';
+import UserCalendar from '@/pages/user/calendar/schedule-interview';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -49,6 +50,7 @@ export const USER_RESUMES_LINK = '/user/resumes';
 export const USER_PROFILE_LINK = '/user/profile';
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
+export const USER_CALENDAR_LINK = '/user/calendar';
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -124,7 +126,11 @@ export const router = createBrowserRouter([
             {
                 path: USER_PASSQUIZ_LINK + "/:id",
                 element: <PassQuiz />
-            }
+            },
+            {
+                path: USER_CALENDAR_LINK,
+                element: <UserCalendar/>
+            },
         ]
     },
     {
@@ -171,11 +177,7 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_CALENDAR_LINK,
                 element: <Calendar/>
-            },
-            {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
-            },
+            }
         ]
     },
     {

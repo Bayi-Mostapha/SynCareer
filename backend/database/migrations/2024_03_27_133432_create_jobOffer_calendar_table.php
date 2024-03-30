@@ -16,10 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id');
             $table->unsignedBigInteger('joboffer_id');
             $table->unsignedBigInteger('calendar_id');
-            $table->integer('duration');
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('calendar_id')->references('id')->on('calendar_slots')->onDelete('cascade');
+            $table->foreign('calendar_id')->references('id')->on('calendars')->onDelete('cascade');
             $table->foreign('joboffer_id')->references('id')->on('job_offers')->onDelete('cascade');
             $table->timestamps();
         });
