@@ -83,6 +83,7 @@ function MyDatePicker() {
     setInputHidden(true);
   };
   const sendCalendar = async () => {
+    console.log("selected ",selectedDays)
     try {
       console.log('your selected days', selectedDays)
       const response = await axiosClient.post('/send-calendar', {
@@ -152,26 +153,21 @@ function MyDatePicker() {
     endTimeRef.current.selectedIndex = 0;
   };
 
-  const handleDeleteSlot = (index) => {
-    const selectedDay = selectedDays[currentSection];
-    const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
-    const updatedSelectedDays = [...selectedDays];
-    updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
-    setSelectedDays(updatedSelectedDays);
-  };
-  const handleBackClick = () => {
-    setCurrentSection(currentSection - 1);
-  };
-
-  const handleCheckboxChange = () => {
-    setAllDaysSelected(!allDaysSelected);
-    if (allDaysSelected) {
-      // const updatedSelectedDays = selectedDays.map(day => ({
-      //   ...day,
-      //   slots: []
-      // }));
-      // setSelectedDays(updatedSelectedDays);
-    } else {
+const handleDeleteSlot = (index) => {
+  const selectedDay = selectedDays[currentSection];
+  const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
+  const updatedSelectedDays = [...selectedDays];
+  updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
+  setSelectedDays(updatedSelectedDays);
+};
+const handleBackClick = () => {
+  setCurrentSection(currentSection - 1);
+};
+  useEffect(()=>{
+  console.log(selectedDays);
+  },[selectedDays])
+  useEffect(()=>{
+    if (allDaysSelected){
       if (selectedDays.length > 0) {
         const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
         const updatedSelectedDays = selectedDays.map(day => ({
@@ -181,7 +177,10 @@ function MyDatePicker() {
         setSelectedDays(updatedSelectedDays);
       }
     }
-  };
+  },[allDaysSelected])
+const handleCheckboxChange = () => {
+  setAllDaysSelected(!allDaysSelected);
+};
   return (
     <div className="ml-20 mt-24 py-10 px-5 ">
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
