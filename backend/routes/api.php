@@ -26,6 +26,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\CompanyDashboardController;
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -512,6 +513,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         }
         return response()->file($path);
     });
+
+    // company dashboard
+    Route::get('/job-offers-stats', [CompanyDashboardController::class, 'getJobOffersPerMonth']);
+    Route::get('/applies-stats', [CompanyDashboardController::class, 'getAppliesPerMonth']);
 
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
