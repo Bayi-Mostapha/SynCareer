@@ -89,7 +89,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AuthRoute type="user"><UserLayout /></AuthRoute>,
+        element: <AuthRoute types={["user"]}><UserLayout /></AuthRoute>,
         children: [
             {
                 path: USER_HOME_LINK,
@@ -135,10 +135,10 @@ export const router = createBrowserRouter([
     },
     {
         path: '/user/call',
-        element: <AuthRoute type="user"><UserVideoCall /></AuthRoute>
+        element: <AuthRoute types={["user"]}><UserVideoCall /></AuthRoute>
     },
     {
-        element: <AuthRoute type="company"><CompanyLayout /></AuthRoute>,
+        element: <AuthRoute types={["company"]}><CompanyLayout /></AuthRoute>,
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
@@ -182,10 +182,10 @@ export const router = createBrowserRouter([
     },
     {
         path: '/company/call',
-        element: <AuthRoute type="company"><CompanyVideoCall /></AuthRoute>
+        element: <AuthRoute types={["company"]}><CompanyVideoCall /></AuthRoute>
     },
     {
-        element: <AuthRoute type="admin"><AdminLayout /></AuthRoute>,
+        element: <AuthRoute types={["admin", "super-admin"]}><AdminLayout /></AuthRoute>,
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,

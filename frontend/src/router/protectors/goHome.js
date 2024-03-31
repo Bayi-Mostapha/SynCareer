@@ -16,9 +16,9 @@ export const goHome = (type, navigate, path = '') => {
         case 'admin':
             path !== '' ? navigate(path) : navigate(ADMIN_DASHBOARD_LINK);
             break;
-        // case 'super-admin':
-        //     navigate(ADMIN_DASHBOARD_LINK);
-        //     break;
+        case 'super-admin':
+            path !== '' ? navigate(path) : navigate(ADMIN_DASHBOARD_LINK);
+            break;
         default:
             navigate(LOGIN_LINK);
             break;

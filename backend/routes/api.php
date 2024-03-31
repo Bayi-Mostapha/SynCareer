@@ -65,6 +65,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             $type = 'company';
         } elseif ($user->tokenCan('admin')) {
             $type = 'admin';
+        } elseif ($user->tokenCan('super-admin')) {
+            $type = 'super-admin';
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }

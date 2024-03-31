@@ -33,7 +33,6 @@ export function AuthWrapper({ children }) {
                 picture: picture,
                 type: userResponse.data.type
             };
-            console.log(newUser)
             setUser(newUser);
             setIsLoggedIn(true);
         } catch (err) {
