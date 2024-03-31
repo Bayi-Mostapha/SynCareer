@@ -21,7 +21,7 @@ function ScheduleInterview() {
   const fetchReservedSlots = async () => {
     try {
       const response = await axiosClient.get(`/getCalendar/${cid}`);
-      console.log(response.data);
+      console.log(response.data)
       setdays(response.data.days);
       setReservedSlots(response.data.calendar);
     } catch (error) {

@@ -15,13 +15,17 @@ function JobOfferCandidats() {
     const { id } = useParams();
     const [data, setData] = useState([]);
     const [isFetching, setisFetching] = useState(false);
+    const [calendarExists, setCalendarExists] = useState(false);
     const [calendarShown, setCalendarShown] = useState(false);
 
-    const fetchCandidats = async () => {
+    const getData = async () => {
         try {
             setisFetching(true);
             const res = await axiosClient.get(`/candidats/${id}`)
             setData(res.data)
+
+            const res2 = await axiosClient.get(`/calendar-exists/${id}`)
+            setCalendarExists(res2.data.exists)
         } catch (error) {
             toast.error(error.response.data.message)
         } finally {
@@ -29,7 +33,7 @@ function JobOfferCandidats() {
         }
     }
     useEffect(() => {
-        fetchCandidats()
+        getData()
     }, []);
 
     return (
@@ -42,13 +46,16 @@ function JobOfferCandidats() {
                     </div>
                     :
                     <div>
-                        <Button variant="outline" className="flex gap-2 items-center ml-auto" onClick={() => { setCalendarShown(prev => !prev) }}>
-                            {calendarShown ? 'Hide calendar' : 'Add calendar'}
-                            <FaCalendarDays className="text-sm" />
-                        </Button>
+                        {
+                            !calendarExists &&
+                            <Button variant="outline" className="flex gap-2 items-center ml-auto" onClick={() => { setCalendarShown(prev => !prev) }}>
+                                {calendarShown ? 'Hide calendar' : 'Add calendar'}
+                                <FaCalendarDays className="text-sm" />
+                            </Button>
+                        }
                         <AnimatePresence>
                             {
-                                calendarShown &&
+                                calendarShown && !calendarExists &&
                                 <motion.div
                                     initial={{ opacity: 0, x: -50 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -59,7 +66,13 @@ function JobOfferCandidats() {
                                 </motion.div >
                             }
                         </AnimatePresence>
-                        <SelectionTable columns={columns} data={data} searchColumn={"job_title"} />
+                        <SelectionTable
+                            columns={columns}
+                            data={data}
+                            searchColumn={"job_title"}
+                            calendarExists={calendarExists}
+                            jobOfferId={id}
+                        />
                     </div>
             }
         </CompanyPaddedContent>

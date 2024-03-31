@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { toast } from 'sonner'
 import { axiosClient } from '@/api/axios';
+import { useParams } from 'react-router-dom';
 
 function MyDatePicker() {
+  const { id } = useParams();
   const [selectedDays, setSelectedDays] = useState([]);
   const calendarRef = useRef(null);
 
@@ -86,6 +88,7 @@ function MyDatePicker() {
     console.log("selected ", selectedDays)
     try {
       const response = await axiosClient.post('/send-calendar', {
+        job_offer_id: id,
         selectedDays: selectedDays,
       });
 

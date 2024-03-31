@@ -4,8 +4,8 @@ import { authContext } from "@/contexts/AuthWrapper";
 import Echo from 'laravel-echo';
 // shadcn 
 import { IoIosMenu } from "react-icons/io";
-import { NavLink, useNavigate } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK } from "@/router";
+import { NavLink, redirect, useNavigate } from "react-router-dom";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK, USER_CALENDAR_LINK } from "@/router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -61,10 +61,7 @@ function TopNav() {
         if (user.id) {
             console.log(user.id)
             window.Echo.private(`user.notifications.${user.id}`)
-                .subscribed(() => {
-                    console.log('subed')
-                })
-                .listen('.user-new-quiz', (e) => {
+                .listen('.user-new-notification', (e) => {
                     setNewNotification(true)
                     getNotifications()
                 });
@@ -103,16 +100,24 @@ function TopNav() {
             console.log(error)
         }
     }
+    function redirect(item) {
+        if (item.read == '0')
+            markNotificationAsRead(item.id)
+        switch (item.type) {
+            case 'quiz':
+                navigate(`${USER_PASSQUIZ_LINK}/${item.content}`)
+                break;
+            case 'calendar':
+                navigate(`${USER_CALENDAR_LINK}/${item.content}`)
+                break;
+        }
+    }
     function displayNotifications() {
         return notifications.length > 0 ?
             notifications.map(item => {
                 return (
                     <DropdownMenuItem
-                        onClick={() => {
-                            if (item.read == '0')
-                                markNotificationAsRead(item.id)
-                            navigate(`${USER_PASSQUIZ_LINK}/${item.id}`)
-                        }}
+                        onClick={() => redirect(item)}
                         className={`my-2 flex flex-col items-start cursor-pointer rounded-sm ${item.read == 0 && 'bg-[#F4F7FE] hover:opacity-90'}`}
                         key={'notification_' + item.id}
                     >

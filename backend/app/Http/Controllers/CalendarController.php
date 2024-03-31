@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserNotificationEvent;
 use Carbon\Carbon;
 use App\Models\Calendar;
 use App\Models\CalendarSlot;
 use Illuminate\Http\Request;
 use App\Models\CalendarReserved;
-
+use App\Models\JobOffer;
+use App\Models\UserNotification;
 
 class CalendarController extends Controller
 {
@@ -22,7 +24,7 @@ class CalendarController extends Controller
     public function sendCalendar(Request $request)
     {
         $calendar = Calendar::create([
-            'company_id' => $request->user()->id,
+            'job_offer_id' => $request->input('job_offer_id'),
         ]);
 
         $selectedDays = $request->input('selectedDays');
@@ -128,5 +130,36 @@ class CalendarController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Calendar not found'], 404);
         }
+    }
+
+    public function sendCalendar2Candidats(Request $request)
+    {
+        $validated_data = $request->validate([
+            'job_offer_id' => 'required|exists:job_offers,id',
+            'users_ids.*' => 'required|exists:users,id'
+        ]);
+
+        $job_offer_id = $validated_data['job_offer_id'];
+        $job_offer = JobOffer::find($job_offer_id);
+        if (!$job_offer) {
+            return response()->json(['message' => 'job offer not found'], 404);
+        }
+
+        $calendar = $job_offer->calendar;
+        if (!$calendar) {
+            return response()->json(['message' => 'calendar not found'], 404);
+        }
+
+        foreach (json_decode($request['users_ids']) as $userId) {
+            UserNotification::create([
+                'user_id' => $userId,
+                'from' => $calendar->jobOffer->company->name,
+                'type' => 'calendar',
+                'content' => $calendar->id
+            ]);
+            broadcast(new UserNotificationEvent($userId));
+        }
+
+        return response()->json(['message' => 'calendar sent to user(s) successfully']);
     }
 }
