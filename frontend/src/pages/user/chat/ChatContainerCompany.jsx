@@ -156,7 +156,39 @@ export default function ChatContainer() {
             userType : userContext.user.type
         });
 
-        
+        const newMessage = {
+            message_id: msg,
+            content: msg,
+            sender_role: userContext.user.type,
+            message_type: "text",
+            message_status: "sent",
+            is_first_message: isLast ? false : true
+        };
+        if (Array.isArray(data)) {
+            const conversationToUpdateIndex = data.findIndex(conversation => conversation.conversation_id === actualConversationId);
+
+            if (conversationToUpdateIndex !== -1) {
+                // Clone the data array to avoid mutating the state directly
+                const updatedData = [...data];
+
+                // Clone the conversation object to avoid mutating the state directly
+                const updatedConversation = { ...updatedData[conversationToUpdateIndex] };
+
+                // Push the new message into the messages array of the conversation
+                updatedConversation.messages.push(newMessage);
+
+                // Update the conversation within the updatedData array
+                updatedData[conversationToUpdateIndex] = updatedConversation;
+
+                // Update the state with the updated data for the specific conversation
+                setData(updatedData);
+                console.log(updatedData);
+            } else {
+                console.error("Conversation not found.");
+            }
+        } else {
+            console.error("Data is not an array or is undefined.");
+        }
         
         setIsLast(true);
 

@@ -13,16 +13,16 @@ class SendMessageCompany implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $message;
     public  $conversationId;
-    public  $firstGroup;
+    // public  $firstGroup;
     public  $userType;
     /**
      * Create a new event instance.
      */
-    public function __construct($message, $conversationId, $firstGroup, $userType)
+    public function __construct($message, $conversationId, $userType)
     {
         $this->message = $message;
         $this->conversationId = $conversationId;
-        $this->firstGroup = $firstGroup;
+        // $this->firstGroup = $firstGroup;
         $this->userType = $userType;
     }
 
@@ -47,7 +47,7 @@ class SendMessageCompany implements ShouldBroadcast
         return [
             'message' => $this->message,
             'conversationId' => $this->conversationId,
-            'first_group' => $this->firstGroup ,
+            // 'first_group' => $this->firstGroup ,
             'sender_type' => $this->userType
         ];
     }

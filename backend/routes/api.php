@@ -212,7 +212,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if($lastMessage){
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user1_id,
@@ -258,7 +260,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if($lastMessage){
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user2_id,
@@ -512,12 +516,24 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
 
+    Route::get('/downloadFile/{path}', function($path) {
+        $filePath = public_path($path);
+    
+        if (file_exists($filePath)) {
+            return response()->download($filePath);
+        }
+    
+        return response()->json(['message' => 'File does not exist'], 404);
+    });
     Route::post('/sendMessageFile', function(Request $request){
         $user = $request->user();
         $conversationId = $request->input('conversationId');
         $userId = $request->input('userId');
         $userType = $request->input('userType');
         $fileName  = $request->input('fileName');
+
+        broadcast(new MessageAppear($userId, $conversationId));
+
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             
@@ -532,9 +548,21 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             if ($user->tokenCan('user') == true) {
                 $message->sender_role = "user";
                 $message->user_sender_id = $user->id;
+                broadcast(new SendMessage(
+                    $path,
+                    $conversationId,
+                    "true",
+                    $userType
+                ));
             }else{
                 $message->sender_role = "company";
                 $message->company_sender_id = $user->id;
+                broadcast(new SendMessageCompany(
+                    $path,
+                    $conversationId,
+                    "true",
+                    $userType
+                ));
             }
             
             $message->message_status = 'sent';
