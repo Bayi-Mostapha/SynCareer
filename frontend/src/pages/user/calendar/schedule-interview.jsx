@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { axiosClient } from '@/api/axios';
+import { useParams } from 'react-router-dom';
 
 function ScheduleInterview() {
+  const { cid } = useParams()
   const [selectedDays, setSelectedDays] = useState([]);
   const [reservedSlots, setReservedSlots] = useState([]);
   const [days, setdays] = useState([]);
@@ -18,7 +20,7 @@ function ScheduleInterview() {
 
   const fetchReservedSlots = async () => {
     try {
-      const response = await axiosClient.get('/getCalendar/1');
+      const response = await axiosClient.get(`/getCalendar/${cid}`);
       console.log(response.data);
       setdays(response.data.days);
       setReservedSlots(response.data.calendar);
@@ -58,7 +60,7 @@ function ScheduleInterview() {
   }, [days]);
 
   const sendCalendarData = () => {
-    axiosClient.post('/scheduale-interview', {
+    axiosClient.post('/schedule-interview', {
       slotId: selectOption.current.value,
     })
       .then(response => {

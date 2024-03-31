@@ -27,16 +27,15 @@ import PassQuiz from '@/pages/user/quiz/pass-quiz';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import Profile from '@/pages/company/profile';
 import ViewResume from '@/pages/company/view-resume';
-import Calendar from '@/pages/user/calendar/calendar-fill';
 import UserCalendar from '@/pages/user/calendar/schedule-interview';
+import CompanyVideoCall from '@/pages/company/companyVideoCall';
+import UserVideoCall from '@/pages/user/userVideoCall';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
-import CompanyVideoCall from '@/pages/company/companyVideoCall';
-import UserVideoCall from '@/pages/user/userVideoCall';
 
 
 // links 
@@ -60,7 +59,6 @@ export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
-export const COMPANY_CALENDAR_LINK = '/company/calendar';
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
@@ -130,7 +128,7 @@ export const router = createBrowserRouter([
                 element: <PassQuiz />
             },
             {
-                path: USER_CALENDAR_LINK,
+                path: USER_CALENDAR_LINK + '/:cid',
                 element: <UserCalendar />
             },
         ]
@@ -179,10 +177,6 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
-            },
-            {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar />
             }
         ]
     },

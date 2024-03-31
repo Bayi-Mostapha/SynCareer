@@ -181,9 +181,9 @@ function MyDatePicker() {
     setAllDaysSelected(!allDaysSelected);
   };
   return (
-    <div className="ml-20 mt-24 py-10 px-5 ">
+    <div className='my-4 p-4 rounded border shadow-sm'>
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
-        <Label htmlFor="inputDays" className='py-2 px-4 border border-gray-100 rounded-md'>Select Days</Label>
+        <Label htmlFor="inputDays" className='py-2 px-4 border bg-background rounded-md cursor-pointer'>Select Days</Label>
         <Input id="inputDays" type="text" ref={calendarRef} className="hidden" />
       </div>
       <div className={`${!inputHidden ? 'hidden' : ''} flex flex-col `}>
@@ -231,9 +231,9 @@ function MyDatePicker() {
           <label for="link-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">apply to all days.</label>
         </div>
       </div>
-      <div className=''>
-        <Button onClick={handleBackClick} className={`${!inputHidden || currentSection < 1 ? 'hidden' : ''}`}>Back</Button>
-        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}> Next</Button >
+      <div className='ml-auto flex gap-2 w-fit items-center'>
+        <Button variant='outline' onClick={handleBackClick} className={`${!inputHidden || currentSection < 1 ? 'hidden' : ''}`}>Back</Button>
+        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}>Next</Button >
         <Button onClick={handleNextClick1} className={`${!inputHidden ? 'hidden' : ''}`}>Next</Button>
       </div >
     </div >

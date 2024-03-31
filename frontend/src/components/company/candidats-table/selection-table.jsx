@@ -110,21 +110,23 @@ export default function SelectionTable({ columns, data, searchColumn }) {
 
     return (
         <div className="my-4">
-            <Dialog>
-                <DialogTrigger>send quiz</DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Your quizzes</DialogTitle>
-                        <DialogDescription>
-                            Choose a quiz to send it to selected users
-                        </DialogDescription>
-                        <ScrollArea className="h-96">
-                            {displayQuizzes()}
-                        </ScrollArea>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-
+            {
+                table.getFilteredSelectedRowModel().rows.length > 0 &&
+                <Dialog>
+                    <DialogTrigger>send quiz</DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Your quizzes</DialogTitle>
+                            <DialogDescription>
+                                Choose a quiz to send it to selected users
+                            </DialogDescription>
+                            <ScrollArea className="h-96">
+                                {displayQuizzes()}
+                            </ScrollArea>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+            }
             <div className="flex justify-center items-center py-4">
                 <Input
                     placeholder={`Seach by Job Title...`}
