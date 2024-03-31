@@ -38,10 +38,12 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner";
 // icons 
 import { IoIosArrowDown } from "react-icons/io";
+import SynCareerLoader from "@/components/general/syncareer-loader";
 
-export default function SelectionTable({ columns, data, searchColumn }) {
+export default function SelectionTable({ columns, data, searchColumn, calendarExists, jobOfferId }) {
     const [quizzes, setQuizzes] = useState([]);
     const [isFetching, setisFetching] = useState(false);
+    const [isSending, setIsSending] = useState(false);
 
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
@@ -101,30 +103,66 @@ export default function SelectionTable({ columns, data, searchColumn }) {
         formData.append('users_ids', JSON.stringify(users_ids))
         formData.append('quiz_id', quiz_id)
         try {
+            setIsSending(true)
             let res = await axiosClient.post('/send-quiz', formData)
-            console.log(res)
+            toast.success(res.data.message)
         } catch (error) {
-            console.log(error)
+            toast.error(error.response.data.message)
+        } finally {
+            setIsSending(false)
+        }
+    }
+    const sendCalendar = async () => {
+        const users_ids = table.getFilteredSelectedRowModel().rows.map(row => row.original.id);
+
+        const formData = new FormData();
+        formData.append('users_ids', JSON.stringify(users_ids))
+        formData.append('job_offer_id', jobOfferId)
+        try {
+            setIsSending(true)
+            let res = await axiosClient.post('/send-calendar-candidats', formData)
+            toast.success(res.data.message)
+        } catch (error) {
+            toast.error(error.response.data.message)
+        } finally {
+            setIsSending(false)
         }
     }
 
     return (
         <div className="my-4">
-            <Dialog>
-                <DialogTrigger>send quiz</DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Your quizzes</DialogTitle>
-                        <DialogDescription>
-                            Choose a quiz to send it to selected users
-                        </DialogDescription>
-                        <ScrollArea className="h-96">
-                            {displayQuizzes()}
-                        </ScrollArea>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-
+            {
+                table.getFilteredSelectedRowModel().rows.length > 0 &&
+                <Dialog>
+                    <DialogTrigger disabled={isSending}>send quiz</DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Your quizzes</DialogTitle>
+                            <DialogDescription>
+                                Choose a quiz to send it to selected users
+                            </DialogDescription>
+                            {
+                                isFetching ?
+                                    <SynCareerLoader />
+                                    :
+                                    <ScrollArea className="h-96">
+                                        {displayQuizzes()}
+                                    </ScrollArea>
+                            }
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+            }
+            {
+                table.getFilteredSelectedRowModel().rows.length > 0 && calendarExists &&
+                <Button
+                    disabled={isSending}
+                    variant='outline'
+                    onClick={sendCalendar}
+                >
+                    Send calendar
+                </Button>
+            }
             <div className="flex justify-center items-center py-4">
                 <Input
                     placeholder={`Seach by Job Title...`}

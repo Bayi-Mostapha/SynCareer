@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class JobOfferController extends Controller
@@ -81,5 +82,13 @@ class JobOfferController extends Controller
         $this->authorize('delete', $jobOffer);
         $jobOffer->delete();
         return response()->json(['message' => 'Job offer deleted successfully']);
+    }
+
+    public function calendarExists(JobOffer $jobOffer)
+    {
+        if (!$jobOffer->calendar) {
+            return response()->json(['exists' => false]);
+        }
+        return response()->json(['exists' => true]);
     }
 }

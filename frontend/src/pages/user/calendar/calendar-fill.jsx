@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { toast } from 'sonner'
 import { axiosClient } from '@/api/axios';
+import { useParams } from 'react-router-dom';
 
 function MyDatePicker() {
+  const { id } = useParams();
   const [selectedDays, setSelectedDays] = useState([]);
   const calendarRef = useRef(null);
 
@@ -83,10 +85,10 @@ function MyDatePicker() {
     setInputHidden(true);
   };
   const sendCalendar = async () => {
-    console.log("selected ",selectedDays)
+    console.log("selected ", selectedDays)
     try {
-      console.log('your selected days', selectedDays)
       const response = await axiosClient.post('/send-calendar', {
+        job_offer_id: id,
         selectedDays: selectedDays,
       });
 
@@ -153,21 +155,21 @@ function MyDatePicker() {
     endTimeRef.current.selectedIndex = 0;
   };
 
-const handleDeleteSlot = (index) => {
-  const selectedDay = selectedDays[currentSection];
-  const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
-  const updatedSelectedDays = [...selectedDays];
-  updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
-  setSelectedDays(updatedSelectedDays);
-};
-const handleBackClick = () => {
-  setCurrentSection(currentSection - 1);
-};
-  useEffect(()=>{
-  console.log(selectedDays);
-  },[selectedDays])
-  useEffect(()=>{
-    if (allDaysSelected){
+  const handleDeleteSlot = (index) => {
+    const selectedDay = selectedDays[currentSection];
+    const updatedSlots = selectedDay.slots.filter((slot, idx) => idx !== index);
+    const updatedSelectedDays = [...selectedDays];
+    updatedSelectedDays[currentSection] = { ...selectedDay, slots: updatedSlots };
+    setSelectedDays(updatedSelectedDays);
+  };
+  const handleBackClick = () => {
+    setCurrentSection(currentSection - 1);
+  };
+  useEffect(() => {
+    console.log(selectedDays);
+  }, [selectedDays])
+  useEffect(() => {
+    if (allDaysSelected) {
       if (selectedDays.length > 0) {
         const selectedDaySlots = selectedDays[0].slots; // Assuming slots are stored in the first selected day
         const updatedSelectedDays = selectedDays.map(day => ({
@@ -177,14 +179,14 @@ const handleBackClick = () => {
         setSelectedDays(updatedSelectedDays);
       }
     }
-  },[allDaysSelected])
-const handleCheckboxChange = () => {
-  setAllDaysSelected(!allDaysSelected);
-};
+  }, [allDaysSelected])
+  const handleCheckboxChange = () => {
+    setAllDaysSelected(!allDaysSelected);
+  };
   return (
-    <div className="ml-20 mt-24 py-10 px-5 ">
+    <div className='my-4 p-4 rounded border shadow-sm'>
       <div className={`mb-5 ${inputHidden ? 'hidden' : ''}`}>
-        <Label htmlFor="inputDays" className='py-2 px-4 border border-gray-100 rounded-md'>Select Days</Label>
+        <Label htmlFor="inputDays" className='py-2 px-4 border bg-background rounded-md cursor-pointer'>Select Days</Label>
         <Input id="inputDays" type="text" ref={calendarRef} className="hidden" />
       </div>
       <div className={`${!inputHidden ? 'hidden' : ''} flex flex-col `}>
@@ -232,12 +234,12 @@ const handleCheckboxChange = () => {
           <label for="link-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">apply to all days.</label>
         </div>
       </div>
-      <div className=''>
-        <Button onClick={handleBackClick} className={`${!inputHidden || currentSection < 1 ? 'hidden' : ''}`}>Back</Button>
-        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}>Next</Button>
+      <div className='ml-auto flex gap-2 w-fit items-center'>
+        <Button variant='outline' onClick={handleBackClick} className={`${!inputHidden || currentSection < 1 ? 'hidden' : ''}`}>Back</Button>
+        <Button onClick={handleNextClick} className={`${inputHidden ? 'hidden' : ''}`}>Next</Button >
         <Button onClick={handleNextClick1} className={`${!inputHidden ? 'hidden' : ''}`}>Next</Button>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

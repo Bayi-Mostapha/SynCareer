@@ -28,6 +28,12 @@ Broadcast::channel('user.notifications.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
+// ********************************************************* VIDEOCALL
+
+Broadcast::channel('video.channel', function ($user) {
+    return $user;
+});
+
 // ********************************************************* CHAT
 
 Broadcast::channel('private.user.{id}', function ($user, $id) {

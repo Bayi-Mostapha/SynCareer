@@ -14,13 +14,8 @@ class Calendar extends Model
     use HasFactory;
     protected $table = 'calendars';  
     protected $fillable = [
-        'company_id',
+        'job_offer_id',
     ];
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function slots()
     {
@@ -32,8 +27,8 @@ class Calendar extends Model
         return $this->belongsToMany(User::class, 'calendar_reserved');
     }
 
-    public function jobOffers()
+    public function jobOffer()
     {
-        return $this->belongsToMany(JobOffer::class, 'calendar_joboffers');
+        return $this->belongsTo(JobOffer::class);
     }
 }

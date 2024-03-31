@@ -27,8 +27,9 @@ import PassQuiz from '@/pages/user/quiz/pass-quiz';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import Profile from '@/pages/company/profile';
 import ViewResume from '@/pages/company/view-resume';
-import Calendar from '@/pages/user/calendar/calendar-fill';
 import UserCalendar from '@/pages/user/calendar/schedule-interview';
+import CompanyVideoCall from '@/pages/company/companyVideoCall';
+import UserVideoCall from '@/pages/user/userVideoCall';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -58,7 +59,6 @@ export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
-export const COMPANY_CALENDAR_LINK = '/company/calendar';
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
@@ -89,7 +89,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AuthRoute type="user"><UserLayout /></AuthRoute>,
+        element: <AuthRoute types={["user"]}><UserLayout /></AuthRoute>,
         children: [
             {
                 path: USER_HOME_LINK,
@@ -128,13 +128,17 @@ export const router = createBrowserRouter([
                 element: <PassQuiz />
             },
             {
-                path: USER_CALENDAR_LINK,
-                element: <UserCalendar/>
+                path: USER_CALENDAR_LINK + '/:cid',
+                element: <UserCalendar />
             },
         ]
     },
     {
-        element: <AuthRoute type="company"><CompanyLayout /></AuthRoute>,
+        path: '/user/call',
+        element: <AuthRoute types={["user"]}><UserVideoCall /></AuthRoute>
+    },
+    {
+        element: <AuthRoute types={["company"]}><CompanyLayout /></AuthRoute>,
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
@@ -173,15 +177,15 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
-            },
-            {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
             }
         ]
     },
     {
-        element: <AuthRoute type="admin"><AdminLayout /></AuthRoute>,
+        path: '/company/call',
+        element: <AuthRoute types={["company"]}><CompanyVideoCall /></AuthRoute>
+    },
+    {
+        element: <AuthRoute types={["admin", "super-admin"]}><AdminLayout /></AuthRoute>,
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,
