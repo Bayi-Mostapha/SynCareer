@@ -12,6 +12,10 @@ import {
 // nivo
 import { ResponsiveLineCanvas } from "@nivo/line"
 import CompanyPaddedContent from "@/components/company/padded-content"
+import { useEffect, useState } from "react"
+import { axiosClient } from "@/api/axios"
+import { COMPANY_CHAT_LINK } from "@/router"
+import { Link } from "react-router-dom"
 
 export default function CompanyDashboard() {
     return (
@@ -22,9 +26,6 @@ export default function CompanyDashboard() {
                         <CardHeader>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold">Revenues</h2>
-                                <a className="text-sm text-blue-600" href="#">
-                                    →
-                                </a>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -41,9 +42,6 @@ export default function CompanyDashboard() {
                         <CardHeader>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-lg font-semibold">Lost deals</h2>
-                                <a className="text-sm text-blue-600" href="#">
-                                    →
-                                </a>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -60,16 +58,7 @@ export default function CompanyDashboard() {
                     <Card>
                         <CardHeader>
                             <div className="flex flex-col sm:flex-row sm:justify-between mb-4">
-                                <h2 className="text-lg font-semibold">Interviewed</h2>
-                                <Select>
-                                    <SelectTrigger className="w-fit">
-                                        <SelectValue placeholder="Sort by Newest" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        <SelectItem value="newest">Newest</SelectItem>
-                                        <SelectItem value="oldest">Oldest</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <h2 className="text-lg font-semibold">Upcomming interviews</h2>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -102,26 +91,27 @@ export default function CompanyDashboard() {
                         </CardContent>
                         <CardFooter>
                             <a className="text-sm text-blue-600 mt-4 block" href="#">
-                                All candidats →
+                                All interviews →
                             </a>
                         </CardFooter>
                     </Card>
                     <Card>
                         <CardHeader>
                             <div className="flex flex-col sm:flex-row sm:justify-between mb-4">
-                                <h2 className="text-lg font-semibold">Growth</h2>
-                                <Select>
-                                    <SelectTrigger className="w-fit">
-                                        <SelectValue placeholder="Yearly" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        <SelectItem value="yearly">Yearly</SelectItem>
-                                        <SelectItem value="monthly">Monthly</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <h2 className="text-lg font-semibold">Job offer stats for the last year</h2>
                             </div>
                         </CardHeader>
                         <CardContent>
+                            <div className="flex justify-center items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                    <div className="bg-[#2563eb] w-2 h-2 rounded-full"></div>
+                                    <p className="text-sm text-gray-600">Job offers</p>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <div className="bg-[#EED202] w-2 h-2 rounded-full"></div>
+                                    <p className="text-sm text-gray-600">Applies</p>
+                                </div>
+                            </div>
                             <CurvedlineChart className="w-full h-[300px]" />
                         </CardContent>
                     </Card>
@@ -146,38 +136,20 @@ export default function CompanyDashboard() {
                                     </div>
                                     <Badge variant="secondary">1</Badge>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <Avatar>
-                                        <AvatarImage alt="User 2" src="/placeholder.svg?height=40&width=40" />
-                                        <AvatarFallback>U2</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0 ml-4">
-                                        <p className="text-sm font-medium truncate">Marshall's MKT</p>
-                                        <p className="text-sm text-gray-500 truncate">Latest: Thanks for the quick delivery!</p>
-                                    </div>
-                                </div>
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <a className="text-sm text-blue-600 mt-4 block" href="#">
+                            <Link to={COMPANY_CHAT_LINK} className="text-sm text-blue-600 mt-4 block" href="#">
                                 All messages →
-                            </a>
+                            </Link>
                         </CardFooter>
                     </Card>
                     <Card>
                         <CardHeader>
-                            <h2 className="text-lg font-semibold mb-4">New job offers</h2>
-
+                            <h2 className="text-lg font-semibold mb-4">Latest job offers</h2>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <Button variant="ghost">Fruit2Go</Button>
-                                <Button variant="ghost">Marshall's MKT</Button>
-                                <Button variant="ghost">CCNT</Button>
-                                <Button variant="ghost">Joana Mini-market</Button>
-                                <Button variant="ghost">Little Brazil Vegan</Button>
-                                <Button variant="ghost">Target</Button>
-                            </div>
+                            <div>Fruit2Go</div>
                         </CardContent>
                     </Card>
                 </div>
@@ -188,31 +160,33 @@ export default function CompanyDashboard() {
 
 
 function CurvedlineChart(props) {
+    const [joData, setJOData] = useState([])
+    const [aData, setAData] = useState([])
+    useEffect(() => {
+        async function getStats() {
+            try {
+                let res = await axiosClient.get('/job-offers-stats')
+                setJOData(res.data.data)
+
+                res = await axiosClient.get('/applies-stats')
+                setAData(res.data.data)
+            } catch (error) {
+
+            }
+        }
+        getStats()
+    }, [])
     return (
         <div {...props}>
             <ResponsiveLineCanvas
                 data={[
                     {
-                        id: "Desktop",
-                        data: [
-                            { x: "Jan", y: 43 },
-                            { x: "Feb", y: 137 },
-                            { x: "Mar", y: 61 },
-                            { x: "Apr", y: 145 },
-                            { x: "May", y: 26 },
-                            { x: "Jun", y: 154 },
-                        ],
+                        id: "jo",
+                        data: joData,
                     },
                     {
-                        id: "Mobile",
-                        data: [
-                            { x: "Jan", y: 60 },
-                            { x: "Feb", y: 48 },
-                            { x: "Mar", y: 177 },
-                            { x: "Apr", y: 78 },
-                            { x: "May", y: 96 },
-                            { x: "Jun", y: 204 },
-                        ],
+                        id: "a",
+                        data: aData,
                     },
                 ]}
                 margin={{ top: 10, right: 10, bottom: 40, left: 40 }}
@@ -236,7 +210,7 @@ function CurvedlineChart(props) {
                     tickValues: 5,
                     tickPadding: 16,
                 }}
-                colors={["#2563eb", "#e11d48"]}
+                colors={["#2563eb", "#EED202"]}
                 pointSize={6}
                 useMesh={true}
                 gridYValues={6}

@@ -30,12 +30,12 @@ import ViewResume from '@/pages/company/view-resume';
 import UserCalendar from '@/pages/user/calendar/schedule-interview';
 import CompanyVideoCall from '@/pages/company/companyVideoCall';
 import UserVideoCall from '@/pages/user/userVideoCall';
+import CompanyDashboard from '@/pages/company/company-dashboard';
+import VerifyEmail from '@/pages/auth/verify-email';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
-import CompanyDashboard from '@/pages/company/company-dashboard';
-import VerifyEmail from '@/pages/auth/verify-email';
 
 
 // links 
