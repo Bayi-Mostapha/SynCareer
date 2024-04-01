@@ -40,7 +40,7 @@ import { toast } from "sonner";
 import { IoIosArrowDown } from "react-icons/io";
 import SynCareerLoader from "@/components/general/syncareer-loader";
 
-export default function SelectionTable({ columns, data, searchColumn, calendarExists, jobOfferId }) {
+export default function SelectionTable({ columns, data, searchColumn, calendarExists, quizId, jobOfferId }) {
     const [quizzes, setQuizzes] = useState([]);
     const [isFetching, setisFetching] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -102,6 +102,7 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
         const formData = new FormData();
         formData.append('users_ids', JSON.stringify(users_ids))
         formData.append('quiz_id', quiz_id)
+        formData.append('job_offer_id', jobOfferId)
         try {
             setIsSending(true)
             let res = await axiosClient.post('/send-quiz', formData)
@@ -131,38 +132,56 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
 
     return (
         <div className="my-4">
-            {
-                table.getFilteredSelectedRowModel().rows.length > 0 &&
-                <Dialog>
-                    <DialogTrigger disabled={isSending}>send quiz</DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Your quizzes</DialogTitle>
-                            <DialogDescription>
-                                Choose a quiz to send it to selected users
-                            </DialogDescription>
-                            {
-                                isFetching ?
-                                    <SynCareerLoader />
-                                    :
-                                    <ScrollArea className="h-96">
-                                        {displayQuizzes()}
-                                    </ScrollArea>
-                            }
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
-            }
-            {
-                table.getFilteredSelectedRowModel().rows.length > 0 && calendarExists &&
-                <Button
-                    disabled={isSending}
-                    variant='outline'
-                    onClick={sendCalendar}
-                >
-                    Send calendar
-                </Button>
-            }
+            <div className="flex justify-end gap-2">
+                {
+                    quizId == 0 ?
+                        (table.getFilteredSelectedRowModel().rows.length > 0 &&
+                            <Dialog>
+                                <DialogTrigger disabled={isSending}>
+                                    <Button variant='outline'>
+                                        send quiz
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Your quizzes</DialogTitle>
+                                        <DialogDescription>
+                                            Choose a quiz to send it to selected users
+                                        </DialogDescription>
+                                        {
+                                            isFetching ?
+                                                <SynCareerLoader />
+                                                :
+                                                <ScrollArea className="h-96">
+                                                    {displayQuizzes()}
+                                                </ScrollArea>
+                                        }
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        )
+                        :
+                        (
+                            table.getFilteredSelectedRowModel().rows.length > 0 &&
+                            <Button
+                                onClick={() => sendQuiz(quizId)}
+                                variant='outline'
+                            >
+                                send quiz
+                            </Button>
+                        )
+                }
+                {
+                    table.getFilteredSelectedRowModel().rows.length > 0 && calendarExists &&
+                    <Button
+                        disabled={isSending}
+                        variant='outline'
+                        onClick={sendCalendar}
+                    >
+                        Send calendar
+                    </Button>
+                }
+            </div>
             <div className="flex justify-center items-center py-4">
                 <Input
                     placeholder={`Seach by Job Title...`}

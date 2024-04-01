@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Events\MessageAppear;
 use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
+use Illuminate\Support\Facades\DB;
 use App\Events\UserNotificationEvent;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
@@ -18,16 +19,16 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\JobOfferController;
+use App\Http\Controllers\InterviewsController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\UserNotificationController;
 use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\CompanyDashboardController;
-use App\Http\Controllers\InterviewsController;
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -334,15 +335,27 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     Route::post('/send-quiz', function (Request $request) {
         $validated_data = $request->validate([
+            'job_offer_id' => 'required|exists:job_offers,id',
             'quiz_id' => 'required|exists:quizzes,id',
             'users_ids.*' => 'required|exists:users,id'
         ]);
 
-        $quiz = Quiz::find($validated_data['quiz_id']);
-        if (!$quiz) {
-            return response()->json(['message' => 'quiz not found'], 404);
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $validated_data['job_offer_id'])
+            ->first();
+        if (!$quizJobOffer) {
+            DB::table('quiz_joboffer')->insert([
+                'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
+                'created_at' => now(),
+            ]);
+        } else {
+            if ($quizJobOffer->quiz_id != $validated_data['quiz_id']) {
+                return response()->json(['message' => 'another quiz already exists for this job offer'], 403);
+            }
         }
 
+        $quiz = Quiz::find($validated_data['quiz_id']);
         foreach (json_decode($request['users_ids']) as $userId) {
             $data = [
                 'user_id' => $userId,
@@ -350,7 +363,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 'status' => 'unpassed',
                 'score' => 0
             ];
-
             $passes_quiz = PassesQuiz::create($data);
 
             UserNotification::create([
@@ -359,11 +371,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 'type' => 'quiz',
                 'content' => $passes_quiz->id
             ]);
-
             broadcast(new UserNotificationEvent($userId));
         }
-
         return response()->json(['message' => 'quiz sent to user(s) successfully']);
+    });
+    Route::get('/quiz-exists/{id}', function (Request $request, $id) {
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $id)
+            ->first();
+        if ($quizJobOffer) {
+            return response()->json(['quiz_id' => $quizJobOffer->quiz_id]);
+        }
+        return response()->json(['quiz_id' => 0]);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
         // Retrieve the PassesQuiz record by its ID
@@ -514,7 +533,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     //company interviews
     Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
     Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
-    
+
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
     Route::get('/reserved-slots', [CalendarController::class, 'getReservedSlots']);

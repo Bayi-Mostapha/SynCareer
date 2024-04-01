@@ -98,26 +98,5 @@ export const columns = [
                 }
             </div>
         },
-    },
-    {
-        id: "actions",
-        accessorKey: "action",
-        header: "Action",
-        cell: ({ row }) => {
-            const candidat = row.original
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="p-0 text-gray-400 hover:bg-transparent">
-                            <BsThreeDots />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
-    },
+    }
 ]

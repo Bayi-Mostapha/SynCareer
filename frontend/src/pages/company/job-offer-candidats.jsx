@@ -16,6 +16,7 @@ function JobOfferCandidats() {
     const [data, setData] = useState([]);
     const [isFetching, setisFetching] = useState(false);
     const [calendarExists, setCalendarExists] = useState(false);
+    const [quizId, setQuizId] = useState(false);
     const [calendarShown, setCalendarShown] = useState(false);
 
     const getData = async () => {
@@ -26,6 +27,9 @@ function JobOfferCandidats() {
 
             const res2 = await axiosClient.get(`/calendar-exists/${id}`)
             setCalendarExists(res2.data.exists)
+
+            const res3 = await axiosClient.get(`/quiz-exists/${id}`);
+            setQuizId(res3.data.quiz_id)
         } catch (error) {
             toast.error(error.response.data.message)
         } finally {
@@ -71,6 +75,7 @@ function JobOfferCandidats() {
                             data={data}
                             searchColumn={"job_title"}
                             calendarExists={calendarExists}
+                            quizId={quizId}
                             jobOfferId={id}
                         />
                     </div>

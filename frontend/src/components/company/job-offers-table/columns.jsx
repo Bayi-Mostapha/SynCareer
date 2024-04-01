@@ -134,7 +134,7 @@ export const columns = [
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>
-                                <Link to={`${JOBOFFER_LINK_BASE}/${jobOffer.id}`}>View Candidates</Link>
+                                <Link to={`${JOBOFFER_LINK_BASE}/${jobOffer.id}`}>View Details</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(jobOffer.id)}>Delete</DropdownMenuItem>
                             <DialogTrigger className='ml-2 text-[14px]'>Update</DialogTrigger>
