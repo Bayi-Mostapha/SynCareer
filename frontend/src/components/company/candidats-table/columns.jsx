@@ -88,11 +88,11 @@ export const columns = [
             return <div>
                 {
                     row.original.resume_id ?
-                        <Link to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
+                        <Link className="text-nowrap text-sm text-primary" to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
                             view resume
                         </Link>
                         :
-                        <Link to={VIEW_USER_PROFILE_BASE + row.original.id}>
+                        <Link className="text-nowrap text-sm text-primary" to={VIEW_USER_PROFILE_BASE + row.original.id}>
                             view profile
                         </Link>
                 }

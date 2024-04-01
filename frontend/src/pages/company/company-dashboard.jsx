@@ -14,10 +14,72 @@ import { ResponsiveLineCanvas } from "@nivo/line"
 import CompanyPaddedContent from "@/components/company/padded-content"
 import { useEffect, useState } from "react"
 import { axiosClient } from "@/api/axios"
-import { COMPANY_CHAT_LINK } from "@/router"
+import { COMPANY_CHAT_LINK, COMPANY_INTERVIEW } from "@/router"
 import { Link } from "react-router-dom"
+import formatDistanceToNow from "@/functions/format-time"
+import getUserPicture from "@/functions/get-user-pic"
 
 export default function CompanyDashboard() {
+    const [latestApplies, setLatestApplies] = useState([])
+    const [upcommingInterviews, setUpcommingInterviews] = useState([])
+
+    useEffect(() => {
+        getLatestApplies()
+        getUpcommingInterviews()
+    }, [])
+
+    async function getLatestApplies() {
+        try {
+            const res = await axiosClient.get('/latest-applies')
+            setLatestApplies(res.data.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    function displayLatestApplies() {
+        return latestApplies.map(apply =>
+            <div className="p-2 bg-muted shadow-md rounded-sm" key={'a_' + apply.id}>
+                <p className="text-sm text-primary font-semibold">
+                    <span className="capitalize">{apply.job_offer_title}</span> at <span className="capitalize">{apply.location}</span>
+                </p>
+                <p className="text-xs text-gray-600">
+                    <span className="capitalize">{apply.user_name}</span> applied {formatDistanceToNow(apply.date)}
+                </p>
+            </div>
+        )
+    }
+
+    async function getUpcommingInterviews() {
+        try {
+            const res = await axiosClient.get('/upcomming-interviews')
+            const newInterviews = await Promise.all(res.data.data.map(async interview => {
+                const imgRes = await getUserPicture(interview.user_pic)
+                return { ...interview, user_pic: imgRes }
+            }))
+            console.log(newInterviews);
+            setUpcommingInterviews(newInterviews)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    function displayUpcommingInterviews() {
+        return upcommingInterviews.map(interview =>
+            <div key={'i_' + interview.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <Avatar>
+                        <AvatarImage src={interview.user_pic} alt={interview.user_name} />
+                        <AvatarFallback>{interview.user_name.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <h4 className="font-semibold">{interview.user_name}</h4>
+                        <p className="text-sm text-gray-500">
+                            {interview.day} from {interview.start_time.slice(0, -3)} to {interview.end_time.slice(0, -3)}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
     return (
         <CompanyPaddedContent>
             <div className="p-1">
@@ -57,43 +119,18 @@ export default function CompanyDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                     <Card>
                         <CardHeader>
-                            <div className="flex flex-col sm:flex-row sm:justify-between mb-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                 <h2 className="text-lg font-semibold">Upcomming interviews</h2>
+                                <Link to={COMPANY_INTERVIEW} className="text-sm text-blue-600">
+                                    All interviews →
+                                </Link>
                             </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-semibold">Chris Fiedkicky</h4>
-                                        <p className="text-sm text-gray-500">Supermarket Wiktorska</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-semibold">Maggie Johnson</h4>
-                                        <p className="text-sm text-gray-500">Oasis Organic Inc.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-semibold">Gael Harry</h4>
-                                        <p className="text-sm text-gray-500">New York Fruits</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-semibold">Jenna Sullivan</h4>
-                                        <p className="text-sm text-gray-500">Walmart</p>
-                                    </div>
-                                </div>
+                                {displayUpcommingInterviews()}
                             </div>
                         </CardContent>
-                        <CardFooter>
-                            <a className="text-sm text-blue-600 mt-4 block" href="#">
-                                All interviews →
-                            </a>
-                        </CardFooter>
                     </Card>
                     <Card>
                         <CardHeader>
@@ -146,10 +183,10 @@ export default function CompanyDashboard() {
                     </Card>
                     <Card>
                         <CardHeader>
-                            <h2 className="text-lg font-semibold mb-4">Latest job offers</h2>
+                            <h2 className="text-lg font-semibold">Latest applies</h2>
                         </CardHeader>
-                        <CardContent>
-                            <div>Fruit2Go</div>
+                        <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                            {displayLatestApplies()}
                         </CardContent>
                     </Card>
                 </div>
@@ -171,7 +208,7 @@ function CurvedlineChart(props) {
                 res = await axiosClient.get('/applies-stats')
                 setAData(res.data.data)
             } catch (error) {
-
+                console.log("dashboard", error)
             }
         }
         getStats()

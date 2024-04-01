@@ -32,6 +32,7 @@ import CompanyVideoCall from '@/pages/company/companyVideoCall';
 import UserVideoCall from '@/pages/user/userVideoCall';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
+import CompanyInterviews from '@/pages/company/company-interviews';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -59,6 +60,7 @@ export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
+export const COMPANY_INTERVIEW = '/company/interviews';
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
@@ -177,6 +179,10 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
+            },
+            {
+                path: COMPANY_INTERVIEW,
+                element: <CompanyInterviews />
             }
         ]
     },

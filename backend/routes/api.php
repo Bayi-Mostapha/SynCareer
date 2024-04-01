@@ -215,8 +215,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                if($lastMessage){
-                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
                 }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
@@ -263,8 +263,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                if($lastMessage){
-                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
                 }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
@@ -422,20 +422,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             // Calculate the percentage score
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            // $passesQuiz = PassesQuiz::findOrFail($passesQuizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
 
             // // Update the score and status
-            // $passesQuiz->update([
-            //     'score' => $percentageScore,
-            //     'status' => 'passed',
-            // ]);
+            $passesQuiz->update([
+                'score' => $percentageScore,
+                'status' => 'passed',
+            ]);
 
-            // PassesQuiz::create([
-            //     'quiz_id' => $quizId,
-            //     'user_id' => $userId,
-            //     'score' => 0,
-            //     'status' => 'unpassed',
-            // ]);
             return response()->json(['success' => true, 'score' => $percentageScore]);
         } catch (\Exception $e) {
             // Return an error response to the client
@@ -517,6 +511,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // company dashboard
     Route::get('/job-offers-stats', [CompanyDashboardController::class, 'getJobOffersPerMonth']);
     Route::get('/applies-stats', [CompanyDashboardController::class, 'getAppliesPerMonth']);
+    Route::get('/latest-applies', [CompanyDashboardController::class, 'getLatestApplies']);
+    Route::get('/upcomming-interviews', [CompanyDashboardController::class, 'getUpcommingInterviews']);
 
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
@@ -525,16 +521,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
 
-    Route::get('/downloadFile/{path}', function($path) {
+    Route::get('/downloadFile/{path}', function ($path) {
         $filePath = public_path($path);
-    
+
         if (file_exists($filePath)) {
             return response()->download($filePath);
         }
-    
+
         return response()->json(['message' => 'File does not exist'], 404);
     });
-    Route::post('/sendMessageFile', function(Request $request){
+    Route::post('/sendMessageFile', function (Request $request) {
         $user = $request->user();
         $conversationId = $request->input('conversationId');
         $userId = $request->input('userId');
@@ -563,7 +559,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                     "true",
                     $userType
                 ));
-            }else{
+            } else {
                 $message->sender_role = "company";
                 $message->company_sender_id = $user->id;
                 broadcast(new SendMessageCompany(
