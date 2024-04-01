@@ -53,6 +53,7 @@ export const USER_PROFILE_LINK = '/user/profile';
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 export const USER_CALENDAR_LINK = '/user/calendar';
+export const USER_CALL = '/user/call'
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -61,6 +62,7 @@ export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
 export const COMPANY_INTERVIEW = '/company/interviews';
+export const COMPANY_CALL = '/company/call'
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
@@ -136,7 +138,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path: '/user/call',
+        path: USER_CALL + '/:token',
         element: <AuthRoute types={["user"]}><UserVideoCall /></AuthRoute>
     },
     {
@@ -187,7 +189,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path: '/company/call',
+        path: COMPANY_CALL + '/:token',
         element: <AuthRoute types={["company"]}><CompanyVideoCall /></AuthRoute>
     },
     {

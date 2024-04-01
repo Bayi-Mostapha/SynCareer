@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\CompanyDashboardController;
+use App\Http\Controllers\InterviewsController;
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -107,10 +108,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
-
     //reports
     Route::post('/reports', [ReportController::class, 'store']);
-
 
     // Reda chat app
     Route::post('/sendMessage', function (Request $request) {
@@ -436,8 +435,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
     });
-
-
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -514,6 +511,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/latest-applies', [CompanyDashboardController::class, 'getLatestApplies']);
     Route::get('/upcomming-interviews', [CompanyDashboardController::class, 'getUpcommingInterviews']);
 
+    //company interviews
+    Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
+    Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
+    
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
     Route::get('/reserved-slots', [CalendarController::class, 'getReservedSlots']);

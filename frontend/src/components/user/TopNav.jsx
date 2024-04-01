@@ -5,7 +5,7 @@ import Echo from 'laravel-echo';
 // shadcn 
 import { IoIosMenu } from "react-icons/io";
 import { NavLink, redirect, useNavigate } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK, USER_CALENDAR_LINK } from "@/router";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK, USER_CALENDAR_LINK, USER_CALL } from "@/router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -110,6 +110,9 @@ function TopNav() {
             case 'calendar':
                 navigate(`${USER_CALENDAR_LINK}/${item.content}`)
                 break;
+            case 'call':
+                navigate(`${USER_CALL}/${item.content}`)
+                break;
         }
     }
     function displayNotifications() {
@@ -122,7 +125,12 @@ function TopNav() {
                         key={'notification_' + item.id}
                     >
                         <div className="flex justify-between gap-4">
-                            <p>{item.from} send you a {item.type}</p>
+                            {
+                                item.type != 'call' ?
+                                    <p>{item.from} send you a {item.type}</p>
+                                    :
+                                    <p>{item.from} is calling you</p>
+                            }
                             {
                                 item.read == 0 &&
                                 <div className="h-[6px] w-[6px] bg-primary rounded-full"></div>
