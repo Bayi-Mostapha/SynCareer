@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { axiosClient } from "@/api/axios";
 import { authContext } from "@/contexts/AuthWrapper";
 import Echo from 'laravel-echo';
@@ -25,15 +25,23 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 // functions 
 import formatDistanceToNow from "@/functions/format-time";
 import ProfileNavigator from "../general/profile-navigator";
-
+// sound 
 
 function TopNav() {
+    const audioRef = useRef(null);
     const navigate = useNavigate()
+
     const { user } = useContext(authContext);
     const [open, setOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [newNotification, setNewNotification] = useState(false);
     const [notifications, setNotifications] = useState([]);
+
+    const playNotificationSound = () => {
+        if (audioRef.current) {
+            audioRef.current.play();
+        }
+    };
 
     useEffect(() => {
         getNotifications()
@@ -62,6 +70,7 @@ function TopNav() {
             console.log(user.id)
             window.Echo.private(`user.notifications.${user.id}`)
                 .listen('.user-new-notification', (e) => {
+                    playNotificationSound()
                     setNewNotification(true)
                     getNotifications()
                 });
@@ -169,6 +178,7 @@ function TopNav() {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-40 px-6 py-3 lg:py-0 flex items-center bg-background shadow-sm">
+            <audio ref={audioRef} src='/public/notification.wav' />
             <h1 className="py-2 text-xl text-primary font-semibold">SynCareer</h1>
             <ul className="pt-3 ml-20 hidden lg:flex gap-4">
                 <li>
