@@ -8,10 +8,10 @@ const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,
    
     <div  onClick={() => onClickContact(conversation_id,profileImageUrl,sender,jobTitle,userId,isLast)} className={`flex items-start justify-between ${selected == conversation_id ? 'bg-blue-100' : 'bg-gray-100'} py-3 px-8 cursor-pointer`}>
       
-      <div className="w-10 h-10  rounded-full relative flex items-center justify-center">
+      <div className="w-12 h-12  rounded-full relative flex items-center justify-center mr-3">
         <img className="rounded-full object-cover w-full h-full" src={profileImageUrl} alt="profile" />
         {
-          online ? <div className='w-3 h-3 rounded-full bg-green-600 top-1 z-30 absolute -right-1'></div>
+          online ? <div className='w-3 h-3 rounded-full bg-green-600 top-1 z-30 absolute right-0'></div>
           :
                ''
         }
@@ -26,7 +26,7 @@ const ChatContact = ({ profileImageUrl, sender, timestamp, message, unreadCount,
             </div>
           )}
           {unreadCount <= 0 && (
-            <p className="text-xs text-tline font-small ">{timestamp ? timestamp : ''}</p>
+            <p className="text-xs text-tline text-gray-700 font-small">{timestamp ? timestamp : ''}</p>
           )}
         </div>
         <div className="h-5 ">

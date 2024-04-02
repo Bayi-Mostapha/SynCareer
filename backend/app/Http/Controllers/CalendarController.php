@@ -98,7 +98,7 @@ class CalendarController extends Controller
             $calendar = Calendar::findOrFail($id);
             $calendarData = [];
             $days = CalendarSlot::where('status', 'free')
-                ->where('company_id', $calendar->company_id)
+                ->where('calendar_id', $calendar->id)
                 ->distinct()
                 ->pluck('day')
                 ->toArray();
@@ -111,7 +111,7 @@ class CalendarController extends Controller
                         'endtime' => $slot->end_time,
                         'id' => $slot->id
                     ];
-                    // Check if the day already exists in $calendarData
+                    // Check if the day already exists in $calendarDatasss
                     if (array_key_exists($day, $calendarData)) {
                         // If the day already exists, push the slot data to its slots array
                         array_push($calendarData[$day]['slots'], $slotData);

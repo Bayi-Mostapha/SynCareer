@@ -240,7 +240,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
-                            'path' => $message->file_path
+                            'path' => $message->file_path,
+                            'time' => date('h:i A', strtotime($message->created_at))
                         ];
                     }),
                     // Add other necessary fields
@@ -270,8 +271,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user2_id,
                     'profile_pic' => $conversation->user2->picture,
-                    'job_title' => $conversation->user2->job_title,
-                    'name' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
+                    'job_title' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
+                    'name' => $conversation->user2->name,
                     'last_message' => $lastMessage ? $fileMessage : null,
                     'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
                     'actual_user_last_sender' => $actualUserLastSender,
@@ -288,7 +289,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
-                            'path' => $message->file_path
+                            'path' => $message->file_path,
+                            'time' => date('h:i A', strtotime($message->created_at))
                         ];
                     }),
                     // Add other necessary fields
@@ -525,15 +527,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
 
-    Route::get('/downloadFile/{path}', function($path) {
-        $filePath = public_path($path);
-    
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
+    Route::get('/downloadFile/{filename}', function($filename) {
+        $filePath = storage_path('app/fileUploads/'.$filename);
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
         }
-    
-        return response()->json(['message' => 'File does not exist'], 404);
+     return response()->file($filePath);
     });
+    
     Route::post('/sendMessageFile', function(Request $request){
         $user = $request->user();
         $conversationId = $request->input('conversationId');
@@ -546,7 +547,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         if ($request->hasFile('file')) {
             $file = $request->file('file');
 
-            $path = $file->storeAs('fileUploads', $fileName, 'public');
+            $path = $file->storeAs('fileUploads', $fileName);
 
             $message = new Message();
             $message->conversation_id = $conversationId;
