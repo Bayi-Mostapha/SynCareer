@@ -11,7 +11,9 @@ import { axiosClient } from '@/api/axios';
 import { useContext } from 'react';
 import { authContext } from '@/contexts/AuthWrapper';
 import { ScrollArea } from "@/components/ui/scroll-area"
-
+import { FaFileCirclePlus } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
+import SynCareerLoadingPage from "@/pages/loading-page";
 
 window.Echo = new Echo({
   broadcaster: 'pusher',
@@ -45,6 +47,8 @@ export default function ChatContainer() {
     const lastMessageRef = useRef(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [data, setData] = useState();
+    const [isFetching, setIsFetching] = useState(true);
+
     
     useEffect(() => {
         if(actualConversationId !== 0){
@@ -70,6 +74,8 @@ export default function ChatContainer() {
             const { data } = await axiosClient.get('/conversations');
             console.log('yeeees',data);
             setData(data)
+            setFilteredContacts(null)
+            setIsFetching(false)
             const UnreadMessagesCount = data.reduce((total, conversation) => {
                 return total + conversation.unread_messages_count;
             }, 0);
@@ -106,19 +112,7 @@ export default function ChatContainer() {
         window.Echo.leave('private.company.' + previousActualConversationId);
 
         window.Echo.private('private.company.' + actualConversationId).listen('.chatUser', (e) => {
-            // if(actualConversationId !== 0){
-            //     const conversationToUpdate = data.find(conversation => conversation.conversation_id === actualConversationId);
-            //     if (conversationToUpdate) {
-            //         const messagesToUpdate = conversationToUpdate.messages;
-            //         setMessages(messagesToUpdate);
-            //         console.log("msgs",messagesToUpdate);
-            //     } else {
-            //         console.error("Conversation not found.");
-            //     }
-            //     updateMessageStatus();
-            // }
-             updateMessageStatus();
-
+            updateMessageStatus();
             fetchDataGlobale();
             setIsLast(false);
         });
@@ -130,10 +124,7 @@ export default function ChatContainer() {
             fetchDataGlobale();
         }
     });
-    // // this is for online users 
-    // window.Echo.private('onlineData').listen('.onlinee', (e) => {
-    //     console.log(e.users);
-    // });
+    
 
     return () => {
         if (previousActualConversationId) {
@@ -155,7 +146,7 @@ export default function ChatContainer() {
         });
 
         const newMessage = {
-            message_id: msg ,
+            message_id: msg,
             content: msg,
             sender_role: userContext.user.type,
             message_type: "text",
@@ -164,20 +155,20 @@ export default function ChatContainer() {
         };
         if (Array.isArray(data)) {
             const conversationToUpdateIndex = data.findIndex(conversation => conversation.conversation_id === actualConversationId);
-        
+
             if (conversationToUpdateIndex !== -1) {
                 // Clone the data array to avoid mutating the state directly
                 const updatedData = [...data];
-        
+
                 // Clone the conversation object to avoid mutating the state directly
                 const updatedConversation = { ...updatedData[conversationToUpdateIndex] };
-        
+
                 // Push the new message into the messages array of the conversation
                 updatedConversation.messages.push(newMessage);
-        
+
                 // Update the conversation within the updatedData array
                 updatedData[conversationToUpdateIndex] = updatedConversation;
-        
+
                 // Update the state with the updated data for the specific conversation
                 setData(updatedData);
                 console.log(updatedData);
@@ -189,7 +180,7 @@ export default function ChatContainer() {
         }
         
         setIsLast(true);
-
+        fetchDataGlobale();
         
       } catch (error) {
           console.log(error);
@@ -249,16 +240,101 @@ useEffect(()=>{
 const handleInputChange = (e) => {
     setSearchValue(e.target.value);
 };
+
+
+
+
+
+    const [file, setFile] = useState(null);
+    const [fileFlag, setFileFlag] = useState(false);
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+        MessageInput.current.value = e.target.files[0].name  ;
+        setFileFlag(!fileFlag);
+    };
+    const fileCancel = () => {
+        setFileFlag(!fileFlag);
+        setFile(null);
+        MessageInput.current.value = ""  ;
+    }
+    const handleUpload = async () => {
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileName', file.name);
+            formData.append('conversationId', actualConversationId);
+            formData.append('userId', userId);
+            formData.append('userType', userContext.user.type);
+  const newMessage = {
+                message_id: file.name,
+                content: file.name,
+                sender_role: userContext.user.type,
+                message_type: "text",
+                message_status: "sent",
+                is_first_message: isLast ? false : true,
+                path: file.name
+            };
+            if (Array.isArray(data)) {
+                const conversationToUpdateIndex = data.findIndex(conversation => conversation.conversation_id === actualConversationId);
+    
+                if (conversationToUpdateIndex !== -1) {
+                    // Clone the data array to avoid mutating the state directly
+                    const updatedData = [...data];
+    
+                    // Clone the conversation object to avoid mutating the state directly
+                    const updatedConversation = { ...updatedData[conversationToUpdateIndex] };
+    
+                    // Push the new message into the messages array of the conversation
+                    updatedConversation.messages.push(newMessage);
+    
+                    // Update the conversation within the updatedData array
+                    updatedData[conversationToUpdateIndex] = updatedConversation;
+    
+                    // Update the state with the updated data for the specific conversation
+                    setData(updatedData);
+                    console.log(updatedData);
+                } else {
+                    console.error("Conversation not found.");
+                }
+            } else {
+                console.error("Data is not an array or is undefined.");
+            }
+            
+            const response = await axiosClient.post('/sendMessageFile', formData , {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            });
+           
+            // fetchDataGlobale();
+          
+            fetchDataGlobale();
+            setIsLast(true);
+            fileCancel();
+            console.log('File uploaded:', response.data);
+            // Handle success (e.g., show a success message)
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            // Handle error (e.g., show an error message)
+        }
+    };
+    useEffect(()=>{
+        updateMessageStatus();
+    },[actualConversationId])
     return (
       <div className="relative">
-      <div className="flex flex-col h-screen bg-background ml-16">
+         {isFetching ? <SynCareerLoadingPage /> : '' }
+      <div className={`flex flex-col h-screen bg-background ml-16 ${isFetching ? 'hidden' : ''}`}>
         {/* hidden contact sidebar for responsive  */}
-        <ContactSideBar ImageUrl={icon1}  profileImageUrl={profileImageUrl} UnreadMsgNumber={200} />
+        <ContactSideBar  profileImageUrl={profileImageUrl} UnreadMsgNumber={totalUnreadMessagesCount} data={data} onClickContact={handleClickContact} actualConversationId={actualConversationId} onlineUsers={onlineUsers} />
+
         {/* contact side bar */}
         <div className="hidden lg:flex flex-col absolute top-16 bottom-0 left-16 w-96 z-20 bg-gray-100 ">
           <div className="justify-start flex flex-col px-8 pt-6"> 
-            <p className="font-medium text-2xl text-black mb-1">Messages</p>
-            <p className="text-sm  text-unread mb-1">{totalUnreadMessagesCount} Unread</p>
+            <p className="font-medium text-2xl text-primary  mb-1">Messages</p>
+            <p className="text-xs  text-gray-800">{totalUnreadMessagesCount} Unread</p>
           </div>
           <div className="relative px-9 mb-7 mt-3">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
@@ -277,41 +353,48 @@ const handleInputChange = (e) => {
           {/* display contacts  */}
           <ScrollArea className=" h-full">
            
-                {filteredContacts && filteredContacts.map(conversation => (
-                    <ChatContact 
-                        key={conversation.conversation_id} 
-                        profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.jpg`}
-                        sender={conversation.name}
-                        timestamp={conversation.last_message_time}
-                        message={conversation.last_message}
-                        unreadCount={conversation.unread_messages_count}
-                        onClickContact={handleClickContact}
-                        conversation_id={conversation.conversation_id}
-                        userId={conversation.user_id}
-                        jobTitle={conversation.job_title}
-                        selected={actualConversationId}
-                        online={onlineUsers.includes(conversation.user_id)}
-                        isLast={conversation.actual_user_last_sender}
-                    />
-                ))}
-                
-                {!filteredContacts && data && data.map(conversation => (
-                    <ChatContact 
-                        key={conversation.conversation_id} 
-                        profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.jpg`}
-                        sender={conversation.name}
-                        timestamp={conversation.last_message_time}
-                        message={conversation.last_message}
-                        unreadCount={conversation.unread_messages_count}
-                        onClickContact={handleClickContact}
-                        conversation_id={conversation.conversation_id}
-                        userId={conversation.user_id}
-                        jobTitle={conversation.job_title}
-                        selected={actualConversationId}
-                        online={onlineUsers.includes(conversation.user_id)}
-                        isLast={conversation.actual_user_last_sender}
-                    />
-                ))}
+          {filteredContacts && filteredContacts.length > 0 ? (
+                        filteredContacts.map(conversation => (
+                            <ChatContact 
+                                key={conversation.conversation_id} 
+                                profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.png`}
+                                sender={conversation.name}
+                                timestamp={conversation.last_message_time}
+                                message={conversation.last_message}
+                                unreadCount={conversation.unread_messages_count}
+                                onClickContact={handleClickContact}
+                                conversation_id={conversation.conversation_id}
+                                userId={conversation.user_id}
+                                jobTitle={conversation.job_title}
+                                selected={actualConversationId}
+                                online={onlineUsers.includes(conversation.user_id)}
+                                isLast={conversation.actual_user_last_sender}
+                            />
+                        ))
+                    ) : (
+                        (!isFetching ? '' : <p>Not found</p>)
+                    )}
+
+                    {!filteredContacts && data && data.length > 0 && (
+                        data.map(conversation => (
+                            <ChatContact 
+                                key={conversation.conversation_id} 
+                                profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.png`}
+                                sender={conversation.name}
+                                timestamp={conversation.last_message_time}
+                                message={conversation.last_message}
+                                unreadCount={conversation.unread_messages_count}
+                                onClickContact={handleClickContact}
+                                conversation_id={conversation.conversation_id}
+                                userId={conversation.user_id}
+                                jobTitle={conversation.job_title}
+                                selected={actualConversationId}
+                                online={onlineUsers.includes(conversation.user_id)}
+                                isLast={conversation.actual_user_last_sender}
+                            />
+                        ))
+                    )}
+              
             
         
           </ScrollArea>
@@ -329,6 +412,8 @@ const handleInputChange = (e) => {
                 key={message.content}
                 message={message.content}
                 first={message.is_first_message}
+                path={message.path}
+                time={message.time}
             />
             ) : (
             <ChatBubbleReceive
@@ -337,6 +422,8 @@ const handleInputChange = (e) => {
                 first={message.is_first_message}
                 profileImageUrl={profileImageUrl}
                 sender={username}
+                path={message.path}
+                time={message.time}
             />
             )
         ))}
@@ -348,24 +435,32 @@ const handleInputChange = (e) => {
                 <div className="basis-3/5 lg:basis-5/6 ">
                     <ScrollArea>
                         <textarea
+                         disabled={fileFlag ? true : false}
                         ref={MessageInput}
                         id="large-input"
                         placeholder="Type your message here..."
-                        className="h-full outline-none block w-full p-2 text-gray-700 border-none rounded-lg text-base resize-none ml-3"
+                        className={` h-full outline-none block w-full p-2 text-gray-700 border-none rounded-lg text-base resize-none ml-3`}
                         ></textarea>
                     </ScrollArea>
                 </div>
                 <div className="flex  justify-center items-end basis-1/6">
-                    <button
-                    className="w-9 mr-2 cursor-pointer"
-                    ><img className="w-full " src="http://localhost:8000/images/fileup.png" alt="" /></button>
-                    <button
-                    onClick={handleClick}
+                { fileFlag
+                    ? 
+                    <MdCancel className="mr-2 cursor-pointer" size={35}  onClick={fileCancel}/> 
+                    : 
+                    <label htmlFor="file">
+                    <FaFileCirclePlus className="mr-2 cursor-pointer" size={35} />
+                </label>
+                }
+                
+                <input type="file" onChange={handleFileChange} hidden id='file' />
+                <button
+                    onClick={fileFlag ? handleUpload : handleClick}
                     type="button"
                     className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-6 py-2.5"
                     >
                     Send
-                    </button>
+                </button>
                 </div>
             </div>
         </div>

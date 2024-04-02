@@ -52,26 +52,24 @@ function JobOffer() {
             console.log(response.data);
             toast.success('Job offer posted successfully!');
             reset(); // Reset the form after successful submission
+            fetchJobOffers();
         } catch (error) {
             console.error('Error posting job offer:', error);
             toast.error('Failed to post job offer. Please try again later.');
         }
     };
 
-   
-
     const [jobOffers, setJobOffers] = useState([]);
 
+    const fetchJobOffers = async () => {
+        try {
+            const response = await axiosClient.get('joboffers');
+            setJobOffers(response.data);
+        } catch (error) {
+            console.error('Error fetching job offers:', error);
+        }
+    };
     useEffect(() => {
-        const fetchJobOffers = async () => {
-            try {
-                const response = await axiosClient.get('joboffers');
-                setJobOffers(response.data);
-            } catch (error) {
-                console.error('Error fetching job offers:', error);
-            }
-        };
-
         fetchJobOffers();
     }, []);
 

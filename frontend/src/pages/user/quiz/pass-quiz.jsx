@@ -21,9 +21,9 @@ function PassQuiz() {
 
     const getQuizData = async (id) => {
         try {
-            const { data } = await axiosClient.get(`/quizzes/${id}`, {});
+            const { data } = await axiosClient.get(`/quizzes/${id}`);
             setQuizData(data);
-            console.log(data);
+            console.log('quiz:', data);
         } catch (error) {
             console.log('quiz fetching error ', error);
         }
@@ -38,11 +38,13 @@ function PassQuiz() {
         try {
             const payload = {
                 selectedAnswers: selectedOptions,
-                quizId: id
+                quizId: quizData.id
             };
             console.log('payload', selectedOptions);
             const response = await axiosClient.post('/calculateScore', payload);
             const { success, score } = response.data;
+
+            console.log('response', response)
 
             if (success) {
                 console.log('Score:', score);
@@ -190,23 +192,23 @@ function PassQuiz() {
                         <p>{counter}</p>
                         <p>{quizData.data[currentQuestion].question_content}</p>
                         <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                            <input id="option_a" ref={InputRadioA} type="radio" value={quizData.data[currentQuestion].option_a} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                            <input id="option_a" ref={InputRadioA} type="radio" value={quizData.data[currentQuestion].option_a} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                             <label for="option_a" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{quizData.data[currentQuestion].option_a}</label>
                         </div>
                         <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                            <input id="option_b" ref={InputRadioB} type="radio" value={quizData.data[currentQuestion].option_b} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                            <input id="option_b" ref={InputRadioB} type="radio" value={quizData.data[currentQuestion].option_b} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                             <label for="option_b" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{quizData.data[currentQuestion].option_b}</label>
                         </div>
                         <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                            <input id="option_c" ref={InputRadioC} type="radio" value={quizData.data[currentQuestion].option_c} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                            <input id="option_c" ref={InputRadioC} type="radio" value={quizData.data[currentQuestion].option_c} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                             <label for="option_c" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{quizData.data[currentQuestion].option_c}</label>
                         </div>
                         <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                            <input id="option_d" ref={InputRadioD} type="radio" value={quizData.data[currentQuestion].option_d} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                            <input id="option_d" ref={InputRadioD} type="radio" value={quizData.data[currentQuestion].option_d} name="options" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                             <label for="option_d" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{quizData.data[currentQuestion].option_d}</label>
                         </div>
-                       
-                        
+
+
                         <div>
                             {errors ?
                                 <p className='bg-red-100 text-red-600 p-2 rounded-md'>{errors}</p>

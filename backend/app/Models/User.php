@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Models\Report;
 use App\Models\Resume;
+use App\Models\Message;
 use App\Models\JobOffer;
+use App\Models\Conversation;
 use App\Models\UserEducation;
 use App\Models\UserExperience;
+use App\Models\UserNotification;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -55,10 +58,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return 'u' . $this->getAuthIdentifier();
+    }
+
     public function sendEmailVerificationNotification()
     {
         // We override the default notification and will use our own
         $this->notify(new EmailVerificationNotification("user"));
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class);
     }
 
     public function experiences()

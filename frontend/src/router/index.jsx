@@ -27,14 +27,17 @@ import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
 import Profile from '@/pages/company/profile';
 import ViewResume from '@/pages/company/view-resume';
-import Calendar from '@/pages/user/calendar/calendar-fill';
+import UserCalendar from '@/pages/user/calendar/schedule-interview';
+import CompanyVideoCall from '@/pages/company/companyVideoCall';
+import UserVideoCall from '@/pages/user/userVideoCall';
+import CompanyDashboard from '@/pages/company/company-dashboard';
+import VerifyEmail from '@/pages/auth/verify-email';
+import CompanyInterviews from '@/pages/company/company-interviews';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
-import CompanyDashboard from '@/pages/company/company-dashboard';
-import VerifyEmail from '@/pages/auth/verify-email';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
+import Admins from '@/pages/super-admin/admins';
 
 
 // links 
@@ -53,6 +56,8 @@ export const USER_SAVEDJOBOFFERS_LINK = '/user/savedjobs';
 
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
+export const USER_CALENDAR_LINK = '/user/calendar';
+export const USER_CALL = '/user/call'
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -60,10 +65,12 @@ export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
-export const COMPANY_CALENDAR_LINK = '/company/calendar';
+export const COMPANY_INTERVIEW = '/company/interviews';
+export const COMPANY_CALL = '/company/call'
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
+export const ADMINS_LINK = '/admin/admins';
 
 
 //savedjobs
@@ -93,7 +100,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        element: <AuthRoute type="user"><UserLayout /></AuthRoute>,
+        element: <AuthRoute types={["user"]}><UserLayout /></AuthRoute>,
         children: [
             {
                 path: USER_HOME_LINK,
@@ -134,11 +141,19 @@ export const router = createBrowserRouter([
             {
                 path: USER_PASSQUIZ_LINK + "/:id",
                 element: <PassQuiz />
-            }
+            },
+            {
+                path: USER_CALENDAR_LINK + '/:cid',
+                element: <UserCalendar />
+            },
         ]
     },
     {
-        element: <AuthRoute type="company"><CompanyLayout /></AuthRoute>,
+        path: USER_CALL + '/:token',
+        element: <AuthRoute types={["user"]}><UserVideoCall /></AuthRoute>
+    },
+    {
+        element: <AuthRoute types={["company"]}><CompanyLayout /></AuthRoute>,
         children: [
             {
                 path: COMPANY_DASHBOARD_LINK,
@@ -179,21 +194,25 @@ export const router = createBrowserRouter([
                 element: <QuizTable />
             },
             {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
-            },
-            {
-                path: COMPANY_CALENDAR_LINK,
-                element: <Calendar/>
-            },
+                path: COMPANY_INTERVIEW,
+                element: <CompanyInterviews />
+            }
         ]
     },
     {
-        element: <AuthRoute type="admin"><AdminLayout /></AuthRoute>,
+        path: COMPANY_CALL + '/:token',
+        element: <AuthRoute types={["company"]}><CompanyVideoCall /></AuthRoute>
+    },
+    {
+        element: <AuthRoute types={["admin", "super-admin"]}><AdminLayout /></AuthRoute>,
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,
                 element: <h1>hi admin</h1>
+            },
+            {
+                path: ADMINS_LINK,
+                element: <Admins />
             },
         ]
     },

@@ -1,32 +1,35 @@
 <?php
 
-use Carbon\Carbon;
 use App\Models\Quiz;
-use App\Models\User;
-use App\Models\Company;
 use App\Models\Message;
 use App\Models\Question;
-use App\Events\OnlineUser;
 use App\Models\PassesQuiz;
 use App\Events\SendMessage;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageAppear;
+use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Events\UserNotificationEvent;
+use App\Http\Controllers\AdminsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\JobOfferController;
+use App\Http\Controllers\InterviewsController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CompanyDashboardController;
+use App\Http\Controllers\UserNotificationController;
+use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\ReportController;
-
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -54,14 +57,6 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 
 // AUTH USERS 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware(['throttle:6,1'])
-        ->name('verification.send');
-
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
@@ -74,6 +69,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             $type = 'company';
         } elseif ($user->tokenCan('admin')) {
             $type = 'admin';
+        } elseif ($user->tokenCan('super-admin')) {
+            $type = 'super-admin';
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
@@ -84,11 +81,22 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         ]);
     });
 
+    // admins crd
+    Route::get('/admins', [AdminsController::class, 'index']);
+    Route::post('/admins', [AdminsController::class, 'store']);
+    Route::delete('/admins/{admin}', [AdminsController::class, 'destroy']);
+
+    //notifications
+    Route::get('/user-notifications', [UserNotificationController::class, 'index']);
+    Route::post('/user-notifications', [UserNotificationController::class, 'markAllRead']);
+    Route::post('/user-notifications/{notification}', [UserNotificationController::class, 'markRead']);
+
     // resume 
     Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
-    Route::post('/store-resume', [ResumeController::class, 'store']);
+    Route::post('/resumes', [ResumeController::class, 'store']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
+    Route::get('/download-resume-id/{resume}', [ResumeController::class, 'downloadById']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
 
     // joboffers
@@ -107,9 +115,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
-
     //reports
     Route::post('/reports', [ReportController::class, 'store']);
+
 
 
 
@@ -122,6 +130,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 
     // Reda 
+
+    // Reda chat app
+
     Route::post('/sendMessage', function (Request $request) {
         $user = $request->user();
         $message = $request->validate([
@@ -187,7 +198,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             ));
         }
     });
-
     Route::post('/updateMessageStatus', function (Request $request) {
         $conversationId = $request->input('conversation_id');
         if ($request->user()->tokenCan('user')) {
@@ -206,7 +216,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['message' => 'No messages found or no update needed']);
         }
     });
-
     Route::get('/conversations', function (Request $request) {
         $userId = $request->user()->id;
 
@@ -226,14 +235,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
+                }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user1_id,
                     'profile_pic' => $conversation->user1->picture,
                     'job_title' => $conversation->user1->job_title,
                     'name' => $conversation->user1->first_name . ' ' . $conversation->user1->last_name,
-                    'last_message' => $lastMessage ? $lastMessage->content : null,
+                    'last_message' => $lastMessage ? $fileMessage : null,
                     'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
                     'actual_user_last_sender' => $actualUserLastSender,
                     'unread_messages_count' => $unreadMessagesCount,
@@ -244,11 +255,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
                         return [
                             'message_id' => $message->id,
-                            'content' => $message->content,
+                            'content' => $message->content ? $message->content : $message->file_path,
                             'sender_role' => $message->sender_role,
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
+                            'path' => $message->file_path,
+                            'time' => date('h:i A', strtotime($message->created_at))
                         ];
                     }),
                     // Add other necessary fields
@@ -271,14 +284,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
+                }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
                     'user_id' => $conversation->user2_id,
                     'profile_pic' => $conversation->user2->picture,
-                    'job_title' => $conversation->user2->job_title,
-                    'name' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
-                    'last_message' => $lastMessage ? $lastMessage->content : null,
+                    'job_title' => $conversation->user2->first_name . ' ' . $conversation->user2->last_name,
+                    'name' => $conversation->user2->name,
+                    'last_message' => $lastMessage ? $fileMessage : null,
                     'last_message_time' => $lastMessage ? date('h:i', strtotime($lastMessage->created_at)) : null,
                     'actual_user_last_sender' => $actualUserLastSender,
                     'unread_messages_count' => $unreadMessagesCount,
@@ -294,6 +309,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                             'message_type' => $message->message_type,
                             'message_status' => $message->message_status,
                             'is_first_message' => $isFirstMessage,
+                            'path' => $message->file_path,
+                            'time' => date('h:i A', strtotime($message->created_at))
                         ];
                     }),
                     // Add other necessary fields
@@ -306,12 +323,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json($responseData);
     });
 
-    Route::post('/getQuizzes', function (Request $request) {
-        $companyId = $request->user()->id;
-        $quizzes = Quiz::where('company', $companyId)
-            ->select('id', 'name', 'nbr_applicants', 'created_at')
-            ->get();
-
+    // Reda quiz
+    Route::get('/quizzes', function (Request $request) {
+        $company = $request->user();
+        $quizzes = $company->quizzes;
         return response()->json($quizzes);
     });
     Route::post('/uploadQuiz', function (Request $request) {
@@ -320,14 +335,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $questions = $request->input('questions');
 
         $quiz = Quiz::create([
-            'company' => $companyId,
+            'company_id' => $companyId,
             'name' => $quizDataArray['name'],
             'duration' => $quizDataArray['duration'],
             'nbr_question' => $quizDataArray['size']
         ]);
 
         foreach ($questions as $questionData) {
-            $question = Question::create([
+            Question::create([
                 'quiz_id' => $quiz->id,
                 'question_content' => $questionData['question'],
                 'option_a' => $questionData['options'][0],
@@ -339,6 +354,58 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         }
 
         return response()->json(['message' => 'Quiz data received successfully']);
+    });
+    Route::post('/send-quiz', function (Request $request) {
+        $validated_data = $request->validate([
+            'job_offer_id' => 'required|exists:job_offers,id',
+            'quiz_id' => 'required|exists:quizzes,id',
+            'users_ids.*' => 'required|exists:users,id'
+        ]);
+
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $validated_data['job_offer_id'])
+            ->first();
+        if (!$quizJobOffer) {
+            DB::table('quiz_joboffer')->insert([
+                'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
+                'created_at' => now(),
+            ]);
+        } else {
+            if ($quizJobOffer->quiz_id != $validated_data['quiz_id']) {
+                return response()->json(['message' => 'another quiz already exists for this job offer'], 403);
+            }
+        }
+
+        $quiz = Quiz::find($validated_data['quiz_id']);
+        foreach (json_decode($request['users_ids']) as $userId) {
+            $data = [
+                'user_id' => $userId,
+                'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
+                'status' => 'unpassed',
+                'score' => 0
+            ];
+            $passes_quiz = PassesQuiz::create($data);
+
+            UserNotification::create([
+                'user_id' => $userId,
+                'from' => $quiz->company->name,
+                'type' => 'quiz',
+                'content' => $passes_quiz->id
+            ]);
+            broadcast(new UserNotificationEvent($userId));
+        }
+        return response()->json(['message' => 'quiz sent to user(s) successfully']);
+    });
+    Route::get('/quiz-exists/{id}', function (Request $request, $id) {
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $id)
+            ->first();
+        if ($quizJobOffer) {
+            return response()->json(['quiz_id' => $quizJobOffer->quiz_id]);
+        }
+        return response()->json(['quiz_id' => 0]);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
         // Retrieve the PassesQuiz record by its ID
@@ -359,9 +426,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json('Quiz not found');
         }
 
-        // Load the questions relationship for the quiz
-        $quiz->load('questions');
-
         // Prepare the response data
         $responseData = [
             'id' => $quiz->id,
@@ -374,14 +438,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         // Return the response with the quiz details
         return response()->json($responseData);
     });
-
-
     Route::post('/calculateScore', function (Request $request) {
         try {
             $selectedAnswers = $request->input('selectedAnswers');
             $quizId = $request->input('quizId');
 
-            // Get the correct answers for the quiz based on the quiz ID
+
             $correctAnswers = Question::where('quiz_id', $quizId)->pluck('answer', 'id')->toArray();
 
             $score = 0;
@@ -392,36 +454,29 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $questionId = $answer['id'];
                 $selectedAnswer = $answer['selected'];
 
-                // Check if the selected answer matches the correct answer
+                // Check if the selected answer matches the correct answer  
                 if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] === $selectedAnswer) {
-                    $score++; // Increment the score if the answer is correct
+                    $score++;
                 }
             }
 
             // Calculate the percentage score
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            // $passesQuiz = PassesQuiz::findOrFail($passesQuizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
 
             // // Update the score and status
-            // $passesQuiz->update([
-            //     'score' => $newScore,
-            //     'status' => 'passed',
-            // ]);
+            $passesQuiz->update([
+                'score' => $percentageScore,
+                'status' => 'passed',
+            ]);
 
-            // PassesQuiz::create([
-            //     'quiz_id' => $quizId,
-            //     'user_id' => $userId,
-            //     'score' => 0,
-            //     'status' => 'unpassed',
-            // ]);
             return response()->json(['success' => true, 'score' => $percentageScore]);
         } catch (\Exception $e) {
             // Return an error response to the client
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
     });
-
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -472,9 +527,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     });
-
-
-
     Route::delete('/quizzes/{quiz}', function (Quiz $quiz) {
         if (!$quiz) {
             return response()->json(['message' => 'Quiz not found.'], 404);
@@ -486,12 +538,88 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json(['message' => 'Quiz deleted successfully.']);
     });
 
+    //getting a private ressource
     Route::get('/storage/{folder}/{file}', function ($folder, $file) {
         $path = storage_path("app/$folder/$file");
         if (!file_exists($path)) {
             return response()->json(['message' => 'File does not exist'], 404);
         }
         return response()->file($path);
+    });
+
+    // company dashboard
+    Route::get('/job-offers-stats', [CompanyDashboardController::class, 'getJobOffersPerMonth']);
+    Route::get('/applies-stats', [CompanyDashboardController::class, 'getAppliesPerMonth']);
+    Route::get('/latest-applies', [CompanyDashboardController::class, 'getLatestApplies']);
+    Route::get('/upcomming-interviews', [CompanyDashboardController::class, 'getUpcommingInterviews']);
+
+    //company interviews
+    Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
+    Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
+
+    //calendar
+    Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
+    Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
+    Route::get('/reserved-slots', [CalendarController::class, 'getReservedSlots']);
+    Route::post('/send-calendar', [CalendarController::class, 'sendCalendar']);
+    Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
+    Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
+
+    Route::get('/downloadFile/{filename}', function ($filename) {
+        $filePath = storage_path('app/fileUploads/' . $filename);
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+        return response()->file($filePath);
+    });
+
+    Route::post('/sendMessageFile', function (Request $request) {
+        $user = $request->user();
+        $conversationId = $request->input('conversationId');
+        $userId = $request->input('userId');
+        $userType = $request->input('userType');
+        $fileName  = $request->input('fileName');
+
+        broadcast(new MessageAppear($userId, $conversationId));
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+
+            $path = $file->storeAs('fileUploads', $fileName);
+
+            $message = new Message();
+            $message->conversation_id = $conversationId;
+            $message->content = '';
+            $message->message_type = 'file';
+            $message->file_path = $path;
+
+            if ($user->tokenCan('user') == true) {
+                $message->sender_role = "user";
+                $message->user_sender_id = $user->id;
+                broadcast(new SendMessage(
+                    $path,
+                    $conversationId,
+                    "true",
+                    $userType
+                ));
+            } else {
+                $message->sender_role = "company";
+                $message->company_sender_id = $user->id;
+                broadcast(new SendMessageCompany(
+                    $path,
+                    $conversationId,
+                    "true",
+                    $userType
+                ));
+            }
+
+            $message->message_status = 'sent';
+            $message->save();
+
+            return response()->json(['path' => $path], 200);
+        }
+
+        return response()->json(['error' => 'File not provided'], 400);
     });
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);

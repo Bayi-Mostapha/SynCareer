@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('calendar_joboffers', function (Blueprint $table) {
+        Schema::create('calendar_slots', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('joboffer_id');
             $table->unsignedBigInteger('calendar_id');
-            $table->integer('duration');
-
+            $table->unsignedBigInteger('company_id');
+            $table->date('day');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->enum('status', ['free', 'reserved']);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('calendar_id')->references('id')->on('calendar_slots')->onDelete('cascade');
-            $table->foreign('joboffer_id')->references('id')->on('job_offers')->onDelete('cascade');
+            $table->foreign('calendar_id')->references('id')->on('calendars')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('calendar_joboffer');
+        Schema::dropIfExists('calendar_slots');
     }
 };

@@ -37,4 +37,9 @@ class JobOffer extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    public function calendar()
+    {
+        return $this->hasOne(Calendar::class);
+    }
 }

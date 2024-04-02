@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('question_content');
             $table->string('option_a');
             $table->string('option_b');
-            $table->string('option_c');
-            $table->string('option_d');
+            $table->string('option_c')->nullable();
+            $table->string('option_d')->nullable();
             $table->string('answer');
             // Define foreign key
             $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');

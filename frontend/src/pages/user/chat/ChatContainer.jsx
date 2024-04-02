@@ -13,7 +13,9 @@ import { authContext } from '@/contexts/AuthWrapper';
 import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from "@/components/ui/scroll-area"
-
+import { FaFileCirclePlus } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
+import SynCareerLoadingPage from "@/pages/loading-page";
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
@@ -37,7 +39,7 @@ export default function ChatContainer() {
     const [conversations, setConversations] = useState();
     const [actualConversationId, setActualConversationId] = useState(0);
     const [previousActualConversationId, setPreviousActualConversationId] = useState(null);
-    const [profileImageUrl, setProfileImageUrl] = useState("http://localhost:8000/images/default.jpg");
+    const [profileImageUrl, setProfileImageUrl] = useState("http://localhost:8000/images/default.png");
     const [username, setUsername] = useState("unkown");
     const [jobTitle, setJobTitle] = useState("unkown");
     const [userId, setUserId] = useState(1);
@@ -48,6 +50,7 @@ export default function ChatContainer() {
     const lastMessageRef = useRef(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [data, setData] = useState();
+    const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
         if (actualConversationId !== 0) {
@@ -71,10 +74,14 @@ export default function ChatContainer() {
     const [totalUnreadMessagesCount, setTotalUnreadMessagesCount] = useState(0);
 
     const fetchDataGlobale = async () => {
+       
         try {
+
             const { data } = await axiosClient.get('/conversations');
             console.log('yeeees', data);
             setData(data)
+            setFilteredContacts(null)
+            setIsFetching(false);
             const UnreadMessagesCount = data.reduce((total, conversation) => {
                 return total + conversation.unread_messages_count;
             }, 0);
@@ -115,17 +122,6 @@ export default function ChatContainer() {
         window.Echo.leave('private.user.' + previousActualConversationId);
 
         window.Echo.private('private.user.' + actualConversationId).listen('.chatUser', (e) => {
-            // if(actualConversationId !== 0){
-            //     const conversationToUpdate = data.find(conversation => conversation.conversation_id === actualConversationId);
-            //     if (conversationToUpdate) {
-            //         const messagesToUpdate = conversationToUpdate.messages;
-            //         setMessages(messagesToUpdate);
-            //         console.log("msgs",messagesToUpdate);
-            //     } else {
-            //         console.error("Conversation not found.");
-            //     }
-            //     updateMessageStatus();
-            // }
             updateMessageStatus();
             fetchDataGlobale();
             setIsLast(false);
@@ -237,37 +233,135 @@ export default function ChatContainer() {
         updateMessageStatus();
         fetchDataGlobale();
     };
+useEffect(()=>{
+    updateMessageStatus();
+},[actualConversationId])
+
+const [searchValue, setSearchValue] = useState('');
+const [filteredContacts, setFilteredContacts] = useState(false);
+
+// Filter contacts based on search value
+useEffect(()=>{
+    if(searchValue == ''){
+        setFilteredContacts(false);
+    }
+    const Contacts = data?.filter(contact => {
+        return contact.name.toLowerCase().includes(searchValue.toLowerCase());
+    });
+    setFilteredContacts(Contacts);
+},[searchValue]);
+
+// Handle input change
+const handleInputChange = (e) => {
+    setSearchValue(e.target.value);
+};
 
 
+    const [file, setFile] = useState(null);
+    const [fileFlag, setFileFlag] = useState(false);
 
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+        MessageInput.current.value = e.target.files[0].name  ;
+        setFileFlag(!fileFlag);
+    };
+    const fileCancel = () => {
+        setFileFlag(!fileFlag);
+        setFile(null);
+        MessageInput.current.value = ""  ;
+    }
+    const handleUpload = async () => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileName', file.name);
+            formData.append('conversationId', actualConversationId);
+            formData.append('userId', userId);
+            formData.append('userType', userContext.user.type);
 
-
+            
+            const response = await axiosClient.post('/sendMessageFile', formData , {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            });
+           
+            const newMessage = {
+                message_id: file.name,
+                content: file.name,
+                sender_role: userContext.user.type,
+                message_type: "text",
+                message_status: "sent",
+                is_first_message: isLast ? false : true,
+                path: file.name
+            };
+            if (Array.isArray(data)) {
+                const conversationToUpdateIndex = data.findIndex(conversation => conversation.conversation_id === actualConversationId);
+    
+                if (conversationToUpdateIndex !== -1) {
+                    // Clone the data array to avoid mutating the state directly
+                    const updatedData = [...data];
+    
+                    // Clone the conversation object to avoid mutating the state directly
+                    const updatedConversation = { ...updatedData[conversationToUpdateIndex] };
+    
+                    // Push the new message into the messages array of the conversation
+                    updatedConversation.messages.push(newMessage);
+    
+                    // Update the conversation within the updatedData array
+                    updatedData[conversationToUpdateIndex] = updatedConversation;
+    
+                    // Update the state with the updated data for the specific conversation
+                    setData(updatedData);
+                    console.log(updatedData);
+                } else {
+                    console.error("Conversation not found.");
+                }
+            } else {
+                console.error("Data is not an array or is undefined.");
+            }
+            
+            setIsLast(true);
+            fileCancel();
+            console.log('File uploaded:', response.data);
+            // Handle success (e.g., show a success message)
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            // Handle error (e.g., show an error message)
+        }
+    };
+    useEffect(()=>{
+        updateMessageStatus();
+    },[actualConversationId])
     return (
         <>
-            <div className="flex flex-col h-screen bg-background">
+        {isFetching ? <SynCareerLoadingPage /> : '' }
+           
+            <div className={`flex flex-col h-screen bg-background ${isFetching ? 'hidden' : ''}`}>
                 {/* hidden contact sidebar for responsive  */}
-                <ContactSideBar ImageUrl={icon1} profileImageUrl={profileImageUrl} UnreadMsgNumber={200} />
+                <ContactSideBar  profileImageUrl={profileImageUrl} UnreadMsgNumber={totalUnreadMessagesCount} data={data} onClickContact={handleClickContact} actualConversationId={actualConversationId} onlineUsers={onlineUsers} />
                 {/* contact side bar */}
-                <div className="hidden lg:flex flex-col absolute top-[78px] bottom-0 left-0 w-96 z-20 bg-gray-100 ">
-                    <div className="justify-start flex flex-col px-8 pt-6">
-                        <p className="font-medium text-2xl text-black mb-1">Messages</p>
-                        <p className="text-sm  text-unread mb-1">{totalUnreadMessagesCount} Unread</p>
+                <div className="hidden lg:flex flex-col absolute top-[78px] bottom-0 left-0 w-96 z-20 bg-gray-100">
+                    <div className="justify-start flex flex-col px-7 pt-6">
+                        <p className="font-medium text-2xl text-primary  mb-1">Messages</p>
+                        <p className="text-xs  text-gray-800 ">{totalUnreadMessagesCount} Unread</p>
                     </div>
-                    <div className="relative px-9 mb-7 mt-3">
+                    <div className="relative px-7 mb-4 mt-3">
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                            <svg className="w-5 h-5 ml-9 text-gray-300 dark:text-gray-300" ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 ml-7 text-gray-300 dark:text-gray-300 " ariaHidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
                         </div>
-                        <input type="text" className="block w-full p-3  ps-10 text-sm placeholder:text-gray300 text-gray-800 border-none  rounded-lg bg-white outline-none   " placeholder="Search " />
+                        <input type="text" className="block w-full p-3 ps-10 text-sm placeholder:text-gray300 text-gray-800 border-none  rounded-lg bg-white outline-none   " placeholder="Search " onChange={handleInputChange}/>
                     </div>
                     {/* display contacts  */}
 
                     <ScrollArea className=" h-full">
-                        {data && data.map(conversation => (
-                            <ChatContact
-                                key={conversation.conversation_id}
-                                profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.jpg`}
+                    {filteredContacts && filteredContacts.length > 0 ? (
+                        filteredContacts.map(conversation => (
+                            <ChatContact 
+                                key={conversation.conversation_id} 
+                                profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.png`}
                                 sender={conversation.name}
                                 timestamp={conversation.last_message_time}
                                 message={conversation.last_message}
@@ -280,8 +374,31 @@ export default function ChatContainer() {
                                 online={onlineUsers.includes(conversation.user_id)}
                                 isLast={conversation.actual_user_last_sender}
                             />
-                        ))}
+                        ))
+                    ) : (
+                        (!isFetching ? '' : <p>Not found</p>)
+                    )}
 
+                    {!filteredContacts && data && data.length > 0 && (
+                        data.map(conversation => (
+                            <ChatContact 
+                                key={conversation.conversation_id} 
+                                profileImageUrl={conversation.profile_pic ? conversation.profile_pic : `http://localhost:8000/images/default.png`}
+                                sender={conversation.name}
+                                timestamp={conversation.last_message_time}
+                                message={conversation.last_message}
+                                unreadCount={conversation.unread_messages_count}
+                                onClickContact={handleClickContact}
+                                conversation_id={conversation.conversation_id}
+                                userId={conversation.user_id}
+                                jobTitle={conversation.job_title}
+                                selected={actualConversationId}
+                                online={onlineUsers.includes(conversation.user_id)}
+                                isLast={conversation.actual_user_last_sender}
+                            />
+                        ))
+                    )}
+              
                     </ScrollArea>
                 </div>
 
@@ -298,6 +415,7 @@ export default function ChatContainer() {
                                         key={message.content}
                                         message={message.content}
                                         first={message.is_first_message}
+                                        path={message.path}
                                     />
                                 ) : (
                                     <ChatBubbleReceive
@@ -306,6 +424,7 @@ export default function ChatContainer() {
                                         first={message.is_first_message}
                                         profileImageUrl={profileImageUrl}
                                         sender={username}
+                                        path={message.path}
                                     />
                                 )
                             ))}
@@ -325,13 +444,20 @@ export default function ChatContainer() {
                                     </ScrollArea>
                                 </div>
                                 <div className="flex  justify-center items-end basis-1/6">
+                                { fileFlag
+                                        ? 
+                                        <MdCancel className="mr-2 cursor-pointer" size={30}  onClick={fileCancel}/> 
+                                        : 
+                                        <label htmlFor="file">
+                                        <FaFileCirclePlus className="mr-2 cursor-pointer" size={30} />
+                                    </label>
+                                    }
+                                    
+                                    <input type="file" onChange={handleFileChange} hidden id='file' />
                                     <button
-                                        className="w-9 mr-2 cursor-pointer"
-                                    ><img className="w-full " src="http://localhost:8000/images/fileup.png" alt="" /></button>
-                                    <button
-                                        onClick={handleClick}
+                                        onClick={fileFlag ? handleUpload : handleClick}
                                         type="button"
-                                        className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-6 py-2.5"
+                                        className="text-white bg-primary hover:bg-primary font-medium rounded-lg text-sm px-6 py-2.5"
                                     >
                                         Send
                                     </button>

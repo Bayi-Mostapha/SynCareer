@@ -39,7 +39,16 @@ class AuthenticatedSessionController extends Controller
         }
 
         $user->tokens()->delete();
-        $token = $user->createToken('api-token', [$authenticatedGuard])->plainTextToken;
+        $token = "";
+        if ($user->role && $user->role === 's') {
+            $token = $user->createToken('api-token', ["super-admin"])->plainTextToken;
+            $authenticatedGuard = "super-admin";
+        } else {
+            $token = $user->createToken('api-token', [$authenticatedGuard])->plainTextToken;
+        }
+        if ($token === "") {
+            return response()->json(['message' => 'Something went wrong.'], 400);
+        }
 
         return response()->json([
             'user' => $user,

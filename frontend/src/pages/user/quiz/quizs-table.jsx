@@ -1,6 +1,6 @@
 import { axiosClient } from "@/api/axios";
 import { columns } from "@/components/user/columns";
-import DataTable from "@/components/general/data-table1";
+import DataTable from "@/components/general/data-table";
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Dialog,
@@ -51,7 +51,7 @@ function QuizTable() {
     // fetch quizzes from database 
     const fetchQuizes = async () => {
         try {
-            const { data } = await axiosClient.post('/getQuizzes', {});
+            const { data } = await axiosClient.get('/quizzes');
             setisFetching(false);
             setData(data)
         } catch (error) {
@@ -65,7 +65,8 @@ function QuizTable() {
                 quizData: quizData,
                 questions: questions
             };
-            await axiosClient.post('/uploadQuiz', payload);
+            const res = await axiosClient.post('/uploadQuiz', payload);
+            console.log(res)
         } catch (error) {
             // Handle error
             console.error('Error uploading quiz:', error);
@@ -227,7 +228,6 @@ function QuizTable() {
             initialize();
             fetchQuizes();
         }
-        console.log(questions);
     }, [questions]);
 
     const initialize = () => {
@@ -368,15 +368,13 @@ function QuizTable() {
                     {/* ////////////////////////////////// */}
                 </div>
             </div>
-            <div className="border border-gray-200 rounded-md overflow-x-auto">
-                {isFetching ?
-                    <div className="flex items-center justify-center p-10">
-                        <SynCareerLoader />
-                    </div>
-                    :
-                    <DataTable columns={columns} data={data} searchColumn={"name"} />
-                }
-            </div>
+            {isFetching ?
+                <div className="flex items-center justify-center p-10">
+                    <SynCareerLoader />
+                </div>
+                :
+                <DataTable columns={columns} data={data} searchColumn={"name"} />
+            }
         </div>
     );
 }

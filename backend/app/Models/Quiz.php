@@ -15,7 +15,7 @@ class Quiz extends Model
         'created_at' => 'datetime:Y-m-d',
     ];
     protected $fillable = [
-        'company',
+        'company_id',
         'name',
         'duration',
         'nbr_applicants',

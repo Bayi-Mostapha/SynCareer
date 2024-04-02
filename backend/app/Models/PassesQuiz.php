@@ -14,6 +14,7 @@ class PassesQuiz extends Model
     protected $fillable = [
         'quiz_id',
         'user_id',
+        'job_offer_id',
         'score',
         'status',
     ];

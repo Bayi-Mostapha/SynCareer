@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\JobOffer;
 use Auth;
@@ -86,7 +88,6 @@ class JobOfferController extends Controller
 
     public function saveJob(Request $request, JobOffer $jobOffer)
     {
-
         // Get the authenticated user
         $user = $request->user();
 
@@ -108,6 +109,7 @@ class JobOfferController extends Controller
         // Return the saved job offers as JSON response
         return response()->json($savedJobOffers);
     }
+
     public function delete(Request $request, JobOffer $jobOffer)
     {
         // Get the authenticated user
@@ -118,5 +120,13 @@ class JobOfferController extends Controller
 
         // Return a success response
         return response()->json(['message' => 'Job offer unsaved successfully']);
+    }
+
+    public function calendarExists(JobOffer $jobOffer)
+    {
+        if (!$jobOffer->calendar) {
+            return response()->json(['exists' => false]);
+        }
+        return response()->json(['exists' => true]);
     }
 }

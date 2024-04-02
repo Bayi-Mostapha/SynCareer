@@ -16,8 +16,30 @@ import { VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
 
 export const columns = [
     {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: "matching",
-        header: "",
+        header: "MP",
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("matching"));
             const formatted = new Intl.NumberFormat("en-US", {
@@ -66,36 +88,15 @@ export const columns = [
             return <div>
                 {
                     row.original.resume_id ?
-                        <Link to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
+                        <Link className="text-nowrap text-sm text-primary" to={VIEW_USER_RESUME_BASE + row.original.resume_id}>
                             view resume
                         </Link>
                         :
-                        <Link to={VIEW_USER_PROFILE_BASE + row.original.id}>
+                        <Link className="text-nowrap text-sm text-primary" to={VIEW_USER_PROFILE_BASE + row.original.id}>
                             view profile
                         </Link>
                 }
             </div>
         },
-    },
-    {
-        id: "actions",
-        accessorKey: "action",
-        header: "Action",
-        cell: ({ row }) => {
-            const candidat = row.original
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="p-0 text-gray-400 hover:bg-transparent">
-                            <BsThreeDots />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
-    },
+    }
 ]
