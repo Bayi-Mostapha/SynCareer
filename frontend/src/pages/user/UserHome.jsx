@@ -58,7 +58,7 @@ function UserHome() {
       toast.error("Failed to save/unsave job");
     }
   };
-  
+
 
   const filteredJobOffers = jobOffers.filter((jobOffer) =>
     jobOffer.job_title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -77,9 +77,8 @@ function UserHome() {
       // Format the time difference
       let postedTime;
       if (diffMinutes < 60) {
-        postedTime = `Posted ${diffMinutes} minute${
-          diffMinutes !== 1 ? "s" : ""
-        } ago`;
+        postedTime = `Posted ${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""
+          } ago`;
       } else {
         const diffHours = Math.floor(diffMinutes / 60);
         if (diffHours < 24) {
@@ -113,17 +112,16 @@ function UserHome() {
                 </div>
               </div>
               <div className="ml-auto mr-4">
-              <button
-                onClick={() => handleSaveJob(jobOffer.id)}
-                className={`text-5xl border-2 p-1 rounded-md  ${
-                    isSaved ? "text-[#0085FF] border-[#0085FF] " : "text-[#808080] border-[#808080]"
-                }`}
+                <button
+                  onClick={() => handleSaveJob(jobOffer.id)}
+                  className={`text-5xl border-2 p-1 rounded-md  ${isSaved ? "text-[#0085FF] border-[#0085FF] " : "text-[#808080] border-[#808080]"
+                    }`}
                 >
-                {isSaved ? (
+                  {isSaved ? (
                     <MdBookmark className="text-[25px]" />
-                ) : (
+                  ) : (
                     <MdOutlineBookmarkBorder className="text-[25px]" />
-                )}
+                  )}
                 </button>
               </div>
             </div>
@@ -138,7 +136,7 @@ function UserHome() {
 
   return (
     <UserPaddedContent>
-      <div className="flex flex-col gap-2 p-4">
+      <div>
         <div className="relative flex items-center w-full  mb-4">
           <IoSearch className="text-[20px] mx-[25%]  absolute left-3 top-1/2 transform -translate-y-1/2 text-[#2D2D2D]" />
           <input
