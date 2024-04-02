@@ -4,16 +4,17 @@ import Echo from 'laravel-echo';
 import { authContext } from '@/contexts/AuthWrapper';
 import { Button } from '@/components/ui/button';
 import { USER_HOME_LINK } from '@/router';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import VideoCallControlls from '@/components/general/video-call-controls';
 import { CiMicrophoneOff } from "react-icons/ci";
 import getUserPicture from '@/functions/get-user-pic';
 
 const UserVideoCall = () => {
+    const { token } = useParams()
     const navigate = useNavigate();
     const { user } = useContext(authContext)
-    const channel = window.Echo.join('video.channel');
+    const channel = window.Echo.join('video.channel.' + token);
 
     const [showVid, setShowVid] = useState(true);
     const [showAudio, setShowAudio] = useState(true);
@@ -57,6 +58,7 @@ const UserVideoCall = () => {
                 if (callAnswered) {
                     userVideo.current.srcObject = null
                     setCallAnswered(false)
+                    toast.info(user.name + 'left')
                     window.location.reload()
                 }
             })
@@ -173,6 +175,7 @@ const UserVideoCall = () => {
         setCall({})
         setOtherUser(null)
         peerRef.current.destroy()
+        window.location.reload()
         navigate(USER_HOME_LINK)
     }
 
@@ -216,7 +219,7 @@ const UserVideoCall = () => {
                                 )
                             }
                             {
-                                callAnswered && !cCam &&
+                                callAnswered && !cCam && otherUser &&
                                 <img className='object-cover w-44 h-44 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2' src={otherUser.picture} alt="" />
                             }
                         </div>

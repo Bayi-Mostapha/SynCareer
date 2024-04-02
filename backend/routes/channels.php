@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\Company;
 use App\Models\Conversation;
+use App\Models\VideoCallToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -30,9 +31,21 @@ Broadcast::channel('user.notifications.{id}', function ($user, $id) {
 
 // ********************************************************* VIDEOCALL
 
-Broadcast::channel('video.channel', function ($user) {
-    return $user;
+Broadcast::channel('video.channel.{token}', function ($user, $token) {
+    $videoCall = VideoCallToken::where('token', $token)->first();
+    if (!$videoCall) {
+        return null; 
+    }
+
+    if ($user->tokenCan('user') && $videoCall->user_id == $user->id) {
+        return $user;
+    } else if ($user->tokenCan('company') && $videoCall->company_id == $user->id) {
+        return $user;
+    }
+
+    return null;
 });
+
 
 // ********************************************************* CHAT
 

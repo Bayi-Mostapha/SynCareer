@@ -19,12 +19,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -36,18 +30,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner";
-// icons 
-import { IoIosArrowDown } from "react-icons/io";
+// components
 import SynCareerLoader from "@/components/general/syncareer-loader";
+// icons 
+import { TbCalendarShare } from "react-icons/tb";
+import { FiSearch } from "react-icons/fi";
+import { GrSend } from "react-icons/gr";
+import { HiOutlineDocumentPlus } from "react-icons/hi2";
 
-export default function SelectionTable({ columns, data, searchColumn, calendarExists, jobOfferId }) {
+export default function SelectionTable({ columns, data, searchColumn, calendarExists, quizId, jobOfferId }) {
     const [quizzes, setQuizzes] = useState([]);
     const [isFetching, setisFetching] = useState(false);
     const [isSending, setIsSending] = useState(false);
 
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
-    const [columnVisibility, setColumnVisibility] = useState([])
     const [rowSelection, setRowSelection] = useState({})
 
     useEffect(() => {
@@ -74,12 +71,10 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         state: {
             sorting,
             columnFilters,
-            columnVisibility,
             rowSelection
         },
     });
@@ -102,6 +97,7 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
         const formData = new FormData();
         formData.append('users_ids', JSON.stringify(users_ids))
         formData.append('quiz_id', quiz_id)
+        formData.append('job_offer_id', jobOfferId)
         try {
             setIsSending(true)
             let res = await axiosClient.post('/send-quiz', formData)
@@ -131,75 +127,74 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
 
     return (
         <div className="my-4">
-            {
-                table.getFilteredSelectedRowModel().rows.length > 0 &&
-                <Dialog>
-                    <DialogTrigger disabled={isSending}>send quiz</DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Your quizzes</DialogTitle>
-                            <DialogDescription>
-                                Choose a quiz to send it to selected users
-                            </DialogDescription>
-                            {
-                                isFetching ?
-                                    <SynCareerLoader />
-                                    :
-                                    <ScrollArea className="h-96">
-                                        {displayQuizzes()}
-                                    </ScrollArea>
-                            }
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
-            }
-            {
-                table.getFilteredSelectedRowModel().rows.length > 0 && calendarExists &&
-                <Button
-                    disabled={isSending}
-                    variant='outline'
-                    onClick={sendCalendar}
-                >
-                    Send calendar
-                </Button>
-            }
-            <div className="flex justify-center items-center py-4">
-                <Input
-                    placeholder={`Seach by Job Title...`}
-                    value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn(searchColumn)?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto flex items-center gap-2">
-                            Columns <IoIosArrowDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter(
-                                (column) => column.getCanHide()
-                            )
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
+            <div className="flex justify-end gap-2">
+                {
+                    quizId == 0 ?
+                        (table.getFilteredSelectedRowModel().rows.length > 0 &&
+                            <Dialog>
+                                <DialogTrigger disabled={isSending}>
+                                    <Button
+                                        className='flex items-center gap-2'
+                                        variant='outline'
                                     >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                        Set and send quiz <HiOutlineDocumentPlus className="text-xl" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Your quizzes</DialogTitle>
+                                        <DialogDescription>
+                                            Choose a quiz for this job offer (it will be automatically sent it to selected users)
+                                        </DialogDescription>
+                                        {
+                                            isFetching ?
+                                                <SynCareerLoader />
+                                                :
+                                                <ScrollArea className="h-96">
+                                                    {displayQuizzes()}
+                                                </ScrollArea>
+                                        }
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        )
+                        :
+                        (
+                            table.getFilteredSelectedRowModel().rows.length > 0 &&
+                            <Button
+                                className='flex items-center gap-2'
+                                onClick={() => sendQuiz(quizId)}
+                                variant='outline'
+                            >
+                                Send quiz <GrSend />
+                            </Button>
+                        )
+                }
+                {
+                    table.getFilteredSelectedRowModel().rows.length > 0 && calendarExists &&
+                    <Button
+                        className='flex items-center gap-2'
+                        disabled={isSending}
+                        variant='outline'
+                        onClick={sendCalendar}
+                    >
+                        Send calendar <TbCalendarShare />
+                    </Button>
+                }
+            </div>
+            <div className="flex justify-between items-center py-4">
+                <h1 className="text-lg font-medium">Candidats for job offer #{jobOfferId}</h1>
+                <div className="relative">
+                    <FiSearch className="text-lg text-gray-300 absolute left-2 top-1/2 transform -translate-y-1/2"/>
+                    <Input
+                        placeholder={`Seach by Job Title...`}
+                        value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn(searchColumn)?.setFilterValue(event.target.value)
+                        }
+                        className="pl-8 py-5 max-w-72"
+                    />
+                </div>
             </div>
             <div className="my-2 text-xs text-muted-foreground">
                 {table.getFilteredSelectedRowModel().rows.length} of{" "}

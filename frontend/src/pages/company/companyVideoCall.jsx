@@ -3,7 +3,7 @@ import Peer from 'simple-peer';
 import Echo from 'laravel-echo';
 import { authContext } from '@/contexts/AuthWrapper';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import VideoCallControlls from '@/components/general/video-call-controls';
 import { COMPANY_DASHBOARD_LINK } from '@/router';
@@ -11,9 +11,10 @@ import { CiMicrophoneOff } from "react-icons/ci";
 import getUserPicture from '@/functions/get-user-pic';
 
 const CompanyVideoCall = () => {
+    const { token } = useParams()
     const navigate = useNavigate();
     const { user } = useContext(authContext)
-    const channel = window.Echo.join('video.channel');
+    const channel = window.Echo.join('video.channel.' + token);
 
     const [showVid, setShowVid] = useState(true);
     const [showAudio, setShowAudio] = useState(true);
@@ -171,6 +172,7 @@ const CompanyVideoCall = () => {
         channel.whisper('company-hanged-up', {
             data: 'Call ended by ' + user.name
         })
+        window.location.reload()
         navigate(COMPANY_DASHBOARD_LINK)
     }
 

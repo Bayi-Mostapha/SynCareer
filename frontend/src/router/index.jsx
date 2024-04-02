@@ -32,10 +32,12 @@ import CompanyVideoCall from '@/pages/company/companyVideoCall';
 import UserVideoCall from '@/pages/user/userVideoCall';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
+import CompanyInterviews from '@/pages/company/company-interviews';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
+import Admins from '@/pages/super-admin/admins';
 
 
 // links 
@@ -52,6 +54,7 @@ export const USER_PROFILE_LINK = '/user/profile';
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 export const USER_CALENDAR_LINK = '/user/calendar';
+export const USER_CALL = '/user/call'
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -59,9 +62,12 @@ export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
+export const COMPANY_INTERVIEW = '/company/interviews';
+export const COMPANY_CALL = '/company/call'
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
+export const ADMINS_LINK = '/admin/admins';
 
 
 
@@ -134,7 +140,7 @@ export const router = createBrowserRouter([
         ]
     },
     {
-        path: '/user/call',
+        path: USER_CALL + '/:token',
         element: <AuthRoute types={["user"]}><UserVideoCall /></AuthRoute>
     },
     {
@@ -177,11 +183,15 @@ export const router = createBrowserRouter([
             {
                 path: COMPANY_QUIZ_LINK,
                 element: <QuizTable />
+            },
+            {
+                path: COMPANY_INTERVIEW,
+                element: <CompanyInterviews />
             }
         ]
     },
     {
-        path: '/company/call',
+        path: COMPANY_CALL + '/:token',
         element: <AuthRoute types={["company"]}><CompanyVideoCall /></AuthRoute>
     },
     {
@@ -190,6 +200,10 @@ export const router = createBrowserRouter([
             {
                 path: ADMIN_DASHBOARD_LINK,
                 element: <h1>hi admin</h1>
+            },
+            {
+                path: ADMINS_LINK,
+                element: <Admins />
             },
         ]
     },

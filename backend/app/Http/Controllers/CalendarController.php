@@ -98,7 +98,7 @@ class CalendarController extends Controller
             $calendar = Calendar::findOrFail($id);
             $calendarData = [];
             $days = CalendarSlot::where('status', 'free')
-                ->where('calendar_id', $calendar->id)
+                ->where('calendar_id', $id)
                 ->distinct()
                 ->pluck('day')
                 ->toArray();

@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use App\Events\MessageAppear;
 use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
+use Illuminate\Support\Facades\DB;
 use App\Events\UserNotificationEvent;
+use App\Http\Controllers\AdminsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\ReportController;
@@ -18,15 +20,16 @@ use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\JobOfferController;
+use App\Http\Controllers\InterviewsController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\UserNotificationController;
 use App\Http\Controllers\JobOfferCandidatsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\CompanyDashboardController;
 
 // GUEST
 Route::get('/verify-email/{id}/{hash}/{type}', VerifyEmailController::class)
@@ -78,6 +81,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         ]);
     });
 
+    // admins crd
+    Route::get('/admins', [AdminsController::class, 'index']);
+    Route::post('/admins', [AdminsController::class, 'store']);
+    Route::delete('/admins/{admin}', [AdminsController::class, 'destroy']);
+
     //notifications
     Route::get('/user-notifications', [UserNotificationController::class, 'index']);
     Route::post('/user-notifications', [UserNotificationController::class, 'markAllRead']);
@@ -107,10 +115,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
-
     //reports
     Route::post('/reports', [ReportController::class, 'store']);
-
 
     // Reda chat app
     Route::post('/sendMessage', function (Request $request) {
@@ -215,8 +221,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->company_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                if($lastMessage){
-                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
                 }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
@@ -264,8 +270,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 $actualUserLastSender = $lastMessage ? ($lastMessage->user_sender_id ? true : false) : false;
                 // Initialize lastSender as null for each conversation
                 $lastSender = null;
-                if($lastMessage){
-                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content ;
+                if ($lastMessage) {
+                    $fileMessage = $lastMessage->content === "" ? $lastMessage->file_path : $lastMessage->content;
                 }
                 $conversationData = [
                     'conversation_id' => $conversation->id,
@@ -337,23 +343,35 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     Route::post('/send-quiz', function (Request $request) {
         $validated_data = $request->validate([
+            'job_offer_id' => 'required|exists:job_offers,id',
             'quiz_id' => 'required|exists:quizzes,id',
             'users_ids.*' => 'required|exists:users,id'
         ]);
 
-        $quiz = Quiz::find($validated_data['quiz_id']);
-        if (!$quiz) {
-            return response()->json(['message' => 'quiz not found'], 404);
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $validated_data['job_offer_id'])
+            ->first();
+        if (!$quizJobOffer) {
+            DB::table('quiz_joboffer')->insert([
+                'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
+                'created_at' => now(),
+            ]);
+        } else {
+            if ($quizJobOffer->quiz_id != $validated_data['quiz_id']) {
+                return response()->json(['message' => 'another quiz already exists for this job offer'], 403);
+            }
         }
 
+        $quiz = Quiz::find($validated_data['quiz_id']);
         foreach (json_decode($request['users_ids']) as $userId) {
             $data = [
                 'user_id' => $userId,
                 'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
                 'status' => 'unpassed',
                 'score' => 0
             ];
-
             $passes_quiz = PassesQuiz::create($data);
 
             UserNotification::create([
@@ -362,11 +380,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 'type' => 'quiz',
                 'content' => $passes_quiz->id
             ]);
-
             broadcast(new UserNotificationEvent($userId));
         }
-
         return response()->json(['message' => 'quiz sent to user(s) successfully']);
+    });
+    Route::get('/quiz-exists/{id}', function (Request $request, $id) {
+        $quizJobOffer = DB::table('quiz_joboffer')
+            ->where('job_offer_id', $id)
+            ->first();
+        if ($quizJobOffer) {
+            return response()->json(['quiz_id' => $quizJobOffer->quiz_id]);
+        }
+        return response()->json(['quiz_id' => 0]);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
         // Retrieve the PassesQuiz record by its ID
@@ -424,28 +449,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             // Calculate the percentage score
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            // $passesQuiz = PassesQuiz::findOrFail($passesQuizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
 
             // // Update the score and status
-            // $passesQuiz->update([
-            //     'score' => $percentageScore,
-            //     'status' => 'passed',
-            // ]);
+            $passesQuiz->update([
+                'score' => $percentageScore,
+                'status' => 'passed',
+            ]);
 
-            // PassesQuiz::create([
-            //     'quiz_id' => $quizId,
-            //     'user_id' => $userId,
-            //     'score' => 0,
-            //     'status' => 'unpassed',
-            // ]);
             return response()->json(['success' => true, 'score' => $percentageScore]);
         } catch (\Exception $e) {
             // Return an error response to the client
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
     });
-
-
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -519,7 +536,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // company dashboard
     Route::get('/job-offers-stats', [CompanyDashboardController::class, 'getJobOffersPerMonth']);
     Route::get('/applies-stats', [CompanyDashboardController::class, 'getAppliesPerMonth']);
+    Route::get('/latest-applies', [CompanyDashboardController::class, 'getLatestApplies']);
+    Route::get('/upcomming-interviews', [CompanyDashboardController::class, 'getUpcommingInterviews']);
 
+    //company interviews
+    Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
+    Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
+
+    //calendar
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
     Route::get('/reserved-slots', [CalendarController::class, 'getReservedSlots']);
@@ -535,7 +559,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
      return response()->file($filePath);
     });
     
-    Route::post('/sendMessageFile', function(Request $request){
+    Route::post('/sendMessageFile', function (Request $request) {
         $user = $request->user();
         $conversationId = $request->input('conversationId');
         $userId = $request->input('userId');
@@ -564,7 +588,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                     "true",
                     $userType
                 ));
-            }else{
+            } else {
                 $message->sender_role = "company";
                 $message->company_sender_id = $user->id;
                 broadcast(new SendMessageCompany(
