@@ -2,47 +2,41 @@
 import { axiosClient } from '@/api/axios';
 import React from 'react';
 
-const ChatBubbleSend = ({message,first ,path}) => {
-  const requestFile = async (filePath) => {
-    const response = await axiosClient.get(`/downloadFile/${filePath}`, {
-      responseType: 'blob', // Set the response type to blob
-  });
-  }
-  const downloadFile = async (filePath) => {
+const ChatBubbleSend = ({message,first ,path,time}) => {
+  const filename = path?.split('/').pop();
+  const downloadResume = async (filename) => {
     try {
-      requestFile(filePath);
+        const response = await axiosClient.get(`/downloadFile/${filename}`, {
+            responseType: 'blob', 
+           
+        });
+        console.log('file:', response.data);
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
 
-        // Create a blob URL from the response data
-        const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
 
-        // Create a temporary anchor element
-        const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.setAttribute('download', filePath.split('/').pop()); // Extract the file name from the file path
-        downloadLink.style.display = 'none';
-        document.body.appendChild(downloadLink);
-
-        // Trigger the click event
-        downloadLink.click();
-
-        // Clean up
-        window.URL.revokeObjectURL(blobUrl);
-        document.body.removeChild(downloadLink);
+        // Revoke the object URL to release memory
+        window.URL.revokeObjectURL(url);
     } catch (error) {
-        console.error('Error downloading file:', error);
-        if (error.response) {
-          console.error('Error response:', error.response);
-      }
+        console.error('Error downloading resume:', error);
+        toast.error('Error downloading resume');
     }
 };
 
+
+
   return (
-   <div className=' justify-end flex' onClick={() => path && downloadFile(path)}>
+   <div className=' justify-end flex' onClick={() => path && downloadResume(filename)}>
     <div className={`placeholder: w-2/3 flex  justify-end ${first ? 'mt-3' : 'mt-1' }`}>
       <div className=" basis-5/6 flex flex-col justify-start pt-1 px-3">
-        {first && <p className="text-gray-900 text-md font-bold mb-2">you</p> }
-      <div className="bg-gray-100 w-full  rounded rounded-tl-none p-3 px-5">
-        <p className="text-sm text-gray-700 font-medium">{path ? path : message}</p>
+        {first && <p className="text-gray-900 text-md mb-2 font-semibold">you</p> }
+      <div className="bg-blue-100 w-full  rounded-md p-3 px-5 relative pb-6 ">
+        <p className="text-sm text-black ">{path ? filename : message}</p>
+        <p className='absolute bottom-2 right-3 text-gray-800 text-xs font-medium z-40'>{time}</p>
       </div>
       </div>
     </div>

@@ -56,3 +56,4 @@ class sendMessage implements ShouldBroadcast
         ];
     }
 }
+

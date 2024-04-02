@@ -6,6 +6,8 @@ use App\Models\JobOffer;
 use App\Models\JobOfferSkill;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use App\Models\JobOffer;
+use Auth;
 
 class JobOfferController extends Controller
 {
@@ -90,6 +92,42 @@ class JobOfferController extends Controller
         $this->authorize('delete', $jobOffer);
         $jobOffer->delete();
         return response()->json(['message' => 'Job offer deleted successfully']);
+    }
+
+    public function saveJob(Request $request, JobOffer $jobOffer)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Attach the job offer to the user (assuming many-to-many relationship)
+        $user->savedOffers()->attach($jobOffer);
+
+        // Return a success response
+        return response()->json(['message' => 'Job saved successfully']);
+    }
+
+    public function GetSavedJobs(Request $request)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Retrieve the saved job offers for the user
+        $savedJobOffers = $user->savedOffers;
+
+        // Return the saved job offers as JSON response
+        return response()->json($savedJobOffers);
+    }
+
+    public function delete(Request $request, JobOffer $jobOffer)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Detach the job offer from the user's saved offers
+        $user->savedOffers()->detach($jobOffer);
+
+        // Return a success response
+        return response()->json(['message' => 'Job offer unsaved successfully']);
     }
 
     public function calendarExists(JobOffer $jobOffer)
