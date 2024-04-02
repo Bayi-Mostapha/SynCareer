@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { IoIosLogOut, IoIosMenu } from "react-icons/io";
 import { Link, NavLink } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK, USER_PROFILE_LINK, USER_CHAT_LINK } from "@/router";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_PROFILE_LINK, USER_SAVEDJOBOFFERS_LINK, USER_CHAT_LINK } from "@/router";
 
 import {
     DropdownMenu,
@@ -102,6 +102,9 @@ function TopNav() {
                         <Link to={USER_PROFILE_LINK}>Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
+                                    <Link to={USER_SAVEDJOBOFFERS_LINK}>Saved Jobs</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
                         <Button variant='ghost' className="flex gap-1" onClick={() => { userContext.logout() }}>
                             Log out
                             <IoIosLogOut />
@@ -142,12 +145,16 @@ function TopNav() {
                                     <Link to={USER_PROFILE_LINK}>Profile</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
+                                    <Link to={USER_SAVEDJOBOFFERS_LINK}>Saved Jobs</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
                                     <Button variant='ghost' className="flex gap-1" onClick={() => { userContext.logout() }}>
                                         Log out
                                         <IoIosLogOut />
                                     </Button>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
+
                         </DropdownMenu>
                         <ul className="py-4">
                             <li>

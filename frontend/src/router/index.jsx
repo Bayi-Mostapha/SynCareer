@@ -20,11 +20,11 @@ import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
 import ApplyJobOffer from '@/components/user/home/ApplyJobOffer';
 import ProfilePage from '@/pages/user/profile-settings';
+import SavedJobOffers from '@/pages/user/SavedJobOffers';
 import Chat from '@/pages/user/chat/ChatContainer';
 import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
 import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import Profile from '@/pages/company/profile';
 import ViewResume from '@/pages/company/view-resume';
 import Calendar from '@/pages/user/calendar/calendar-fill';
@@ -48,6 +48,9 @@ export const RESET_PASSWORD_LINK = '/reset-password/:email';
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
 export const USER_PROFILE_LINK = '/user/profile';
+
+export const USER_SAVEDJOBOFFERS_LINK = '/user/savedjobs';
+
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 // company 
@@ -62,6 +65,8 @@ export const COMPANY_CALENDAR_LINK = '/company/calendar';
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 
+
+//savedjobs
 
 
 // router 
@@ -117,6 +122,10 @@ export const router = createBrowserRouter([
             {
                 path: USER_PROFILE_LINK,
                 element: <ProfilePage />,
+            },
+            {
+                path: USER_SAVEDJOBOFFERS_LINK,
+                element: <SavedJobOffers />,
             },
             {
                 path: USER_CHAT_LINK,

@@ -112,6 +112,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/reports', [ReportController::class, 'store']);
 
 
+
+    //savedjobs
+    Route::post('/saveJob/{jobOffer}', [JobOfferController::class, 'saveJob']);
+    Route::get('/SavedJobOffers', [JobOfferController::class, 'GetSavedJobs']);
+    Route::delete('/SavedJobOffers/{jobOffer}', [JobOfferController::class, 'delete']);
+
+
+
+
     // Reda 
     Route::post('/sendMessage', function (Request $request) {
         $user = $request->user();
