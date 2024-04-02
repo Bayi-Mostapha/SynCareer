@@ -16,6 +16,10 @@ class JobOfferController extends Controller
             return response()->json($jobOffers);
         } else {
             $jobOffers = JobOffer::all();
+            foreach ($jobOffers as $offer) {
+                $jobOffer["company"] = $offer->company;
+                $jobOffer["skills"] = $offer->skills;
+            }
             return response()->json($jobOffers);
         }
     }

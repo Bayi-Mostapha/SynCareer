@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { axiosClient } from "@/api/axios";
 import { IoSearch } from "react-icons/io5";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 import { USER_HOME_LINK } from "@/router"; // Import the link for the saved job offers page
 import UserPaddedContent from "@/components/user/padded-content";
 import { MdBookmark, MdOutlineBookmarkBorder } from "react-icons/md";
 import { toast } from "sonner";
+import getUserPicture from "@/functions/get-user-pic";
+import formatDistanceToNow from "@/functions/format-time";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function UserHome() {
+  const { id } = useParams()
+  const [isFetching, setIsFetching] = useState(false);
   const [jobOffers, setJobOffers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [imageUrl, setImageUrl] = useState(null);
   const [savedJobOffers, setSavedJobOffers] = useState(
     JSON.parse(localStorage.getItem("savedJobOffers")) || []
   );
@@ -21,18 +27,24 @@ function UserHome() {
 
   const getJobOffers = async () => {
     try {
+      setIsFetching(true)
       const response = await axiosClient.get("/joboffers");
-      setJobOffers(response.data);
-      // Set the image URL here if necessary
+      const newJobOffers = await Promise.all(
+        response.data.map(async (jobOffer) => {
+          const picture = await getUserPicture(jobOffer.company.picture, 'company');
+          return { ...jobOffer, company_pic: picture };
+        })
+      );
+      setJobOffers(newJobOffers);
     } catch (error) {
       console.log("error fetching job data", error);
+    } finally {
+      setIsFetching(false)
     }
   };
-
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-
   const handleSaveJob = async (jobId) => {
     try {
       const isSaved = savedJobOffers.some((savedJob) => savedJob.id === jobId);
@@ -58,50 +70,23 @@ function UserHome() {
       toast.error("Failed to save/unsave job");
     }
   };
-
-
   const filteredJobOffers = jobOffers.filter((jobOffer) =>
     jobOffer.job_title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   function displayJobOffers() {
-    console.log("Saved Job Offers:", savedJobOffers);
     return filteredJobOffers.map((jobOffer) => {
-      console.log("Current Job Offer:", jobOffer);
-      // Calculate time difference
-      const createdAt = new Date(jobOffer.created_at);
-      const currentTime = new Date();
-      const diffTime = Math.abs(currentTime - createdAt);
-      const diffMinutes = Math.floor(diffTime / (1000 * 60)); // Convert milliseconds to minutes
-
-      // Format the time difference
-      let postedTime;
-      if (diffMinutes < 60) {
-        postedTime = `Posted ${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""
-          } ago`;
-      } else {
-        const diffHours = Math.floor(diffMinutes / 60);
-        if (diffHours < 24) {
-          postedTime = `Posted ${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
-        } else {
-          const diffDays = Math.floor(diffHours / 24);
-          postedTime = `Posted ${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
-        }
-      }
-
+      let postedTime = formatDistanceToNow(jobOffer.created_at);
       const isSaved = savedJobOffers.some((savedJob) => savedJob.id === jobOffer.id);
-      console.log("isSaved:", isSaved);
-
       return (
         <Link
           key={jobOffer.id}
           to={`${USER_HOME_LINK}/${jobOffer.id}`}
-          className="block bg-white rounded-lg p-4 mb-4 w-[95%]"
+          className="block bg-white rounded-lg p-4 mb-4 shadow-sm"
         >
           <div className="flex flex-col py-3 pl-4">
             <div className="flex gap-4 mb-4 justify-between items-center">
               <div>
-                <img src={imageUrl} alt="Company_logo" />
+                <img className="w-14 h-14 rounded" src={jobOffer.company_pic} alt="Company_logo" />
               </div>
               <div className="flex flex-col">
                 <h1 className="text-gray-800 font-bold">{jobOffer.job_title}</h1>
@@ -125,8 +110,11 @@ function UserHome() {
                 </button>
               </div>
             </div>
-            <div>
-              <p className="text-gray-600">{postedTime}</p>
+            <p className="text-gray-600">{postedTime}</p>
+            <div className="w-3/4 ml-auto">
+              {jobOffer.skills.map(skill => {
+                return <Badge className='mr-1'>{skill.content}</Badge>
+              })}
             </div>
           </div>
         </Link>
@@ -138,7 +126,7 @@ function UserHome() {
     <UserPaddedContent>
       <div>
         <div className="relative flex items-center w-full  mb-4">
-          <IoSearch className="text-[20px] mx-[25%]  absolute left-3 top-1/2 transform -translate-y-1/2 text-[#2D2D2D]" />
+          <IoSearch className="text-[20px] mx-[25%]  absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search..."
@@ -147,9 +135,19 @@ function UserHome() {
             className="mx-[25%] pl-10 pr-4 py-4 w-full border border-gray-300 rounded-lg"
           />
         </div>
-        <div className="flex gap-4 mx-auto">
-          <div>{displayJobOffers()}</div>
-          <Outlet />
+        <div className="relative mx-auto grid grid-cols-3 gap-1">
+          {!id && <div className="col-span-1"></div>}
+          {isFetching ?
+            <div className="flex flex-col gap-4">
+              <Skeleton className='h-40'></Skeleton>
+              <Skeleton className='h-40'></Skeleton>
+            </div>
+            :
+            <ScrollArea className="px-3 col-span-1 overflow-auto h-[450px]">
+              {displayJobOffers()}
+            </ScrollArea>
+          }
+          {jobOffers.length > 0 && <Outlet />}
         </div>
       </div>
     </UserPaddedContent>
