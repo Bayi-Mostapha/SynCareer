@@ -12,6 +12,7 @@ use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
 use Illuminate\Support\Facades\DB;
 use App\Events\UserNotificationEvent;
+use App\Http\Controllers\AdminsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\ReportController;
@@ -79,6 +80,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             'type' => $type,
         ]);
     });
+
+    // admins crd
+    Route::get('/admins', [AdminsController::class, 'index']);
+    Route::post('/admins', [AdminsController::class, 'store']);
+    Route::delete('/admins/{admin}', [AdminsController::class, 'destroy']);
 
     //notifications
     Route::get('/user-notifications', [UserNotificationController::class, 'index']);
@@ -360,6 +366,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             $data = [
                 'user_id' => $userId,
                 'quiz_id' => $validated_data['quiz_id'],
+                'job_offer_id' => $validated_data['job_offer_id'],
                 'status' => 'unpassed',
                 'score' => 0
             ];
@@ -534,6 +541,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
     Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
 
+    //calendar
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);
     Route::post('/send-calendar-candidats', [CalendarController::class, 'sendCalendar2Candidats']);
     Route::get('/reserved-slots', [CalendarController::class, 'getReservedSlots']);

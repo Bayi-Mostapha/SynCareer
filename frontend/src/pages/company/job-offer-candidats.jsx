@@ -42,7 +42,6 @@ function JobOfferCandidats() {
 
     return (
         <CompanyPaddedContent>
-            <h1 className="text-lg font-semibold">Candidats for job offer #{id}</h1>
             {
                 isFetching ?
                     <div className="h-96 w-full flex justify-center items-center">

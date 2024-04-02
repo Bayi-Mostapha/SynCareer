@@ -2,7 +2,7 @@ import SideBar, { SidebarItem } from "@/components/general/SideNav";
 import TopNav from "@/components/general/TopNav";
 import { Outlet } from "react-router-dom";
 import { PiBriefcaseBold } from "react-icons/pi";
-import { FaFileCircleQuestion } from "react-icons/fa6";
+import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { TbCalendarTime } from "react-icons/tb";
 
@@ -17,11 +17,11 @@ function CompanyLayout() {
                 <TopNav />
             </header>
             <SideBar>
-                <SidebarItem icon={<IoHomeOutline />} text={'Home'} location={COMPANY_DASHBOARD_LINK} />
+                <SidebarItem icon={<IoHomeOutline />} text={'Dashboard'} location={COMPANY_DASHBOARD_LINK} />
                 <SidebarItem icon={<IoChatbubblesOutline />} text={'Conversations'} location={COMPANY_CHAT_LINK} />
-                <SidebarItem icon={<PiBriefcaseBold />} text={'Job Upload'} location={JOBOFFER_LINK_BASE} />
+                <SidebarItem icon={<PiBriefcaseBold />} text={'Job Management'} location={JOBOFFER_LINK_BASE} />
                 <SidebarItem icon={<TbCalendarTime />} text={'Interviews'} location={COMPANY_INTERVIEW} />
-                <SidebarItem icon={<FaFileCircleQuestion />} text={'Quiz Management'} location={COMPANY_QUIZ_LINK} />
+                <SidebarItem icon={<HiOutlineClipboardDocumentCheck />} text={'Quiz Library'} location={COMPANY_QUIZ_LINK} />
             </SideBar>
             <main className="">
                 <Outlet />

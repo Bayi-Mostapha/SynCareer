@@ -1,6 +1,6 @@
 import { axiosClient } from "@/api/axios";
 import { columns } from "@/components/user/columns";
-import DataTable from "@/components/general/data-table1";
+import DataTable from "@/components/general/data-table";
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Dialog,
@@ -368,15 +368,13 @@ function QuizTable() {
                     {/* ////////////////////////////////// */}
                 </div>
             </div>
-            <div className="border border-gray-200 rounded-md overflow-x-auto">
-                {isFetching ?
-                    <div className="flex items-center justify-center p-10">
-                        <SynCareerLoader />
-                    </div>
-                    :
-                    <DataTable columns={columns} data={data} searchColumn={"name"} />
-                }
-            </div>
+            {isFetching ?
+                <div className="flex items-center justify-center p-10">
+                    <SynCareerLoader />
+                </div>
+                :
+                <DataTable columns={columns} data={data} searchColumn={"name"} />
+            }
         </div>
     );
 }

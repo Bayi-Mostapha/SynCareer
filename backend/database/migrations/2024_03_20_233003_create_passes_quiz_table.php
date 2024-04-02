@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('quiz_id');
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('job_offer_id');
             $table->string('score');
             $table->enum('status', ['passed', 'unpassed']);
             // Define foreign keys
             $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('job_offer_id')->references('id')->on('job_offers')->onDelete('cascade');
             $table->timestamps();
         });
     }

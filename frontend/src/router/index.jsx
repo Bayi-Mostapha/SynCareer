@@ -37,6 +37,7 @@ import CompanyInterviews from '@/pages/company/company-interviews';
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
+import Admins from '@/pages/super-admin/admins';
 
 
 // links 
@@ -66,6 +67,7 @@ export const COMPANY_CALL = '/company/call'
 
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
+export const ADMINS_LINK = '/admin/admins';
 
 
 
@@ -198,6 +200,10 @@ export const router = createBrowserRouter([
             {
                 path: ADMIN_DASHBOARD_LINK,
                 element: <h1>hi admin</h1>
+            },
+            {
+                path: ADMINS_LINK,
+                element: <Admins />
             },
         ]
     },

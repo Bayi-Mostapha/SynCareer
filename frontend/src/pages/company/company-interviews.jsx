@@ -73,7 +73,7 @@ function CompanyInterviews() {
     }
     return (
         <CompanyPaddedContent>
-            <h2 className="text-primary text-xl mb-4">Upcomming interviews</h2>
+            <h2 className="text-xl font-semibold mb-4">Upcomming interviews</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {displayUpcommingInterviews()}
             </div>
