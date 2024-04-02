@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"
 // icons 
 import { IoIosArrowDown } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
 
 export default function DataTable({ columns, data, searchColumn }) {
     const [sorting, setSorting] = useState([])
@@ -54,14 +55,15 @@ export default function DataTable({ columns, data, searchColumn }) {
         <div className="my-4 border rounded-xl">
             <div className="px-5 py-6 flex justify-between items-center">
                 <h3 className="text-gray-800 text-lg font-medium">Quiz List</h3>
-                <div className="flex justify-center items-center">
+                <div className="relative">
+                    <FiSearch className="text-lg text-gray-300 absolute left-2 top-1/2 transform -translate-y-1/2" />
                     <Input
                         placeholder={`Seach by ${searchColumn}...`}
                         value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
                         onChange={(event) =>
                             table.getColumn(searchColumn)?.setFilterValue(event.target.value)
                         }
-                        className="max-w-sm"
+                        className="pl-8 py-5 max-w-72"
                     />
                 </div>
             </div>

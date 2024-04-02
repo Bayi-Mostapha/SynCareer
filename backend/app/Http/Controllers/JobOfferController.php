@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
+use App\Models\JobOfferSkill;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -39,6 +40,13 @@ class JobOfferController extends Controller
         $validatedData['company_id'] = $user->id;
         // Create a new job offer instance
         $jobOffer = JobOffer::create($validatedData);
+
+        foreach ($request->skills as $skill) {
+            JobOfferSkill::create([
+                'content' => $skill,
+                'job_offer_id' => $jobOffer->id,
+            ]);
+        }
 
         // Return a response indicating success
         return response()->json(['message' => 'Job offer created successfully', 'jobOffer' => $jobOffer], 201);

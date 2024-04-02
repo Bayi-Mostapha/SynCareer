@@ -26,7 +26,7 @@ export function AuthWrapper({ children }) {
         try {
             const userResponse = await axiosClient.get('/user');
 
-            let picture = await getUserPicture(userResponse.data.user?.picture)
+            let picture = await getUserPicture(userResponse.data.user?.picture, userResponse.data.type)
 
             const newUser = {
                 ...userResponse.data.user,

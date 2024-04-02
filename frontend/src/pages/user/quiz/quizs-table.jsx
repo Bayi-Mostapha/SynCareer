@@ -24,6 +24,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import SynCareerLoader from "@/components/general/syncareer-loader";
+import { MdOutlineFileUpload } from "react-icons/md";
+import CompanyPaddedContent from "@/components/company/padded-content";
 
 function QuizTable() {
     const [data, setData] = useState([]);
@@ -300,14 +302,16 @@ function QuizTable() {
 
 
     return (
-        <div className="ml-20 mt-24 px-6 mb-10 overflow-x-auto">
+        <CompanyPaddedContent>
             <div className="flex items-center justify-between py-5 overflow-x-auto">
-                <h1 className="text-xl font-medium text-gray-700">hy reda el khayati,</h1>
+                <h1 className="text-xl font-medium text-gray-700">Quizzes</h1>
                 <div>
                     <div className="">
                         {/* isOpen={isOpen} onOpenChange={(isOpen) => isOpen ? setErrors(null) : handleCloseDialog()} */}
                         <Dialog >
-                            <DialogTrigger className="py-2 px-5 bg-black text-white rounded-md">Set Quiz</DialogTrigger>
+                            <DialogTrigger>
+                                <Button className="flex gap-2" variant="default">New Quiz <MdOutlineFileUpload className='text-xl' /></Button>
+                            </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>Add New Quiz</DialogTitle>
@@ -375,7 +379,7 @@ function QuizTable() {
                 :
                 <DataTable columns={columns} data={data} searchColumn={"name"} />
             }
-        </div>
+        </CompanyPaddedContent>
     );
 }
 
