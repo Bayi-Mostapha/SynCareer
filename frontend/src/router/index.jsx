@@ -38,6 +38,7 @@ import CompanyInterviews from '@/pages/company/company-interviews';
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import Admins from '@/pages/super-admin/admins';
+import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 
 
 // links 
