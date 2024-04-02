@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
 use App\Models\JobOfferSkill;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use App\Models\JobOffer;
-use Auth;
 
 class JobOfferController extends Controller
 {
