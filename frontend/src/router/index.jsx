@@ -25,7 +25,7 @@ import Chat from '@/pages/user/chat/ChatContainer';
 import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
 import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
-import Profile from '@/pages/company/profile';
+import Profile from '@/pages/company/user-profile';
 import ViewResume from '@/pages/company/view-resume';
 import UserCalendar from '@/pages/user/calendar/schedule-interview';
 import CompanyVideoCall from '@/pages/company/companyVideoCall';

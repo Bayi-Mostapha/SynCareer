@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class UserExperience extends Model
 {
     use HasFactory;
-    
+
+    protected $table = 'user_experience';
+
     protected $fillable = [
         'user_id',
         'beginning_date',

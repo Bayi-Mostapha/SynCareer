@@ -110,7 +110,7 @@ function ApplyJobOffer() {
             const response = await axiosClient.post(`/apply/${id}`);
             toast.success("Applied succesfully")
         } catch (error) {
-            toast.success("Something went wrong please try again")
+            toast.error("Something went wrong please try again")
             console.error("Error applying for job offer", error);
         }
     }

@@ -16,7 +16,13 @@ class JobOfferCandidatsController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return response()->json($user);
+        $new_user = [
+            'user' => $user,
+            'skills' => $user->skills,
+            'education' => $user->education,
+            'experience' => $user->experience,
+        ];
+        return response()->json($new_user);
     }
 
     public function index(Request $request, JobOffer $jobOffer)

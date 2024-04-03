@@ -114,6 +114,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);
+    Route::get('/experience', [ProfileController::class, 'getExperience']);
+    Route::get('/education', [ProfileController::class, 'getEducation']);
+    Route::get('/skills', [ProfileController::class, 'getSkills']);
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
     //reports

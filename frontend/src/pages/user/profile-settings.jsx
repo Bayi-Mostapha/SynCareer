@@ -1,9 +1,7 @@
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { authContext } from '../../contexts/AuthWrapper';
 import { axiosClient } from '../../api/axios';
 import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'sonner'
 import { useDropzone } from 'react-dropzone'
 // shadcn 
@@ -14,10 +12,17 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import UserPaddedContent from '@/components/user/padded-content';
+import { FaRegTrashCan } from 'react-icons/fa6';
+import { IoMdAddCircle } from 'react-icons/io';
+import { Label } from '@/components/ui/label';
 
 function ProfilePage() {
+    const [isFetching, setIsFetching] = useState(false)
+    const [experience, setExperience] = useState([])
+    const [education, setEducation] = useState([])
+    const [skills, setSkills] = useState([])
     const [image, setImage] = useState(null);
-    const { user } = useContext(authContext);
+    const { user, getUser } = useContext(authContext);
     const form = useForm({
         //resolver: yupResolver(schema),
         defaultValues: {
@@ -31,6 +36,27 @@ function ProfilePage() {
         }
     });
     const { handleSubmit, control } = form;
+
+    async function getData() {
+        try {
+            setIsFetching(true)
+            const res = await axiosClient.get('/experience')
+            setExperience(res.data.experience)
+
+            const res2 = await axiosClient.get('/education')
+            setEducation(res2.data.education)
+
+            const res3 = await axiosClient.get('/skills')
+            setSkills(res3.data.skills)
+        } catch (error) {
+            console.log(error.response)
+        } finally {
+            setIsFetching(false)
+        }
+    }
+    useEffect(() => {
+        getData()
+    }, [])
 
     const onDrop = useCallback(acceptedFiles => {
         if (!acceptedFiles[0]) {
@@ -55,140 +81,313 @@ function ProfilePage() {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log(response);
             } catch (error) {
-                console.error(error);
+                toast.error(error.response.data.message)
             }
         }
 
         try {
+            data = { ...data, experience, education, skills }
             const response = await axiosClient.put('/profile', data);
-            console.log(response)
+            getUser()
+            toast.success(response.data.message)
         } catch (error) {
-            console.log(error)
+            toast.error(error.response.data.message)
         }
+    };
+
+    function addExperience() {
+        setExperience(prev => [...prev, {
+            beginning_date: '2024-01-01',
+            end_date: '2024-02-01',
+            position: 'position',
+            company_name: 'company',
+        }])
+    }
+    const handleExperienceChange = (index, e) => {
+        const { name, value } = e.target;
+        setExperience(prev => {
+            const updatedExperiences = [...prev];
+            updatedExperiences[index][name] = value;
+            return updatedExperiences
+        });
+    };
+    const removeExperience = (index) => {
+        setExperience(prev => {
+            const updatedExperiences = [...prev];
+            updatedExperiences.splice(index, 1);
+            return updatedExperiences;
+        });
+    };
+
+    function addEducation() {
+        setEducation(prev => [...prev, {
+            graduation_date: '2024-01-01',
+            school_name: 'school name',
+            degree: 'your degree',
+        }])
+    }
+    const handleEducationChange = (index, e) => {
+        const { name, value } = e.target;
+        setEducation(prev => {
+            const updatedEducations = [...prev];
+            updatedEducations[index][name] = value;
+            return updatedEducations
+        });
+    };
+    const removeEducation = (index) => {
+        setEducation(prev => {
+            const updatedEducations = [...prev];
+            updatedEducations.splice(index, 1);
+            return updatedEducations;
+        });
+    };
+
+    function addSkill() {
+        setSkills(prev => [...prev, {
+            content: 'your skill',
+        }])
+    }
+    const handleSkillChange = (index, e) => {
+        const { name, value } = e.target;
+        setSkills(prev => {
+            const updatedSkills = [...prev];
+            updatedSkills[index][name] = value;
+            return updatedSkills
+        });
+    };
+    const removeSkill = (index) => {
+        setSkills(prev => {
+            const updatedSkills = [...prev];
+            updatedSkills.splice(index, 1);
+            return updatedSkills;
+        });
     };
 
     return (
         <UserPaddedContent>
-            <Form {...form}>
-                <form className='w-full sm:w-96 px-10 sm:p-0 flex flex-col gap-2' onSubmit={handleSubmit(submit)} >
-                    <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
-                    <FormField
-                        control={control}
-                        name="first_name"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>First Name</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+            {
+                isFetching ?
+                    "Please hold while we're getting your data"
+                    :
+                    <Form {...form}>
+                        <form className='w-full sm:w-96 px-10 sm:p-0 flex flex-col gap-2' onSubmit={handleSubmit(submit)} >
+                            <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
+                            <FormField
+                                control={control}
+                                name="first_name"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>First Name</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
 
-                    <FormField
-                        control={control}
-                        name="last_name"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Last Name</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+                            <FormField
+                                control={control}
+                                name="last_name"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Last Name</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
 
-                    <FormField
-                        control={control}
-                        name="job_title"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Job Title</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+                            <FormField
+                                control={control}
+                                name="job_title"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Job Title</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
 
-                    <FormField
-                        control={control}
-                        name="email"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+                            <FormField
+                                control={control}
+                                name="email"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
 
-                    <FormField
-                        control={control}
-                        name="phone_number"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Phone Number</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
+                            <FormField
+                                control={control}
+                                name="phone_number"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Phone Number</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
 
-                    <FormField
-                        control={control}
-                        name="birthday"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Birthday</FormLabel>
-                                    <FormControl>
-                                        <Input className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
-                    <FormField
-                        control={control}
-                        name="bio"
-                        render={({ field }) => {
-                            return (
-                                <FormItem>
-                                    <FormLabel>Bio</FormLabel>
-                                    <FormControl>
-                                        <Textarea className="pr-10" placeholder="" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )
-                        }}
-                    />
-                    <Button variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>
-                        Save
-                    </Button>
-                </form>
-            </Form>
+                            <FormField
+                                control={control}
+                                name="birthday"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Birthday</FormLabel>
+                                            <FormControl>
+                                                <Input className="pr-10" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
+                            <FormField
+                                control={control}
+                                name="bio"
+                                render={({ field }) => {
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Bio</FormLabel>
+                                            <FormControl>
+                                                <Textarea className="pr-10 bg-background" placeholder="" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )
+                                }}
+                            />
+                            <h4 className='text-lg font-medium'>Experience</h4>
+                            {
+                                experience.map((exp, i) =>
+                                    <div key={'exp_' + i} className='my-2'>
+                                        <div className="mb-1 flex justify-between">
+                                            <Label>Experience {i + 1}</Label>
+                                            <Button onClick={() => removeExperience(i)} variant='destructive' type='button'>
+                                                <FaRegTrashCan className='text-lg' />
+                                            </Button>
+                                        </div>
+                                        <Input
+                                            type="text"
+                                            name="beginning_date"
+                                            value={exp.beginning_date}
+                                            onChange={(e) => handleExperienceChange(i, e)}
+                                        />
+                                        <Input
+                                            type="text"
+                                            name="end_date"
+                                            value={exp.end_date}
+                                            onChange={(e) => handleExperienceChange(i, e)}
+                                        />
+                                        <Input
+                                            type="text"
+                                            name="position"
+                                            value={exp.position}
+                                            onChange={(e) => handleExperienceChange(i, e)}
+                                        />
+                                        <Input
+                                            type="text"
+                                            name="company_name"
+                                            value={exp.company_name}
+                                            onChange={(e) => handleExperienceChange(i, e)}
+                                        />
+                                    </div>
+                                )
+                            }
+                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addExperience} type='button'>
+                                Add Experience <IoMdAddCircle className='text-xl text-primary' />
+                            </Button>
+
+                            <h4 className='text-lg font-medium'>Education</h4>
+                            {
+                                education.map((edu, i) =>
+                                    <div key={'edu_' + i} className='my-2'>
+                                        <div className="mb-1 flex justify-between">
+                                            <Label>Education {i + 1}</Label>
+                                            <Button onClick={() => removeEducation(i)} variant='destructive' type='button'>
+                                                <FaRegTrashCan className='text-lg' />
+                                            </Button>
+                                        </div>
+                                        <Input
+                                            type="text"
+                                            name="graduation_date"
+                                            value={edu.graduation_date}
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                        />
+                                        <Input
+                                            type="text"
+                                            name="school_name"
+                                            value={edu.school_name}
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                        />
+                                        <Input
+                                            type="text"
+                                            name="degree"
+                                            value={edu.degree}
+                                            onChange={(e) => handleEducationChange(i, e)}
+                                        />
+                                    </div>
+                                )
+                            }
+                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addEducation} type='button'>
+                                Add Education <IoMdAddCircle className='text-xl text-primary' />
+                            </Button>
+
+                            <h4 className='text-lg font-medium'>Skills</h4>
+                            {
+                                skills.map((skill, i) =>
+                                    <div key={'skill_' + i} className='my-2'>
+                                        <div className="mb-1 flex justify-between">
+                                            <Label>Skill {i + 1}</Label>
+                                            <Button onClick={() => removeSkill(i)} variant='destructive' type='button'>
+                                                <FaRegTrashCan className='text-lg' />
+                                            </Button>
+                                        </div>
+                                        <Input
+                                            type="text"
+                                            name="content"
+                                            value={skill.content}
+                                            onChange={(e) => handleSkillChange(i, e)}
+                                        />
+                                    </div>
+                                )
+                            }
+                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addSkill} type='button'>
+                                Add Skill <IoMdAddCircle className='text-xl text-primary' />
+                            </Button>
+
+                            <Button variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>
+                                Save
+                            </Button>
+                        </form>
+                    </Form>
+            }
         </UserPaddedContent>
     );
 }
