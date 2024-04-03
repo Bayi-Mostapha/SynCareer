@@ -105,6 +105,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
     Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
     Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
+    Route::get('/quiz-results/{jobOffer}', [JobOfferController::class, 'getResults']);
 
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
@@ -118,21 +119,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     //reports
     Route::post('/reports', [ReportController::class, 'store']);
 
-
-
-
     //savedjobs
     Route::post('/saveJob/{jobOffer}', [JobOfferController::class, 'saveJob']);
     Route::get('/SavedJobOffers', [JobOfferController::class, 'GetSavedJobs']);
     Route::delete('/SavedJobOffers/{jobOffer}', [JobOfferController::class, 'delete']);
 
-
-
-
-    // Reda 
-
     // Reda chat app
-
     Route::post('/sendMessage', function (Request $request) {
         $user = $request->user();
         $message = $request->validate([

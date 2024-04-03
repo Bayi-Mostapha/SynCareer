@@ -37,6 +37,8 @@ import { TbCalendarShare } from "react-icons/tb";
 import { FiSearch } from "react-icons/fi";
 import { GrSend } from "react-icons/gr";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
+import { Link } from "react-router-dom";
+import { QUIZ_RESULTS_LINK } from "@/router";
 
 export default function SelectionTable({ columns, data, searchColumn, calendarExists, quizId, jobOfferId }) {
     const [quizzes, setQuizzes] = useState([]);
@@ -183,9 +185,11 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
                 }
             </div>
             <div className="flex justify-between items-center py-4">
-                <h1 className="text-lg font-medium">Candidats for job offer #{jobOfferId}</h1>
+                <h1 className="text-lg font-medium">
+                    Candidats for job offer #{jobOfferId}
+                </h1>
                 <div className="relative">
-                    <FiSearch className="text-lg text-gray-300 absolute left-2 top-1/2 transform -translate-y-1/2"/>
+                    <FiSearch className="text-lg text-gray-300 absolute left-2 top-1/2 transform -translate-y-1/2" />
                     <Input
                         placeholder={`Seach by Job Title...`}
                         value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
@@ -196,7 +200,11 @@ export default function SelectionTable({ columns, data, searchColumn, calendarEx
                     />
                 </div>
             </div>
-            <div className="my-2 text-xs text-muted-foreground">
+            {
+                quizId != 0 &&
+                <Link to={QUIZ_RESULTS_LINK} className="text-primary">view quiz resultes →</Link>
+            }
+            <div className="mb-2 text-xs text-muted-foreground">
                 {table.getFilteredSelectedRowModel().rows.length} of{" "}
                 {table.getFilteredRowModel().rows.length} row(s) selected.
             </div>

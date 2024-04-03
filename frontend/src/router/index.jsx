@@ -39,6 +39,7 @@ import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import Admins from '@/pages/super-admin/admins';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
+import JobOfferQuiz from '@/pages/company/joboffer-quiz';
 
 
 // links 
@@ -65,6 +66,7 @@ export const JOBOFFER_LINK_BASE = '/company/joboffer';
 export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
+export const QUIZ_RESULTS_LINK = 'quiz-resultes'
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
 export const COMPANY_INTERVIEW = '/company/interviews';
 export const COMPANY_CALL = '/company/call'
@@ -173,6 +175,10 @@ export const router = createBrowserRouter([
                             {
                                 path: '',
                                 element: <JobOfferCandidats />
+                            },
+                            {
+                                path: QUIZ_RESULTS_LINK,
+                                element: <JobOfferQuiz />
                             },
                             {
                                 path: VIEW_USER_PROFILE_BASE + ':uid',

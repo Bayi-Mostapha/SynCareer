@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input"
 import { IoIosArrowDown } from "react-icons/io";
 import { FiSearch } from "react-icons/fi";
 
-export default function DataTable({ columns, data, searchColumn }) {
+export default function DataTable({ columns, data, searchColumn, title }) {
     const [sorting, setSorting] = useState([])
     const [columnFilters, setColumnFilters] = useState([])
     const [columnVisibility, setColumnVisibility] = useState([])
@@ -54,7 +54,7 @@ export default function DataTable({ columns, data, searchColumn }) {
     return (
         <div className="my-4 border rounded-xl">
             <div className="px-5 py-6 flex justify-between items-center">
-                <h3 className="text-gray-800 text-lg font-medium">Quiz List</h3>
+                <h3 className="text-gray-800 text-lg font-medium">{title} List</h3>
                 <div className="relative">
                     <FiSearch className="text-lg text-gray-300 absolute left-2 top-1/2 transform -translate-y-1/2" />
                     <Input

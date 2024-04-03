@@ -66,7 +66,8 @@ class JobOfferCandidatsController extends Controller
 
         $jobOffer->candidats()->attach($user, [
             'matching_percentage' => 0,
-            'resume_id' => $id
+            'resume_id' => $id,
+            'created_at' => now()
         ]);
     }
 }

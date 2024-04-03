@@ -23,7 +23,20 @@ class JobOfferController extends Controller
             return response()->json($jobOffers);
         }
     }
+    public function getResults(Request $request, JobOffer $jobOffer)
+    {
+        $user = $request->user();
+        if (!$user->tokenCan('company')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
+        $results = $jobOffer->quizResults;
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = [...(array)$result, 'user' => $result->user];
+        }
+        return response()->json($results);
+    }
     public function store(Request $request)
     {
         $user = $request->user();

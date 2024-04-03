@@ -229,7 +229,7 @@ function JobOffer() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} />
+            <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} title="Job offers" />
         </CompanyPaddedContent>
     );
 }

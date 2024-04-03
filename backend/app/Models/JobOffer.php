@@ -47,4 +47,8 @@ class JobOffer extends Model
     {
         return $this->hasMany(JobOfferSkill::class);
     }
+    public function quizResults()
+    {
+        return $this->hasMany(PassesQuiz::class);
+    }
 }

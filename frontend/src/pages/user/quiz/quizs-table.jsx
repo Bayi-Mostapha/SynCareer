@@ -377,7 +377,7 @@ function QuizTable() {
                     <SynCareerLoader />
                 </div>
                 :
-                <DataTable columns={columns} data={data} searchColumn={"name"} />
+                <DataTable columns={columns} data={data} searchColumn={"name"} title="Quizzes" />
             }
         </CompanyPaddedContent>
     );
