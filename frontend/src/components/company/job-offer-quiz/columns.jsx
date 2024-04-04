@@ -47,6 +47,9 @@ export const columns = [
                 </Button>
             );
         },
+        cell: ({ row }) => {
+            return parseFloat(row.getValue('score')).toFixed(2)
+        }
     },
     {
         accessorKey: 'status',

@@ -1,6 +1,6 @@
 import { axiosClient } from '../../api/axios';
 import DataTable from "@/components/general/data-table";
-import { columns } from '@/components/company/quiz/columns';
+import { columns } from '@/components/company/job-offer-quiz/columns';
 import { useEffect, useState } from 'react';
 import CompanyPaddedContent from '@/components/company/padded-content';
 import { useParams } from 'react-router-dom';

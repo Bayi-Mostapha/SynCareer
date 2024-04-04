@@ -38,7 +38,8 @@ function PassQuiz() {
         try {
             const payload = {
                 selectedAnswers: selectedOptions,
-                quizId: quizData.id
+                quizId: quizData.id,
+                passQuizId: id
             };
             console.log('payload', selectedOptions);
             const response = await axiosClient.post('/calculateScore', payload);

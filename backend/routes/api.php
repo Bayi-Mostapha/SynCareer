@@ -458,7 +458,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             // Calculate the percentage score
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->passQuizId);
 
             // // Update the score and status
             $passesQuiz->update([

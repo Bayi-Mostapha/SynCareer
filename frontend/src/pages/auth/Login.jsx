@@ -41,14 +41,14 @@ function Login() {
     const submit = async (data) => {
         try {
             const response = await axiosClient.post('/login', data);
+            userContext.setIsLoggedIn(true);
+            localStorage.setItem('token', response.data.token);
             const picture = await getUserPicture(response.data.user?.picture)
             userContext.setUser({
                 ...response.data.user,
                 picture,
                 type: response.data.type
             });
-            userContext.setIsLoggedIn(true);
-            localStorage.setItem('token', response.data.token);
             navigate(USER_HOME_LINK);
         } catch (error) {
             if (error.response) {
