@@ -33,6 +33,9 @@ import UserVideoCall from '@/pages/user/userVideoCall';
 import CompanyDashboard from '@/pages/company/company-dashboard';
 import VerifyEmail from '@/pages/auth/verify-email';
 import CompanyInterviews from '@/pages/company/company-interviews';
+import UsersTable from '@/pages/user/users/users-table';
+import ReportsTable from '@/pages/admin/reports-table';
+import AdminDashboard from '@/pages/admin/admin-dashboard';
 
 // protectors 
 import GuestRoute from './protectors/GuestRoute';
@@ -74,6 +77,8 @@ export const COMPANY_CALL = '/company/call'
 // admin 
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 export const ADMINS_LINK = '/admin/admins';
+export const ADMINS_USERS = '/admin/users';
+export const ADMINS_REPORTS = '/admin/reports';
 
 
 //savedjobs
@@ -149,6 +154,7 @@ export const router = createBrowserRouter([
                 path: USER_CALENDAR_LINK + '/:cid',
                 element: <UserCalendar />
             },
+            
         ]
     },
     {
@@ -215,11 +221,19 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ADMIN_DASHBOARD_LINK,
-                element: <h1>hi admin</h1>
+                element: <AdminDashboard />
             },
             {
                 path: ADMINS_LINK,
                 element: <Admins />
+            },
+            {
+                path: ADMINS_USERS ,
+                element: <UsersTable />
+            },
+            {
+                path: ADMINS_REPORTS + "/:jid",
+                element: <ReportsTable />
             },
         ]
     },

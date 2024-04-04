@@ -1,7 +1,11 @@
 <?php
 
 use App\Models\Quiz;
+use App\Models\User;
+use App\Models\Report;
+use App\Models\Company;
 use App\Models\Message;
+use App\Models\JobOffer;
 use App\Models\Question;
 use App\Models\PassesQuiz;
 use App\Events\SendMessage;
@@ -12,9 +16,9 @@ use App\Models\UserNotification;
 use App\Events\SendMessageCompany;
 use Illuminate\Support\Facades\DB;
 use App\Events\UserNotificationEvent;
-use App\Http\Controllers\AdminsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\AdminsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\ProfileController;
@@ -324,6 +328,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $quizzes = $company->quizzes;
         return response()->json($quizzes);
     });
+    Route::get('/users', function (Request $request) {
+        $users = User::select('id', DB::raw('CONCAT(first_name, " ", last_name) AS name'), 'job_title', 'email', DB::raw('COALESCE(phone_number, "__") AS phone_number'), 'created_at')->get();
+        return response()->json($users);
+    });
+    
     Route::post('/uploadQuiz', function (Request $request) {
         $companyId = $request->user()->id;
         $quizDataArray = $request->input('quizData');
@@ -403,25 +412,22 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json(['quiz_id' => 0]);
     });
     Route::get('/quizzes/{id}', function (Request $request, $id) {
-        // Retrieve the PassesQuiz record by its ID
         $passesQuiz = PassesQuiz::findOrFail($id);
+        $userId = $request->user()->id;
 
-        // Check if the PassesQuiz record has a status of "inpassed"
         if ($passesQuiz->status === 'passed') {
-            // If the status is "inpassed", return a response indicating that the quiz cannot be retrieved
-            return response()->json('bad');
+            return response()->json(null);
+        }
+        if ($passesQuiz->user_id !== $userId ) {
+            return response()->json(null);
         }
 
-        // Retrieve the associated quiz using the relationship defined in the PassesQuiz model
         $quiz = $passesQuiz->quiz;
 
-        // Check if the quiz is empty
         if (!$quiz) {
-            // If the quiz is empty, return an appropriate response
             return response()->json('Quiz not found');
         }
 
-        // Prepare the response data
         $responseData = [
             'id' => $quiz->id,
             'name' => $quiz->name,
@@ -430,20 +436,25 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             'data' => $quiz->questions,
         ];
 
-        // Return the response with the quiz details
         return response()->json($responseData);
     });
+
     Route::post('/calculateScore', function (Request $request) {
+        $userId = $request->user()->id;
         try {
             $selectedAnswers = $request->input('selectedAnswers');
             $quizId = $request->input('quizId');
 
-
+            $quiz = Quiz::find($quizId); 
+            if ($quiz) {
+                $quiz->increment('nbr_applicants');
+            }
+            
             $correctAnswers = Question::where('quiz_id', $quizId)->pluck('answer', 'id')->toArray();
 
             $score = 0;
             $totalQuestions = count($correctAnswers);
-
+            
             // Iterate over the selected answers
             foreach ($selectedAnswers as $answer) {
                 $questionId = $answer['id'];
@@ -455,10 +466,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 }
             }
 
-            // Calculate the percentage score
+            
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            $passesQuiz = PassesQuiz::findOrFail($request->passQuizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
 
             // // Update the score and status
             $passesQuiz->update([
@@ -472,6 +483,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             return response()->json(['success' => false, 'error' => 'Internal server error'], 500);
         }
     });
+
     Route::post('/updateQuiz', function (Request $request) {
         try {
             $quizData = $request->input('quizData');
@@ -615,6 +627,67 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         }
 
         return response()->json(['error' => 'File not provided'], 400);
+    });
+
+    Route::get('/reports/{id}', function(Request $request, $id){
+        $reports = Report::where('job_offer_id', $id)->get();
+        $formattedReports = [];
+        foreach ($reports as $report) {
+           
+            $userName = $report->user->first_name . " " . $report->user->last_name ;
+            $formattedCreatedAt = date('Y-m-d', strtotime($report->created_at));
+            // Add the report data along with the user's name to the formattedReports array
+            $formattedReports[] = [
+                'id' => $report->id,
+                'name' => $userName,
+                'type' => $report->type,
+                'description' => $report->description,
+                'created_at' => $formattedCreatedAt,
+                'jobOfferId' => $report->job_offer_id,
+            ];
+        }
+    
+        // Return the formatted report data
+        return response()->json(['reports' => $formattedReports]);
+    });
+    Route::delete('/deleteReports/{id}', function(Request $request, $id){
+     $jobOffer = JobOffer::findOrFail($id);
+    $jobOffer->delete();
+    });
+
+    Route::get('/users/last-10', function() {
+        $users = User::orderBy('created_at', 'desc')->limit(10)->get();
+        return response()->json($users);
+    });
+
+
+    Route::get('/job-offers/last-10', function(){
+        $jobOffers = JobOffer::with('company')->latest()->take(10)->get();
+
+        $formattedJobOffers = $jobOffers->map(function ($jobOffer) {
+            return [
+                'id' => $jobOffer->id,
+                'title' => $jobOffer->job_title,
+                'company_name' => $jobOffer->company->name, 
+            ];
+        });
+
+        return response()->json($formattedJobOffers);
+    });
+    Route::get('/counts', function() {
+        // Get the counts of users, companies, job offers, and reports
+        $userCount = User::count();
+        $companyCount = Company::count();
+        $jobOfferCount = JobOffer::count();
+        $reportCount = Report::count();
+    
+        // Return the counts as a JSON response
+        return response()->json([
+            'user_count' => $userCount,
+            'company_count' => $companyCount,
+            'job_offer_count' => $jobOfferCount,
+            'report_count' => $reportCount,
+        ]);
     });
 });
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
