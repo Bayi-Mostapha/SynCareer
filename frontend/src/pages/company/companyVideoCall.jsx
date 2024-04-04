@@ -41,9 +41,11 @@ const CompanyVideoCall = () => {
 
         channel.here(async users => {
             setUsers(users);
-            const u = users.filter(u => u.type !== 'company')[0]
-            let picture = await getUserPicture(u.picture)
-            setOtherUser({ ...u, picture })
+            if (users.length > 1) {
+                const u = users.filter(u => u.type !== 'company')[0]
+                let picture = await getUserPicture(u.picture)
+                setOtherUser({ ...u, picture })
+            }
         })
             .joining(async u => {
                 setUsers(prev => [...prev, u])
@@ -51,7 +53,6 @@ const CompanyVideoCall = () => {
                 setOtherUser({ ...u, picture })
             })
             .leaving(user => {
-                console.log('left')
                 setIsCalling(false)
                 setOtherUser(null)
                 setUsers(prev => prev.filter(u => u.type !== 'company'))
@@ -68,8 +69,9 @@ const CompanyVideoCall = () => {
         channel.listenForWhisper('user-cam-toggle', (e) => {
             setUCam(e.state)
         })
-    }, []);
+    }, [navigate]);
     useEffect(() => {
+        console.log(otherUser)
         if (otherUser) {
             channel.whisper('company-cam-toggle', {
                 state: showVid,
@@ -172,7 +174,13 @@ const CompanyVideoCall = () => {
         channel.whisper('company-hanged-up', {
             data: 'Call ended by ' + user.name
         })
-        window.location.reload()
+        setCallAnswered(false)
+        setOtherUser(null)
+        peerRef.current.destroy()
+        myStream.getTracks().forEach(track => {
+            track.stop();
+        });
+        setMyStream(null)
         navigate(COMPANY_DASHBOARD_LINK)
     }
 

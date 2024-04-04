@@ -43,6 +43,37 @@ class InterviewsController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    public function getUserUpcommingInterviews(Request $request)
+    {
+        $currentDate = Carbon::now()->toDateString();
+
+        $closestInterviews = CalendarSlot::where('user_id', $request->user()->id)
+            ->where('status', 'reserved')
+            ->where('day', '>=', $currentDate)
+            ->orderBy('day')
+            ->orderBy('start_time')
+            ->get();
+
+        $data = [];
+        $i = 0;
+        foreach ($closestInterviews as $interview) {
+            $cr = CalendarReserved::where('slot_id', $interview->id)->first();
+            $user = $cr->slot->company;
+
+            $data[$i]['id'] = $cr->id;
+            $data[$i]['user_id'] = $user->id;
+            $data[$i]['user_fname'] = $user->first_name;
+            $data[$i]['user_lname'] = $user->last_name;
+            $data[$i]['user_pic'] = $user->picture;
+            $data[$i]['day'] = $interview->day;
+            $data[$i]['start_time'] = $interview->start_time;
+            $data[$i]['end_time'] = $interview->end_time;
+            $i++;
+        }
+
+        return response()->json(['data' => $data]);
+    }
+
     public function generateToken(Request $request)
     {
         $request->validate([

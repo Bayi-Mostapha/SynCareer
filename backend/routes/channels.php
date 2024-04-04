@@ -34,14 +34,14 @@ Broadcast::channel('user.notifications.{id}', function ($user, $id) {
 Broadcast::channel('video.channel.{token}', function ($user, $token) {
     $videoCall = VideoCallToken::where('token', $token)->first();
     if (!$videoCall) {
-        return null; 
+        return null;
     }
 
     if ($user->tokenCan('user') && $videoCall->user_id == $user->id) {
-        return $user;
+        return array_merge($user->toArray(), ['type' => 'user']);
     } else if ($user->tokenCan('company') && $videoCall->company_id == $user->id) {
-        return $user;
-    }
+        return array_merge($user->toArray(), ['type' => 'company']);
+    }    
 
     return null;
 });

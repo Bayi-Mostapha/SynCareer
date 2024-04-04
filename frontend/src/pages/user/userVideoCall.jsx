@@ -42,9 +42,11 @@ const UserVideoCall = () => {
 
         channel.here(async users => {
             setUsers(users);
-            const u = users.filter(u => u.type !== 'user')[0]
-            let picture = await getUserPicture(u.picture, 'company')
-            setOtherUser({ ...u, picture })
+            if (users.length > 1) {
+                const u = users.filter(u => u.type !== 'user')[0]
+                let picture = await getUserPicture(u.picture)
+                setOtherUser({ ...u, picture })
+            }
         })
             .joining(async u => {
                 setUsers(prev => [...prev, u])
@@ -58,7 +60,6 @@ const UserVideoCall = () => {
                 if (callAnswered) {
                     userVideo.current.srcObject = null
                     setCallAnswered(false)
-                    toast.info(user.name + 'left')
                     window.location.reload()
                 }
             })
@@ -173,9 +174,13 @@ const UserVideoCall = () => {
             data: 'Call ended by ' + user.first_name
         })
         setCall({})
+        setCallAnswered(false)
         setOtherUser(null)
         peerRef.current.destroy()
-        window.location.reload()
+        myStream.getTracks().forEach(track => {
+            track.stop();
+        });
+        setMyStream(null)
         navigate(USER_HOME_LINK)
     }
 

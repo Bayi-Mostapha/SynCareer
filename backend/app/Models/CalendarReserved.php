@@ -21,4 +21,9 @@ class CalendarReserved extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function slot()
+    {
+        return $this->belongsTo(CalendarSlot::class);
+    }
 }
