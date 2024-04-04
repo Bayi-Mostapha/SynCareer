@@ -24,6 +24,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import SynCareerLoader from "@/components/general/syncareer-loader";
+import { MdOutlineFileUpload } from "react-icons/md";
+import CompanyPaddedContent from "@/components/company/padded-content";
 import { authContext } from '@/contexts/AuthWrapper';
 import { useContext } from 'react';
 
@@ -338,14 +340,16 @@ function QuizTable() {
 
 
     return (
-        <div className="ml-20 mt-24 px-6 mb-10 overflow-x-auto">
+        <CompanyPaddedContent>
             <div className="flex items-center justify-between py-5 overflow-x-auto">
                 <h1 className="text-xl font-medium text-gray-700">Hello {userContext.user.name.charAt(0).toUpperCase() + userContext.user.name.slice(1)},</h1>
                 <div>
                     <div className="">
                         {/* isOpen={isOpen} onOpenChange={(isOpen) => isOpen ? setErrors(null) : handleCloseDialog()} */}
                         <Dialog >
-                            <DialogTrigger className="py-2 px-5 bg-black text-white rounded-md">Set Quiz</DialogTrigger>
+                            <DialogTrigger>
+                                <Button className="flex gap-2" variant="default">New Quiz <MdOutlineFileUpload className='text-xl' /></Button>
+                            </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>Add New Quiz</DialogTitle>
@@ -417,9 +421,9 @@ function QuizTable() {
                     <SynCareerLoader />
                 </div>
                 :
-                <DataTable columns={columns} data={data} searchColumn={"name"} />
+                <DataTable columns={columns} data={data} searchColumn={"name"} title="Quizzes" />
             }
-        </div>
+        </CompanyPaddedContent>
     );
 }
 

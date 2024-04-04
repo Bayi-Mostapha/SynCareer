@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\JobOfferSkill;
 use Illuminate\Http\Request;
 
 class JobOfferController extends Controller
@@ -16,10 +16,27 @@ class JobOfferController extends Controller
             return response()->json($jobOffers);
         } else {
             $jobOffers = JobOffer::all();
+            foreach ($jobOffers as $offer) {
+                $jobOffer["company"] = $offer->company;
+                $jobOffer["skills"] = $offer->skills;
+            }
             return response()->json($jobOffers);
         }
     }
+    public function getResults(Request $request, JobOffer $jobOffer)
+    {
+        $user = $request->user();
+        if (!$user->tokenCan('company')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
+        $results = $jobOffer->quizResults;
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = [...(array)$result, 'user' => $result->user];
+        }
+        return response()->json($results);
+    }
     public function store(Request $request)
     {
         $user = $request->user();
@@ -39,6 +56,13 @@ class JobOfferController extends Controller
         $validatedData['company_id'] = $user->id;
         // Create a new job offer instance
         $jobOffer = JobOffer::create($validatedData);
+
+        foreach ($request->skills as $skill) {
+            JobOfferSkill::create([
+                'content' => $skill,
+                'job_offer_id' => $jobOffer->id,
+            ]);
+        }
 
         // Return a response indicating success
         return response()->json(['message' => 'Job offer created successfully', 'jobOffer' => $jobOffer], 201);
@@ -82,6 +106,42 @@ class JobOfferController extends Controller
         $this->authorize('delete', $jobOffer);
         $jobOffer->delete();
         return response()->json(['message' => 'Job offer deleted successfully']);
+    }
+
+    public function saveJob(Request $request, JobOffer $jobOffer)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Attach the job offer to the user (assuming many-to-many relationship)
+        $user->savedOffers()->attach($jobOffer);
+
+        // Return a success response
+        return response()->json(['message' => 'Job saved successfully']);
+    }
+
+    public function GetSavedJobs(Request $request)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Retrieve the saved job offers for the user
+        $savedJobOffers = $user->savedOffers;
+
+        // Return the saved job offers as JSON response
+        return response()->json($savedJobOffers);
+    }
+
+    public function delete(Request $request, JobOffer $jobOffer)
+    {
+        // Get the authenticated user
+        $user = $request->user();
+
+        // Detach the job offer from the user's saved offers
+        $user->savedOffers()->detach($jobOffer);
+
+        // Return a success response
+        return response()->json(['message' => 'Job offer unsaved successfully']);
     }
 
     public function calendarExists(JobOffer $jobOffer)

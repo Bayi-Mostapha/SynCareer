@@ -42,4 +42,13 @@ class JobOffer extends Model
     {
         return $this->hasOne(Calendar::class);
     }
+
+    public function skills()
+    {
+        return $this->hasMany(JobOfferSkill::class);
+    }
+    public function quizResults()
+    {
+        return $this->hasMany(PassesQuiz::class);
+    }
 }

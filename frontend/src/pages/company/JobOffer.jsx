@@ -19,6 +19,11 @@ import DataTable from "@/components/general/data-table";
 import { columns } from '@/components/company/job-offers-table/columns';
 import { useEffect, useState } from 'react';
 import CompanyPaddedContent from '@/components/company/padded-content';
+import { MdOutlineFileUpload } from 'react-icons/md';
+import { Label } from '@/components/ui/label';
+import { FaRegTrashCan } from 'react-icons/fa6';
+import { IoMdAddCircle } from 'react-icons/io';
+import { Separator } from '@/components/ui/separator';
 
 const schema = yup.object().shape({
     job_title: yup.string().required(),
@@ -43,14 +48,37 @@ function JobOffer() {
             role_desc: '',
         }
     });
+    const [jobOffers, setJobOffers] = useState([]);
+    const [skills, setSkills] = useState(['skill'])
     const { formState, handleSubmit, control, reset } = form;
     const { isSubmitting, isValid } = formState;
 
+    function addSkill() {
+        setSkills(prev => [...prev, 'skill'])
+    }
+    const handleSkillChange = (index, e) => {
+        const { value } = e.target;
+        setSkills(prev => {
+            const updatedSkills = [...prev];
+            updatedSkills[index] = value;
+            return updatedSkills
+        });
+    };
+    const removeSkill = (index) => {
+        setSkills(prev => {
+            const updatedSkills = [...prev];
+            updatedSkills.splice(index, 1);
+            return updatedSkills;
+        });
+    };
+
     const onSubmit = async (data) => {
         try {
+            data = { ...data, skills: skills }
             const response = await axiosClient.post('/joboffers', data);
             console.log(response.data);
             toast.success('Job offer posted successfully!');
+            setSkills([])
             reset(); // Reset the form after successful submission
             fetchJobOffers();
         } catch (error) {
@@ -58,8 +86,6 @@ function JobOffer() {
             toast.error('Failed to post job offer. Please try again later.');
         }
     };
-
-    const [jobOffers, setJobOffers] = useState([]);
 
     const fetchJobOffers = async () => {
         try {
@@ -75,10 +101,11 @@ function JobOffer() {
 
     return (
         <CompanyPaddedContent>
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+                <h1 className="text-lg font-medium">Job Offers</h1>
                 <Dialog>
                     <DialogTrigger>
-                        <Button variant="default">Post Job</Button>
+                        <Button className="flex gap-2" variant="default">Post Job <MdOutlineFileUpload className='text-xl' /></Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
@@ -177,6 +204,24 @@ function JobOffer() {
                                             )
                                         }}
                                     />
+                                    <Label className='block mt-6'>Skills</Label>
+                                    {
+                                        skills.map((skill, i) =>
+                                            <div className='my-2 flex gap-3'>
+                                                <Input
+                                                    type="text"
+                                                    value={skill}
+                                                    onChange={(e) => handleSkillChange(i, e)}
+                                                />
+                                                <Button onClick={() => removeSkill(i)} variant='destructive' type='button'>
+                                                    <FaRegTrashCan className='text-lg' />
+                                                </Button>
+                                            </div>
+                                        )
+                                    }
+                                    <Button variant='outline' className='ml-auto flex gap-2' onClick={addSkill} type='button'>
+                                        Add <IoMdAddCircle className='text-xl text-primary' />
+                                    </Button>
                                 </ScrollArea>
                                 <Button disabled={isSubmitting} type="submit">Submit</Button>
                             </form>
@@ -184,7 +229,7 @@ function JobOffer() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} />
+            <DataTable columns={columns} data={jobOffers} searchColumn={"job_title"} title="Job offers" />
         </CompanyPaddedContent>
     );
 }

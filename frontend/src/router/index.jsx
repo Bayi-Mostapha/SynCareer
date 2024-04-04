@@ -20,12 +20,12 @@ import JobOffer from '@/pages/company/JobOffer';
 import UserHome from '@/pages/user/UserHome';
 import ApplyJobOffer from '@/components/user/home/ApplyJobOffer';
 import ProfilePage from '@/pages/user/profile-settings';
+import SavedJobOffers from '@/pages/user/SavedJobOffers';
 import Chat from '@/pages/user/chat/ChatContainer';
 import ChatCompany from '@/pages/user/chat/ChatContainerCompany';
 import QuizTable from '@/pages/user/quiz/quizs-table';
 import PassQuiz from '@/pages/user/quiz/pass-quiz';
-import JobOfferCandidats from '@/pages/company/job-offer-candidats';
-import Profile from '@/pages/company/profile';
+import Profile from '@/pages/company/user-profile';
 import ViewResume from '@/pages/company/view-resume';
 import UserCalendar from '@/pages/user/calendar/schedule-interview';
 import CompanyVideoCall from '@/pages/company/companyVideoCall';
@@ -41,6 +41,8 @@ import AdminDashboard from '@/pages/admin/admin-dashboard';
 import GuestRoute from './protectors/GuestRoute';
 import AuthRoute from './protectors/AuthRoute';
 import Admins from '@/pages/super-admin/admins';
+import JobOfferCandidats from '@/pages/company/job-offer-candidats';
+import JobOfferQuiz from '@/pages/company/joboffer-quiz';
 
 
 // links 
@@ -54,6 +56,9 @@ export const RESET_PASSWORD_LINK = '/reset-password/:email';
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
 export const USER_PROFILE_LINK = '/user/profile';
+
+export const USER_SAVEDJOBOFFERS_LINK = '/user/savedjobs';
+
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 export const USER_CALENDAR_LINK = '/user/calendar';
@@ -64,6 +69,7 @@ export const JOBOFFER_LINK_BASE = '/company/joboffer';
 export const COMPANY_CHAT_LINK = '/company/chat';
 export const COMPANY_QUIZ_LINK = '/company/quiz';
 export const VIEW_USER_PROFILE_BASE = 'view-user/';
+export const QUIZ_RESULTS_LINK = 'quiz-resultes'
 export const VIEW_USER_RESUME_BASE = 'view-resume/';
 export const COMPANY_INTERVIEW = '/company/interviews';
 export const COMPANY_CALL = '/company/call'
@@ -74,6 +80,8 @@ export const ADMINS_LINK = '/admin/admins';
 export const ADMINS_USERS = '/admin/users';
 export const ADMINS_REPORTS = '/admin/reports';
 
+
+//savedjobs
 
 
 // router 
@@ -131,6 +139,10 @@ export const router = createBrowserRouter([
                 element: <ProfilePage />,
             },
             {
+                path: USER_SAVEDJOBOFFERS_LINK,
+                element: <SavedJobOffers />,
+            },
+            {
                 path: USER_CHAT_LINK,
                 element: <Chat />
             },
@@ -169,6 +181,10 @@ export const router = createBrowserRouter([
                             {
                                 path: '',
                                 element: <JobOfferCandidats />
+                            },
+                            {
+                                path: QUIZ_RESULTS_LINK,
+                                element: <JobOfferQuiz />
                             },
                             {
                                 path: VIEW_USER_PROFILE_BASE + ':uid',

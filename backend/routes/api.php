@@ -109,6 +109,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/joboffers/{jobOffer}', [JobOfferController::class, 'show']);
     Route::put('/joboffers/{jobOffer}', [JobOfferController::class, 'update']);
     Route::delete('/joboffers/{jobOffer}', [JobOfferController::class, 'destroy']);
+    Route::get('/quiz-results/{jobOffer}', [JobOfferController::class, 'getResults']);
 
     //cadidats
     Route::get('/candidats/{jobOffer}', [JobOfferCandidatsController::class, 'index']);
@@ -117,10 +118,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     //profilepage
     Route::put('/profile', [ProfileController::class, 'update']);
+    Route::get('/experience', [ProfileController::class, 'getExperience']);
+    Route::get('/education', [ProfileController::class, 'getEducation']);
+    Route::get('/skills', [ProfileController::class, 'getSkills']);
     Route::post('/profile-picture', [ProfileController::class, 'updatePicture']);
 
     //reports
     Route::post('/reports', [ReportController::class, 'store']);
+
+    //savedjobs
+    Route::post('/saveJob/{jobOffer}', [JobOfferController::class, 'saveJob']);
+    Route::get('/SavedJobOffers', [JobOfferController::class, 'GetSavedJobs']);
+    Route::delete('/SavedJobOffers/{jobOffer}', [JobOfferController::class, 'delete']);
 
     // Reda chat app
     Route::post('/sendMessage', function (Request $request) {
@@ -560,14 +569,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/schedule-interview', [CalendarController::class, 'scheduleInterview']);
     Route::get('/getCalendar/{id}', [CalendarController::class, 'getCalendar']);
 
-    Route::get('/downloadFile/{filename}', function($filename) {
-        $filePath = storage_path('app/fileUploads/'.$filename);
+    Route::get('/downloadFile/{filename}', function ($filename) {
+        $filePath = storage_path('app/fileUploads/' . $filename);
         if (!file_exists($filePath)) {
             abort(404, 'File not found');
         }
-     return response()->file($filePath);
+        return response()->file($filePath);
     });
-    
+
     Route::post('/sendMessageFile', function (Request $request) {
         $user = $request->user();
         $conversationId = $request->input('conversationId');

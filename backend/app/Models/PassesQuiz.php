@@ -22,4 +22,8 @@ class PassesQuiz extends Model
     {
         return $this->belongsTo(Quiz::class, 'quiz_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -186,14 +186,14 @@ function Register() {
                     {
                         formStep === 1 && (
                             <section>
-                                <div className="w-full flex flex-col min-[500px]:flex-row gap-2">
+                                <div className="w-full grid grid-cols-1 min-[500px]:grid-cols-2 gap-2">
                                     <FormField
                                         control={control}
                                         name="first_name"
                                         render={({ field }) => {
                                             return (
                                                 <FormItem>
-                                                    <FormLabel>First name</FormLabel>
+                                                    <FormLabel className="text-black">First name</FormLabel>
                                                     <FormControl>
                                                         <Input type='text' {...field} />
                                                     </FormControl>
@@ -207,8 +207,8 @@ function Register() {
                                         name="last_name"
                                         render={({ field }) => {
                                             return (
-                                                <FormItem className="block w-full">
-                                                    <FormLabel>Last name</FormLabel>
+                                                <FormItem>
+                                                    <FormLabel className="text-black">Last name</FormLabel>
                                                     <FormControl>
                                                         <Input type='text' {...field} />
                                                     </FormControl>
@@ -224,7 +224,7 @@ function Register() {
                                     render={({ field }) => {
                                         return (
                                             <FormItem>
-                                                <FormLabel>Email</FormLabel>
+                                                <FormLabel className="text-black">Email</FormLabel>
                                                 <FormControl>
                                                     <Input type='text' {...field} />
                                                 </FormControl>
@@ -240,7 +240,7 @@ function Register() {
                                     render={({ field }) => {
                                         return (
                                             <FormItem>
-                                                <FormLabel>Password</FormLabel>
+                                                <FormLabel className="text-black">Password</FormLabel>
                                                 <FormControl>
                                                     <PasswordInput className="pr-10" {...field} />
                                                 </FormControl>
@@ -265,7 +265,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>Job title</FormLabel>
+                                                        <FormLabel className="text-black">Job title</FormLabel>
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
@@ -283,7 +283,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>Company name</FormLabel>
+                                                        <FormLabel className="text-black">Company name</FormLabel>
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
@@ -299,7 +299,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>Company size</FormLabel>
+                                                        <FormLabel className="text-black">Company size</FormLabel>
                                                         <Select onValueChange={field.onChange}>
                                                             <FormControl>
                                                                 <SelectTrigger className="p-5">
@@ -326,7 +326,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>Industry</FormLabel>
+                                                        <FormLabel className="text-black">Industry</FormLabel>
                                                         <Select onValueChange={field.onChange}>
                                                             <FormControl>
                                                                 <SelectTrigger className="p-5">
@@ -352,7 +352,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>Country</FormLabel>
+                                                        <FormLabel className="text-black">Country</FormLabel>
                                                         <Select onValueChange={field.onChange}>
                                                             <FormControl>
                                                                 <SelectTrigger className="p-5">
@@ -378,7 +378,7 @@ function Register() {
                                             render={({ field }) => {
                                                 return (
                                                     <FormItem>
-                                                        <FormLabel>City</FormLabel>
+                                                        <FormLabel className="text-black">City</FormLabel>
                                                         <FormControl>
                                                             <Input type='text' {...field} />
                                                         </FormControl>
