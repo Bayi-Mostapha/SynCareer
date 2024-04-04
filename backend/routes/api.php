@@ -332,7 +332,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $users = User::select('id', DB::raw('CONCAT(first_name, " ", last_name) AS name'), 'job_title', 'email', DB::raw('COALESCE(phone_number, "__") AS phone_number'), 'created_at')->get();
         return response()->json($users);
     });
-    
+
     Route::post('/uploadQuiz', function (Request $request) {
         $companyId = $request->user()->id;
         $quizDataArray = $request->input('quizData');
@@ -418,7 +418,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         if ($passesQuiz->status === 'passed') {
             return response()->json(null);
         }
-        if ($passesQuiz->user_id !== $userId ) {
+        if ($passesQuiz->user_id !== $userId) {
             return response()->json(null);
         }
 
@@ -442,34 +442,34 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/calculateScore', function (Request $request) {
         $userId = $request->user()->id;
         try {
-            $selectedAnswers = $request->input('selectedAnswers');
-            $quizId = $request->input('quizId');
+            $selectedAnswers = $request->selectedAnswers;
+            $quizId = $request->quizId;
 
-            $quiz = Quiz::find($quizId); 
+            $quiz = Quiz::find($quizId);
             if ($quiz) {
                 $quiz->increment('nbr_applicants');
             }
-            
+
             $correctAnswers = Question::where('quiz_id', $quizId)->pluck('answer', 'id')->toArray();
 
             $score = 0;
             $totalQuestions = count($correctAnswers);
-            
+
             // Iterate over the selected answers
             foreach ($selectedAnswers as $answer) {
                 $questionId = $answer['id'];
                 $selectedAnswer = $answer['selected'];
 
                 // Check if the selected answer matches the correct answer  
-                if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] === $selectedAnswer) {
+                if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] == $selectedAnswer) {
                     $score++;
                 }
             }
 
-            
+
             $percentageScore = ($score / $totalQuestions) * 100;
             // or you can search by user id and quiz id 
-            $passesQuiz = PassesQuiz::findOrFail($request->quizId);
+            $passesQuiz = PassesQuiz::findOrFail($request->passQuizId);
 
             // // Update the score and status
             $passesQuiz->update([
@@ -629,12 +629,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return response()->json(['error' => 'File not provided'], 400);
     });
 
-    Route::get('/reports/{id}', function(Request $request, $id){
+    Route::get('/reports/{id}', function (Request $request, $id) {
         $reports = Report::where('job_offer_id', $id)->get();
         $formattedReports = [];
         foreach ($reports as $report) {
-           
-            $userName = $report->user->first_name . " " . $report->user->last_name ;
+
+            $userName = $report->user->first_name . " " . $report->user->last_name;
             $formattedCreatedAt = date('Y-m-d', strtotime($report->created_at));
             // Add the report data along with the user's name to the formattedReports array
             $formattedReports[] = [
@@ -646,41 +646,41 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
                 'jobOfferId' => $report->job_offer_id,
             ];
         }
-    
+
         // Return the formatted report data
         return response()->json(['reports' => $formattedReports]);
     });
-    Route::delete('/deleteReports/{id}', function(Request $request, $id){
-     $jobOffer = JobOffer::findOrFail($id);
-    $jobOffer->delete();
+    Route::delete('/deleteReports/{id}', function (Request $request, $id) {
+        $jobOffer = JobOffer::findOrFail($id);
+        $jobOffer->delete();
     });
 
-    Route::get('/users/last-10', function() {
+    Route::get('/users/last-10', function () {
         $users = User::orderBy('created_at', 'desc')->limit(10)->get();
         return response()->json($users);
     });
 
 
-    Route::get('/job-offers/last-10', function(){
+    Route::get('/job-offers/last-10', function () {
         $jobOffers = JobOffer::with('company')->latest()->take(10)->get();
 
         $formattedJobOffers = $jobOffers->map(function ($jobOffer) {
             return [
                 'id' => $jobOffer->id,
                 'title' => $jobOffer->job_title,
-                'company_name' => $jobOffer->company->name, 
+                'company_name' => $jobOffer->company->name,
             ];
         });
 
         return response()->json($formattedJobOffers);
     });
-    Route::get('/counts', function() {
+    Route::get('/counts', function () {
         // Get the counts of users, companies, job offers, and reports
         $userCount = User::count();
         $companyCount = Company::count();
         $jobOfferCount = JobOffer::count();
         $reportCount = Report::count();
-    
+
         // Return the counts as a JSON response
         return response()->json([
             'user_count' => $userCount,
