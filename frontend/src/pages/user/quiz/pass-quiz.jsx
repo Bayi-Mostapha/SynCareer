@@ -60,76 +60,19 @@ function PassQuiz() {
             console.error('Error calculating score:', error);
         }
     };
-    // const handleNext = () => {
-    //     InputRadioA.current.checked = false;
-    //     InputRadioB.current.checked = false;
-    //     InputRadioC.current.checked = false;
-    //     InputRadioD.current.checked = false;
-    //     setCounter(0);
-    //     setCurrentQuestion(currentQuestion + 1);
-    //     console.log(currentQuestion)
-    //     console.log(quizData.length)
-    //     if (quizData.data.length - 1 <= currentQuestion) {
-    //         setFlag(true);
-    //         setStartQuiz(false);
-    //         setEndQuiz(true);
-
-    //     }
-    //     if (quizData.length > currentQuestion + 1) {
-    //         let answer = '';
-    //         if (InputRadioA.current.checked) {
-    //             answer = InputRadioA.current.value;
-    //         } else
-    //             if (InputRadioB.current.checked) {
-    //                 answer = InputRadioB.current.value;
-    //             } else
-    //                 if (InputRadioC.current.checked) {
-    //                     answer = InputRadioC.current.value;
-    //                 } else
-    //                     if (InputRadioD.current.checked) {
-    //                         answer = InputRadioD.current.value;
-    //                     }
-    //         const selectedOptionsForCurrentQuestion = {
-    //             id: quizData.data[currentQuestion].id,
-    //             selected: answer
-    //         };
-    //         setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
-
-    //         // Proceed to next question
-    //         setErrors(null);
-    //     } else {
-    //         let answer = '';
-    //         if (InputRadioA.current.checked) {
-    //             answer = InputRadioA.current.value;
-    //         } else if (InputRadioB.current.checked) {
-    //             answer = InputRadioB.current.value;
-    //         } else if (InputRadioC.current.checked) {
-    //             answer = InputRadioC.current.value;
-    //         } else if (InputRadioD.current.checked) {
-    //             answer = InputRadioD.current.value;
-    //         }
-    //         const selectedOptionsForCurrentQuestion = {
-    //             id: quizData.data[currentQuestion].id,
-    //             selected: answer
-    //         };
-    //         console.log(InputRadioA.current.checked, InputRadioB.current.checked, InputRadioC.current.checked, InputRadioD.current.checked)
-    //         console.log(selectedOptionsForCurrentQuestion)
-    //         setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
-
-    //     }
-
-    // };
     const handleNext = () => {
+        setCounter(0);
         setCurrentQuestion(currentQuestion + 1);
         console.log(currentQuestion)
         console.log(quizData.length)
         if (quizData.data.length - 1 <= currentQuestion) {
             setFlag(true);
             setStartQuiz(false);
+            setEndQuiz(true);
         }
         if (quizData.length > currentQuestion + 1) {
             let answer = '';
-            if (InputRadioA.current.checked) {
+            if (InputRadioA.current.checked) {0
                 answer = InputRadioA.current.value;
             } else
                 if (InputRadioB.current.checked) {
@@ -149,35 +92,32 @@ function PassQuiz() {
 
             // Proceed to next question
             setErrors(null);
-
-            InputRadioA.current.checked = false;
-            InputRadioB.current.checked = false;
-            InputRadioC.current.checked = false;
-            InputRadioD.current.checked = false;
-            setErrors(null);
         } else {
             let answer = '';
             if (InputRadioA.current.checked) {
                 answer = InputRadioA.current.value;
-            } else
-                if (InputRadioB.current.checked) {
-                    answer = InputRadioB.current.value;
-                } else
-                    if (InputRadioC.current.checked) {
-                        answer = InputRadioC.current.value;
-                    } else
-                        if (InputRadioD.current.checked) {
-                            answer = InputRadioD.current.value;
-                        }
+            } else if (InputRadioB.current.checked) {
+                answer = InputRadioB.current.value;
+            } else if (InputRadioC.current.checked) {
+                answer = InputRadioC.current.value;
+            } else if (InputRadioD.current.checked) {
+                answer = InputRadioD.current.value;
+            }
             const selectedOptionsForCurrentQuestion = {
                 id: quizData.data[currentQuestion].id,
                 selected: answer
             };
+            console.log(InputRadioA.current.checked, InputRadioB.current.checked, InputRadioC.current.checked, InputRadioD.current.checked)
+            console.log(selectedOptionsForCurrentQuestion)
             setSelectedOptions([...selectedOptions, selectedOptionsForCurrentQuestion]);
 
         }
-
+        InputRadioA.current.checked = false;
+        InputRadioB.current.checked = false;
+        InputRadioC.current.checked = false;
+        InputRadioD.current.checked = false;
     };
+    
 
     useEffect(() => {
         if (startQuiz) {
