@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Report extends Model
 {
     use HasFactory;
-
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+    ];
     protected $fillable = ['type', 'description', 'user_id', 'job_offer_id'];
-
+  
     public function user()
     {
         return $this->belongsTo(User::class);

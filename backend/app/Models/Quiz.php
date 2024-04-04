@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Models\Company;
 use App\Models\Question;
+use App\Models\PassesQuiz;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Quiz extends Model
@@ -32,5 +33,9 @@ class Quiz extends Model
     public function questions()
     {
         return $this->hasMany(Question::class);
+    }
+    public function passes()
+    {
+        return $this->hasMany(PassesQuiz::class,'quiz_id');
     }
 }

@@ -20,12 +20,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
+   
     protected $fillable = [
         'first_name',
         'last_name',
@@ -56,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'created_at' => 'datetime:Y-m-d',
     ];
 
     public function getAuthIdentifierForBroadcasting()

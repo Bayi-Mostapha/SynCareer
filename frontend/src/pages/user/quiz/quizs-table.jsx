@@ -24,7 +24,10 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import SynCareerLoader from "@/components/general/syncareer-loader";
+import { authContext } from '@/contexts/AuthWrapper';
+import { useContext } from 'react';
 
+ 
 function QuizTable() {
     const [data, setData] = useState([]);
     const [isFetching, setisFetching] = useState(true);
@@ -47,13 +50,14 @@ function QuizTable() {
         options: []
     });
     const [open, setOpen] = useState(false);
-
+    const userContext = useContext(authContext);
     // fetch quizzes from database 
     const fetchQuizes = async () => {
         try {
             const { data } = await axiosClient.get('/quizzes');
             setisFetching(false);
             setData(data)
+            console.log(data);
         } catch (error) {
             console.log('Error fetching conversations:', error);
         }
@@ -92,6 +96,7 @@ function QuizTable() {
     const inputoptionBRef = useRef('');
     const inputoptionCRef = useRef('');
     const inputoptionDRef = useRef('');
+    const [selectInput, setSelectInput] = useState('');
 
     //when user click submit in the first form
     const handleSubmit = () => {
@@ -106,13 +111,22 @@ function QuizTable() {
             if (quizData.size == 0) {
                 newErrors.size = "Number can't be 0";
             }
+        } 
+        const size = parseInt(quizData.size);
+        if (isNaN(size) || size === 0) {
+            newErrors.size = "Number of questions must be a number.";
         }
+        
         if (quizData.duration == "") {
             newErrors.duration = "duration is required.";
         } else {
             if (quizData.duration == 0) {
                 newErrors.duration = "duration can't be 0";
             }
+        }
+        const duration = parseInt(quizData.duration);
+        if (isNaN(duration) || duration === 0) {
+            newErrors.duration = "duration must be a number.";
         }
         if (Object.keys(newErrors).length === 0) {
             setOpen(true);
@@ -146,26 +160,47 @@ function QuizTable() {
         }));
     };
     const handleCloseDialog = () => {
-        // setQuizData({
-        //     name: '',
-        //     size: 0,
-        //     duration: ''
-        // });
-        // setQuestions([])
-        // setCurrentQuestion({
-        //     id: 0,
-        //     question: '', // Set to default value
-        //     options: ['', '', '', ''], // Set to default value
-        //     answer: '' // Set to default value
-        // });
-        // setCurrentQuestionIndex(0)
-        // setOpen(false);
+        setQuizData({
+            name: '',
+            size: 0,
+            duration: ''
+        });
+        setQuestions([])
+        setCurrentQuestion({
+            id: 0,
+            question: '', // Set to default value
+            options: ['', '', '', ''], // Set to default value
+            answer: '' // Set to default value
+        });
+        setCurrentQuestionIndex(0)
+        setErrors([]);
+        setOpen(false);
         // document.getElementById('closeDialog')?.click();
     };
     ///////////////////////////////////////////////////////////////////
     const handleNext = () => {
+        setErrors(null);
+        const newErrors = {};
         if (currentQuestionIndex < quizData.size) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            if (inputQuestionRef.current.value === "") {
+                newErrors.question = "question is required.";
+            }
+            if (inputoptionARef.current.value === "") {
+                newErrors.option1 = "option 1 is required.";
+            }
+            if (inputoptionBRef.current.value === "") {
+                newErrors.option2 = "option 2  is required.";
+            }
+            if (selectInput === "") {
+                newErrors.answer = "the answer is required.";
+            }
+            if (Object.keys(newErrors).length === 0) {
+               
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                
+            } else {
+                setErrors(newErrors);
+            } 
         }
     };
     const handleBack = () => {
@@ -245,9 +280,11 @@ function QuizTable() {
         setQuestions([]);
         document.getElementById('closeDialog')?.click();
         setOpen(false);
+        
         setCurrentQuestionIndex(0);
     }
     const handleQuestionChange = (event) => {
+        setErrors(null);
         setQuestionValue(event.target.value);
         setCurrentQuestion(prevQuestion => ({
             ...prevQuestion,
@@ -295,6 +332,7 @@ function QuizTable() {
             ...prevQuestion,
             answer: newValue
         }));
+        setSelectInput(newValue);
     };
 
 
@@ -302,7 +340,7 @@ function QuizTable() {
     return (
         <div className="ml-20 mt-24 px-6 mb-10 overflow-x-auto">
             <div className="flex items-center justify-between py-5 overflow-x-auto">
-                <h1 className="text-xl font-medium text-gray-700">hy reda el khayati,</h1>
+                <h1 className="text-xl font-medium text-gray-700">Hello {userContext.user.name.charAt(0).toUpperCase() + userContext.user.name.slice(1)},</h1>
                 <div>
                     <div className="">
                         {/* isOpen={isOpen} onOpenChange={(isOpen) => isOpen ? setErrors(null) : handleCloseDialog()} */}
@@ -326,11 +364,16 @@ function QuizTable() {
                                         <h2>Question {currentQuestionIndex + 1}</h2>
                                         <Label htmlFor={`question-1`} className='block mt-3'>Enter question</Label>
                                         <Input id={`question-1`} className='mt-2' type="text" placeholder={`Question 1`} value={currentQuestion.question} ref={inputQuestionRef} onChange={handleQuestionChange} />
+                                        <Label className="text-red-500 text-xs font-medium">{errors && errors.question}</Label>
                                         <div className='flex items-center justify-between'>
                                             <div>
                                                 <Input className='mt-2' type="text" placeholder="option a" ref={inputoptionARef} onChange={handleoptionAChange} value={currentQuestion.options[0]} />
+                                                <Label className="text-red-500 text-xs font-medium">{errors && errors.option1}</Label>
                                             </div>
-                                            <div> <Input className='mt-2' type="text" placeholder="option b " ref={inputoptionBRef} onChange={handleoptionBChange} value={currentQuestion.options[1]} /></div>
+                                            <div>
+                                                 <Input className='mt-2' type="text" placeholder="option b " ref={inputoptionBRef} onChange={handleoptionBChange} value={currentQuestion.options[1]} />
+                                                 <Label className="text-red-500 text-xs font-medium">{errors && errors.option2}</Label>
+                                            </div>
                                         </div>
                                         <div className='flex items-center justify-between mb-2'>
                                             <div>
@@ -340,7 +383,7 @@ function QuizTable() {
                                                 <Input className='mt-2' type="text" placeholder="option d" ref={inputoptionDRef} onChange={handleoptionDChange} value={currentQuestion.options[3]} />
                                             </div>
                                         </div>
-                                        <Select onValueChange={handleSelectChange}>
+                                        <Select onValueChange={handleSelectChange} >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select an option" />
                                             </SelectTrigger>
@@ -354,6 +397,7 @@ function QuizTable() {
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
+                                        <Label className="text-red-500 text-xs font-medium">{errors && errors.answer}</Label>
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter>
