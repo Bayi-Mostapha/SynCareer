@@ -99,6 +99,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/resume/{resume}', [ResumeController::class, 'show']);
     Route::get('/resumes', [ResumeController::class, 'index']);
     Route::post('/resumes', [ResumeController::class, 'store']);
+    Route::post('/upload-resume', [ResumeController::class, 'upload']);
     Route::get('/download-resume/{filename}', [ResumeController::class, 'download']);
     Route::get('/download-resume-id/{resume}', [ResumeController::class, 'downloadById']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'deleteResume']);
@@ -326,12 +327,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         $company_id = $company->id;
         $user_id = $request->user_id;
 
-        $exists = Conversation::where('user1_id', $company_id)
-            ->where('user2_id', $user_id)
+        $exists = Conversation::where('user2_id', $company_id)
+            ->where('user1_id', $user_id)
             ->exists();
 
         if (!$exists) {
-            Conversation::create(['user1_id' => $company_id, 'user2_id' => $user_id]);
+            Conversation::create(['user2_id' => $company_id, 'user1_id' => $user_id]);
         }
 
         return response()->json(['message', 'conv created']);
