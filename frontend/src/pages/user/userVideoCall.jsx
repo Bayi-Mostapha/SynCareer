@@ -44,13 +44,13 @@ const UserVideoCall = () => {
             setUsers(users);
             if (users.length > 1) {
                 const u = users.filter(u => u.type !== 'user')[0]
-                let picture = await getUserPicture(u.picture)
+                let picture = await getUserPicture(u.picture, 'company')
                 setOtherUser({ ...u, picture })
             }
         })
             .joining(async u => {
                 setUsers(prev => [...prev, u])
-                let picture = await getUserPicture(u.picture)
+                let picture = await getUserPicture(u.picture, 'company')
                 setOtherUser({ ...u, picture })
             })
             .leaving(user => {
