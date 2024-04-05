@@ -44,6 +44,7 @@ import Admins from '@/pages/super-admin/admins';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import JobOfferQuiz from '@/pages/company/joboffer-quiz';
 import UpcommingInterviews from '@/pages/user/upcomming-interviews';
+import LandingPage from '@/pages/landing-page';
 
 
 // links 
@@ -87,6 +88,10 @@ export const ADMINS_REPORTS = '/admin/reports';
 
 // router 
 export const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <GuestRoute><LandingPage /></GuestRoute>
+    },
     {
         element: <GuestRoute><AuthLayout /></GuestRoute>,
         children: [
@@ -232,7 +237,7 @@ export const router = createBrowserRouter([
                 element: <Admins />
             },
             {
-                path: ADMINS_USERS ,
+                path: ADMINS_USERS,
                 element: <UsersTable />
             },
             {
