@@ -14,6 +14,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import { COMPANY_CHAT_LINK, VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
 import { axiosClient } from "@/api/axios";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
 export const columns = [
     {
@@ -109,13 +110,14 @@ export const columns = [
                 {
                     <Button
                         variant='outline'
+                        className='flex flex-row gap-2 text-xs'
                         onClick={async () => {
                             const res = await axiosClient.post('/conversations', { user_id: row.original.id })
                             console.log(res)
                             navigate(COMPANY_CHAT_LINK)
                         }}
                     >
-                        Chat
+                        chat <IoChatbubbleOutline />
                     </Button>
                 }
             </div>

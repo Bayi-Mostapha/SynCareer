@@ -183,9 +183,14 @@ function ApplyJobOffer() {
                                             <TabsTrigger value="resume">Apply with resume</TabsTrigger>
                                         </TabsList>
                                         <TabsContent className="h-60" value="profile">
-                                            <Button onClick={apply}>Apply</Button>
+                                            <div className="h-full flex flex-col gap-3">
+                                                <h3 className="text-lg font-medium text-gray-700">Apply with your profile</h3>
+                                                <p className="text-gray-600 flex-1">Make sure your profile is polished and up-to-date before submitting your application.</p>
+                                                <Button className="w-full" onClick={apply}>Apply</Button>
+                                            </div>
                                         </TabsContent>
                                         <TabsContent value="resume">
+                                            <h3 className="text-lg font-medium text-gray-700">Choose a resume</h3>
                                             <ResumeList />
                                         </TabsContent>
                                     </Tabs>

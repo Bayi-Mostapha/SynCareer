@@ -2,6 +2,7 @@ import { axiosClient } from "@/api/axios";
 import SynCareerLoader from "@/components/general/syncareer-loader";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 function ResumeList() {
     const { id: jobOffer } = useParams()
@@ -35,10 +36,11 @@ function ResumeList() {
     async function applyWithResume(id) {
         axiosClient.post(`/apply/${jobOffer}`, { resume_id: id })
             .then(res => {
-                console.log(res)
+                toast.success('applied with resume successfully')
             })
             .catch(err => {
-                console.log(err)
+                toast.success('something went wrong')
+                console.error(err)
             })
     }
 

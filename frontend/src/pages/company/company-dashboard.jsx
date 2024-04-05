@@ -10,14 +10,16 @@ import {
 // nivo
 import { ResponsiveLineCanvas } from "@nivo/line"
 import CompanyPaddedContent from "@/components/company/padded-content"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { axiosClient } from "@/api/axios"
 import { COMPANY_CHAT_LINK, COMPANY_INTERVIEW } from "@/router"
 import { Link } from "react-router-dom"
 import formatDistanceToNow from "@/functions/format-time"
 import getUserPicture from "@/functions/get-user-pic"
+import { authContext } from "@/contexts/AuthWrapper"
 
 export default function CompanyDashboard() {
+    const { user } = useContext(authContext)
     const [latestApplies, setLatestApplies] = useState([])
     const [upcommingInterviews, setUpcommingInterviews] = useState([])
 
@@ -81,40 +83,8 @@ export default function CompanyDashboard() {
     return (
         <CompanyPaddedContent>
             <div className="p-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold">Revenues</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-baseline space-x-2">
-                                <h3 className="text-4xl font-bold text-green-600">15%</h3>
-                                <TrendingUpIcon className="text-green-600" />
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <p className="text-sm text-gray-500">Increase compared to last week</p>
-                        </CardFooter>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold">Lost deals</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-baseline space-x-2">
-                                <h3 className="text-4xl font-bold text-red-600">4%</h3>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <p className="text-sm text-gray-500">You closed 96 out of 100 deals</p>
-                        </CardFooter>
-                    </Card>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <h1 className="text-xl font-medium mt-4 capitalize">Hi {user.first_name},</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <Card>
                         <CardHeader>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -152,38 +122,11 @@ export default function CompanyDashboard() {
                     </Card>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-semibold">Chats</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <Avatar>
-                                        <AvatarImage alt="User 1" src="/placeholder.svg?height=40&width=40" />
-                                        <AvatarFallback>U1</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0 ml-4">
-                                        <p className="text-sm font-medium truncate">Fruit2Go</p>
-                                        <p className="text-sm text-gray-500 truncate">Latest: How about an order of 20 boxes?</p>
-                                    </div>
-                                    <Badge variant="secondary">1</Badge>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Link to={COMPANY_CHAT_LINK} className="text-sm text-blue-600 mt-4 block" href="#">
-                                All messages →
-                            </Link>
-                        </CardFooter>
-                    </Card>
-                    <Card>
+                    <Card className="col-span-1 md:col-span-2">
                         <CardHeader>
                             <h2 className="text-lg font-semibold">Latest applies</h2>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                             {displayLatestApplies()}
                         </CardContent>
                     </Card>

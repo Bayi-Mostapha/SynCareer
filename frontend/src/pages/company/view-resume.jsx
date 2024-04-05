@@ -57,23 +57,27 @@ function ViewResume() {
 
     return (
         <CompanyPaddedContent>
-            <Link to={`${JOBOFFER_LINK_BASE}/${id}`}>Go back</Link>
-            <Button onClick={downloadResume}>
-                Download
-            </Button>
+            <div className="flex flex-row justify-between">
+                <Link to={`${JOBOFFER_LINK_BASE}/${id}`}>Go back</Link>
+                <Button onClick={downloadResume}>
+                    Download
+                </Button>
+            </div>
             {
                 file &&
-                <Document
-                    file={file}
-                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                >
-                    {
-                        Array.apply(null, Array(numPages))
-                            .map((x, i) => i + 1)
-                            .map(page =>
-                                <Page pageNumber={page} renderTextLayer={false} renderAnnotationLayer={false} />)
-                    }
-                </Document>
+                <div className="flex justify-center items-center">
+                    <Document
+                        file={file}
+                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                    >
+                        {
+                            Array.apply(null, Array(numPages))
+                                .map((x, i) => i + 1)
+                                .map(page =>
+                                    <Page className='border border-gray-100 shadow-sm' pageNumber={page} renderTextLayer={false} renderAnnotationLayer={false} />)
+                        }
+                    </Document>
+                </div>
             }
         </CompanyPaddedContent>
     );

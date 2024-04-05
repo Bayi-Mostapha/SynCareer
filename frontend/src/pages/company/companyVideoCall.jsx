@@ -160,6 +160,11 @@ const CompanyVideoCall = () => {
             setCallAnswered(false)
             peer.destroy()
             userVideo.current.srcObject = null
+            if (myStream) {
+                myStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
             window.location.reload()
         })
     };
