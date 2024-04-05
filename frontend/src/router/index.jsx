@@ -45,6 +45,7 @@ import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import JobOfferQuiz from '@/pages/company/joboffer-quiz';
 import UpcommingInterviews from '@/pages/user/upcomming-interviews';
 import LandingPage from '@/pages/landing-page';
+import AJobOffers from '@/pages/admin/job-offers';
 
 
 // links 
@@ -80,8 +81,8 @@ export const COMPANY_CALL = '/company/call'
 export const ADMIN_DASHBOARD_LINK = '/admin/dashboard';
 export const ADMINS_LINK = '/admin/admins';
 export const ADMINS_USERS = '/admin/users';
+export const ADMIN_JOB_OFFERS = '/admin/job-offers';
 export const ADMINS_REPORTS = '/admin/reports';
-
 
 //savedjobs
 
@@ -244,6 +245,10 @@ export const router = createBrowserRouter([
                 path: ADMINS_REPORTS + "/:jid",
                 element: <ReportsTable />
             },
+            {
+                path: ADMIN_JOB_OFFERS,
+                element: <AJobOffers />
+            }
         ]
     },
     {
