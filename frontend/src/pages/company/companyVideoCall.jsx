@@ -41,6 +41,7 @@ const CompanyVideoCall = () => {
 
         channel.here(async users => {
             setUsers(users);
+            console.log(users)
             if (users.length > 1) {
                 const u = users.filter(u => u.type !== 'company')[0]
                 let picture = await getUserPicture(u.picture)
@@ -69,7 +70,28 @@ const CompanyVideoCall = () => {
         channel.listenForWhisper('user-cam-toggle', (e) => {
             setUCam(e.state)
         })
-    }, [navigate]);
+
+        return () => {
+            channel.whisper('company-hanged-up', {
+                data: 'Call ended by ' + user.name
+            })
+            channel.unsubscribe();
+            if (peerRef.current) {
+                peerRef.current.destroy()
+            }
+            if (myStream) {
+                myStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            peerRef.current = null
+            setUsers([]);
+            setOtherUser(null)
+            setMyStream(null);
+            setIsCalling(false);
+            setCallAnswered(false);
+        }
+    }, []);
     useEffect(() => {
         console.log(otherUser)
         if (otherUser) {
@@ -132,6 +154,7 @@ const CompanyVideoCall = () => {
             toast.info(e.data, {
                 position: 'top-right'
             })
+            channel.unsubscribe()
             setOtherUser(null)
             setIsCalling(false)
             setCallAnswered(false)
@@ -174,6 +197,7 @@ const CompanyVideoCall = () => {
         channel.whisper('company-hanged-up', {
             data: 'Call ended by ' + user.name
         })
+        channel.unsubscribe()
         setCallAnswered(false)
         setOtherUser(null)
         peerRef.current.destroy()

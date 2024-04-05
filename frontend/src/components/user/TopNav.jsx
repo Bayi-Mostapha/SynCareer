@@ -5,7 +5,7 @@ import Echo from 'laravel-echo';
 // shadcn 
 import { IoIosMenu } from "react-icons/io";
 import { NavLink, redirect, useNavigate } from "react-router-dom";
-import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK, USER_CALENDAR_LINK, USER_CALL } from "@/router";
+import { USER_HOME_LINK, USER_RESUMES_LINK, USER_CHAT_LINK, USER_PASSQUIZ_LINK, USER_CALENDAR_LINK, USER_CALL, UPCOMMING_INTERVIEWS } from "@/router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -192,7 +192,7 @@ function TopNav() {
                     </NavLink>
                 </li>
                 <li>
-                    <NavLink to="tt" className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
+                    <NavLink to={UPCOMMING_INTERVIEWS} className={(navData) => (navData.isActive ? 'border-b-4 border-primary mt-[1px] ' : '') + 'py-4 block h-full'}>
                         Interviews
                     </NavLink>
                 </li>
@@ -249,7 +249,7 @@ function TopNav() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="tt" className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
+                                <NavLink to={UPCOMMING_INTERVIEWS} className={(navData) => (navData.isActive ? 'bg-secondary ' : '') + 'p-2 my-4 block h-full'}>
                                     Interviews
                                 </NavLink>
                             </li>

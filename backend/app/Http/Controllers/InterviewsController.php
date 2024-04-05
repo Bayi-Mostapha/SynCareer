@@ -45,30 +45,25 @@ class InterviewsController extends Controller
 
     public function getUserUpcommingInterviews(Request $request)
     {
-        $currentDate = Carbon::now()->toDateString();
-
-        $closestInterviews = CalendarSlot::where('user_id', $request->user()->id)
-            ->where('status', 'reserved')
-            ->where('day', '>=', $currentDate)
-            ->orderBy('day')
-            ->orderBy('start_time')
+        $userReservedSlots = CalendarReserved::where('user_id', $request->user()->id)
             ->get();
 
         $data = [];
         $i = 0;
-        foreach ($closestInterviews as $interview) {
-            $cr = CalendarReserved::where('slot_id', $interview->id)->first();
-            $user = $cr->slot->company;
-
-            $data[$i]['id'] = $cr->id;
-            $data[$i]['user_id'] = $user->id;
-            $data[$i]['user_fname'] = $user->first_name;
-            $data[$i]['user_lname'] = $user->last_name;
-            $data[$i]['user_pic'] = $user->picture;
-            $data[$i]['day'] = $interview->day;
-            $data[$i]['start_time'] = $interview->start_time;
-            $data[$i]['end_time'] = $interview->end_time;
-            $i++;
+        foreach ($userReservedSlots as $slot) {
+            $cs = CalendarSlot::where('id', $slot->slot_id)
+                ->first();
+            $date = Carbon::createFromFormat('Y-m-d', $cs->day);
+            if ($date->isFuture() || $date->isSameDay(Carbon::today())) {
+                $company = $cs->company;
+                $data[$i]['id'] = $cs->id;
+                $data[$i]['company_name'] = $company->name;
+                $data[$i]['company_pic'] = $company->picture;
+                $data[$i]['day'] = $cs->day;
+                $data[$i]['start_time'] = $cs->start_time;
+                $data[$i]['end_time'] = $cs->end_time;
+                $i++;
+            }
         }
 
         return response()->json(['data' => $data]);

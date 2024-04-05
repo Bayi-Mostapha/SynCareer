@@ -171,218 +171,228 @@ function ProfilePage() {
                     "Please hold while we're getting your data"
                     :
                     <Form {...form}>
-                        <form className='w-full sm:w-96 px-10 sm:p-0 flex flex-col gap-2' onSubmit={handleSubmit(submit)} >
-                            <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
-                            <FormField
-                                control={control}
-                                name="first_name"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>First Name</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
+                        <form onSubmit={handleSubmit(submit)} >
+                            <div className='w-full flex justify-center flex-row gap-10'>
+                                <div className='flex flex-col items-center gap-2'>
+                                    <DnDFile {...dropZone} file='picture' icon={<SlPicture className="text-8xl text-gray-400" />} />
+                                    <FormField
+                                        control={control}
+                                        name="first_name"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>First Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
 
-                            <FormField
-                                control={control}
-                                name="last_name"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Last Name</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
+                                    <FormField
+                                        control={control}
+                                        name="last_name"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Last Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
 
-                            <FormField
-                                control={control}
-                                name="job_title"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Job Title</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
+                                    <FormField
+                                        control={control}
+                                        name="job_title"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Job Title</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
 
-                            <FormField
-                                control={control}
-                                name="email"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
+                                    <FormField
+                                        control={control}
+                                        name="email"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Email</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
 
-                            <FormField
-                                control={control}
-                                name="phone_number"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Phone Number</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
+                                    <FormField
+                                        control={control}
+                                        name="phone_number"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Phone Number</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
 
-                            <FormField
-                                control={control}
-                                name="birthday"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Birthday</FormLabel>
-                                            <FormControl>
-                                                <Input className="pr-10" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
-                            <FormField
-                                control={control}
-                                name="bio"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Bio</FormLabel>
-                                            <FormControl>
-                                                <Textarea className="pr-10 bg-background" placeholder="" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )
-                                }}
-                            />
-                            <h4 className='text-lg font-medium'>Experience</h4>
-                            {
-                                experience.map((exp, i) =>
-                                    <div key={'exp_' + i} className='my-2'>
-                                        <div className="mb-1 flex justify-between">
-                                            <Label>Experience {i + 1}</Label>
-                                            <Button onClick={() => removeExperience(i)} variant='destructive' type='button'>
-                                                <FaRegTrashCan className='text-lg' />
-                                            </Button>
-                                        </div>
-                                        <Input
-                                            type="text"
-                                            name="beginning_date"
-                                            value={exp.beginning_date}
-                                            onChange={(e) => handleExperienceChange(i, e)}
-                                        />
-                                        <Input
-                                            type="text"
-                                            name="end_date"
-                                            value={exp.end_date}
-                                            onChange={(e) => handleExperienceChange(i, e)}
-                                        />
-                                        <Input
-                                            type="text"
-                                            name="position"
-                                            value={exp.position}
-                                            onChange={(e) => handleExperienceChange(i, e)}
-                                        />
-                                        <Input
-                                            type="text"
-                                            name="company_name"
-                                            value={exp.company_name}
-                                            onChange={(e) => handleExperienceChange(i, e)}
-                                        />
+                                    <FormField
+                                        control={control}
+                                        name="birthday"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Birthday</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="pr-10 w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                    <FormField
+                                        control={control}
+                                        name="bio"
+                                        render={({ field }) => {
+                                            return (
+                                                <FormItem>
+                                                    <FormLabel>Bio</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea className="pr-10 bg-background w-96" placeholder="" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                </div>
+                                <div className='flex flex-col items-center gap-2'>
+                                    <div className="w-96 flex justify-between">
+                                        <h4 className='text-lg font-medium'>Experience</h4>
+                                        <Button variant='outline' className='ml-auto flex gap-2' onClick={addExperience} type='button'>
+                                            Add Experience <IoMdAddCircle className='text-xl text-primary' />
+                                        </Button>
                                     </div>
-                                )
-                            }
-                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addExperience} type='button'>
-                                Add Experience <IoMdAddCircle className='text-xl text-primary' />
-                            </Button>
+                                    {
+                                        experience.map((exp, i) =>
+                                            <div key={'exp_' + i} className='bg-[#F8F8FF] my-2 p-4 w-96 border rounded'>
+                                                <div className="mb-1 flex justify-between">
+                                                    <Label>Experience {i + 1}</Label>
+                                                    <Button onClick={() => removeExperience(i)} variant='destructive' type='button'>
+                                                        <FaRegTrashCan className='text-lg' />
+                                                    </Button>
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    name="beginning_date"
+                                                    value={exp.beginning_date}
+                                                    onChange={(e) => handleExperienceChange(i, e)}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    name="end_date"
+                                                    value={exp.end_date}
+                                                    onChange={(e) => handleExperienceChange(i, e)}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    name="position"
+                                                    value={exp.position}
+                                                    onChange={(e) => handleExperienceChange(i, e)}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    name="company_name"
+                                                    value={exp.company_name}
+                                                    onChange={(e) => handleExperienceChange(i, e)}
+                                                />
+                                            </div>
+                                        )
+                                    }
 
-                            <h4 className='text-lg font-medium'>Education</h4>
-                            {
-                                education.map((edu, i) =>
-                                    <div key={'edu_' + i} className='my-2'>
-                                        <div className="mb-1 flex justify-between">
-                                            <Label>Education {i + 1}</Label>
-                                            <Button onClick={() => removeEducation(i)} variant='destructive' type='button'>
-                                                <FaRegTrashCan className='text-lg' />
-                                            </Button>
-                                        </div>
-                                        <Input
-                                            type="text"
-                                            name="graduation_date"
-                                            value={edu.graduation_date}
-                                            onChange={(e) => handleEducationChange(i, e)}
-                                        />
-                                        <Input
-                                            type="text"
-                                            name="school_name"
-                                            value={edu.school_name}
-                                            onChange={(e) => handleEducationChange(i, e)}
-                                        />
-                                        <Input
-                                            type="text"
-                                            name="degree"
-                                            value={edu.degree}
-                                            onChange={(e) => handleEducationChange(i, e)}
-                                        />
+                                    <div className="w-96 flex justify-between">
+                                        <h4 className='text-lg font-medium'>Education</h4>
+                                        <Button variant='outline' className='ml-auto flex gap-2' onClick={addEducation} type='button'>
+                                            Add Education <IoMdAddCircle className='text-xl text-primary' />
+                                        </Button>
                                     </div>
-                                )
-                            }
-                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addEducation} type='button'>
-                                Add Education <IoMdAddCircle className='text-xl text-primary' />
-                            </Button>
-
-                            <h4 className='text-lg font-medium'>Skills</h4>
-                            {
-                                skills.map((skill, i) =>
-                                    <div key={'skill_' + i} className='my-2'>
-                                        <div className="mb-1 flex justify-between">
-                                            <Label>Skill {i + 1}</Label>
-                                            <Button onClick={() => removeSkill(i)} variant='destructive' type='button'>
-                                                <FaRegTrashCan className='text-lg' />
-                                            </Button>
-                                        </div>
-                                        <Input
-                                            type="text"
-                                            name="content"
-                                            value={skill.content}
-                                            onChange={(e) => handleSkillChange(i, e)}
-                                        />
+                                    {
+                                        education.map((edu, i) =>
+                                            <div key={'edu_' + i} className='bg-[#F8F8FF] my-2 p-4 w-96 border rounded'>
+                                                <div className="mb-1 flex justify-between">
+                                                    <Label>Education {i + 1}</Label>
+                                                    <Button onClick={() => removeEducation(i)} variant='destructive' type='button'>
+                                                        <FaRegTrashCan className='text-lg' />
+                                                    </Button>
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    name="graduation_date"
+                                                    value={edu.graduation_date}
+                                                    onChange={(e) => handleEducationChange(i, e)}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    name="school_name"
+                                                    value={edu.school_name}
+                                                    onChange={(e) => handleEducationChange(i, e)}
+                                                />
+                                                <Input
+                                                    type="text"
+                                                    name="degree"
+                                                    value={edu.degree}
+                                                    onChange={(e) => handleEducationChange(i, e)}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                    <div className="w-96 flex justify-between">
+                                        <h4 className='text-lg font-medium'>Skills</h4>
+                                        <Button variant='outline' className='ml-auto flex gap-2' onClick={addSkill} type='button'>
+                                            Add Skill <IoMdAddCircle className='text-xl text-primary' />
+                                        </Button>
                                     </div>
-                                )
-                            }
-                            <Button variant='outline' className='ml-auto flex gap-2' onClick={addSkill} type='button'>
-                                Add Skill <IoMdAddCircle className='text-xl text-primary' />
-                            </Button>
-
-                            <Button variant='default' type="submit" className='mt-4 flex gap-3 w-full mx-auto'>
+                                    {
+                                        skills.map((skill, i) =>
+                                            <div key={'skill_' + i} className='bg-[#F8F8FF] my-2 p-4 w-96 border rounded'>
+                                                <div className="mb-1 flex justify-between">
+                                                    <Label>Skill {i + 1}</Label>
+                                                    <Button onClick={() => removeSkill(i)} variant='destructive' type='button'>
+                                                        <FaRegTrashCan className='text-lg' />
+                                                    </Button>
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    name="content"
+                                                    value={skill.content}
+                                                    onChange={(e) => handleSkillChange(i, e)}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </div>
+                            <Button variant='default' type="submit" className='mt-4 ml-auto flex gap-3 w-fit'>
                                 Save
                             </Button>
                         </form>

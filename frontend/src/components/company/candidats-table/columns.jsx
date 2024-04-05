@@ -11,8 +11,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 // icons 
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
-import { Link } from "react-router-dom";
-import { VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
+import { Link, useNavigate } from "react-router-dom";
+import { COMPANY_CHAT_LINK, VIEW_USER_PROFILE_BASE, VIEW_USER_RESUME_BASE } from "@/router";
+import { axiosClient } from "@/api/axios";
 
 export const columns = [
     {
@@ -95,6 +96,27 @@ export const columns = [
                         <Link className="text-nowrap text-sm text-primary" to={VIEW_USER_PROFILE_BASE + row.original.id}>
                             view profile
                         </Link>
+                }
+            </div>
+        },
+    },
+    {
+        accessorKey: "actions",
+        header: "Chat",
+        cell: ({ row }) => {
+            const navigate = useNavigate()
+            return <div>
+                {
+                    <Button
+                        variant='outline'
+                        onClick={async () => {
+                            const res = await axiosClient.post('/conversations', { user_id: row.original.id })
+                            console.log(res)
+                            navigate(COMPANY_CHAT_LINK)
+                        }}
+                    >
+                        Chat
+                    </Button>
                 }
             </div>
         },

@@ -43,6 +43,7 @@ import AuthRoute from './protectors/AuthRoute';
 import Admins from '@/pages/super-admin/admins';
 import JobOfferCandidats from '@/pages/company/job-offer-candidats';
 import JobOfferQuiz from '@/pages/company/joboffer-quiz';
+import UpcommingInterviews from '@/pages/user/upcomming-interviews';
 
 
 // links 
@@ -56,13 +57,13 @@ export const RESET_PASSWORD_LINK = '/reset-password/:email';
 export const USER_HOME_LINK = '/user/home';
 export const USER_RESUMES_LINK = '/user/resumes';
 export const USER_PROFILE_LINK = '/user/profile';
-
 export const USER_SAVEDJOBOFFERS_LINK = '/user/savedjobs';
-
 export const USER_CHAT_LINK = '/user/chat';
 export const USER_PASSQUIZ_LINK = '/user/quiz';
 export const USER_CALENDAR_LINK = '/user/calendar';
 export const USER_CALL = '/user/call'
+export const UPCOMMING_INTERVIEWS = '/user/interviews'
+
 // company 
 export const COMPANY_DASHBOARD_LINK = '/company/dashboard';
 export const JOBOFFER_LINK_BASE = '/company/joboffer';
@@ -154,7 +155,10 @@ export const router = createBrowserRouter([
                 path: USER_CALENDAR_LINK + '/:cid',
                 element: <UserCalendar />
             },
-            
+            {
+                path: UPCOMMING_INTERVIEWS,
+                element: <UpcommingInterviews />
+            },
         ]
     },
     {

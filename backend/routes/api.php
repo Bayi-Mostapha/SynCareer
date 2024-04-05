@@ -321,6 +321,21 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         return response()->json($responseData);
     });
+    Route::post('/conversations', function (Request $request) {
+        $company = $request->user();
+        $company_id = $company->id;
+        $user_id = $request->user_id;
+
+        $exists = Conversation::where('user1_id', $company_id)
+            ->where('user2_id', $user_id)
+            ->exists();
+
+        if (!$exists) {
+            Conversation::create(['user1_id' => $company_id, 'user2_id' => $user_id]);
+        }
+
+        return response()->json(['message', 'conv created']);
+    });
 
     // Reda quiz
     Route::get('/quizzes', function (Request $request) {
@@ -563,6 +578,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     //company interviews
     Route::get('/all-upcomming-interviews', [InterviewsController::class, 'getUpcommingInterviews']);
     Route::post('/vid-token', [InterviewsController::class, 'generateToken']);
+
+    //user interviews
+    Route::get('/user-upcomming-interviews', [InterviewsController::class, 'getUserUpcommingInterviews']);
 
     //calendar
     Route::get('/calendar-exists/{jobOffer}', [JobOfferController::class, 'calendarExists']);

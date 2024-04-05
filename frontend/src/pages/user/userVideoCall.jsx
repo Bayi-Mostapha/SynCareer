@@ -73,6 +73,27 @@ const UserVideoCall = () => {
         channel.listenForWhisper('company-cam-toggle', (e) => {
             setCCam(e.state)
         })
+
+        return () => {
+            channel.whisper('user-hanged-up', {
+                data: 'Call ended by ' + user.first_name
+            })
+            channel.unsubscribe();
+            if (peerRef.current) {
+                peerRef.current.destroy()
+            }
+            if (myStream) {
+                myStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            setUsers([]);
+            setOtherUser(null)
+            setMyStream(null);
+            setCall({})
+            setAnswering(false)
+            setCallAnswered(false)
+        }
     }, []);
     useEffect(() => {
         if (otherUser) {
@@ -123,6 +144,7 @@ const UserVideoCall = () => {
         peer.on('stream', (currentStream) => {
             setAnswering(false)
             setCallAnswered(true)
+            console.log('true now')
             userVideo.current.srcObject = currentStream;
         });
 
@@ -132,6 +154,7 @@ const UserVideoCall = () => {
             toast.info(e.data, {
                 position: 'top-right'
             })
+            channel.unsubscribe()
             setOtherUser(null)
             setCall({})
             peer.destroy()
@@ -173,6 +196,7 @@ const UserVideoCall = () => {
         channel.whisper('user-hanged-up', {
             data: 'Call ended by ' + user.first_name
         })
+        channel.unsubscribe()
         setCall({})
         setCallAnswered(false)
         setOtherUser(null)
