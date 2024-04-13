@@ -1,5 +1,9 @@
 # SynCareer
 
+a recruitment platform built with laravel on backend and react on frontend
+
+demo video: https://youtu.be/wBSVLTLLiO8
+
 ## Project setup
 
 ### backend:
